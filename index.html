@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Purrfect Home — Realistic Cat Care 3D</title>
+<style>
+:root{--ink:#24332e;--cream:#fff8e9;--green:#2e7658;--gold:#f3bd56;--pink:#ef9da2}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#b9c5b4;font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);touch-action:none}#game{position:fixed;inset:0}canvas{display:block;width:100%;height:100%}.hud{position:fixed;z-index:2;left:12px;right:12px;top:12px;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;pointer-events:none}.panel{background:rgba(255,248,233,.94);border:2px solid rgba(36,51,46,.1);box-shadow:0 5px 18px #254a3420;border-radius:18px;padding:10px 13px;pointer-events:auto;backdrop-filter:blur(8px)}.brand{font-weight:900;font-size:16px;letter-spacing:-.4px}.sub{font-size:11px;opacity:.7}.meters{display:grid;grid-template-columns:repeat(2,minmax(86px,1fr));gap:7px;min-width:190px}.meter{font-size:10px;font-weight:800}.track{height:7px;background:#e7e3d5;border-radius:9px;overflow:hidden;margin-top:3px}.fill{height:100%;width:75%;border-radius:9px;background:#6dbb7e;transition:width .25s}.fill.hunger{background:#e9a94c}.fill.litter{background:#d48c70}.fill.love{background:#df8294}.topright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}.pill{font-size:11px;font-weight:800;background:#fff8e9;border-radius:30px;padding:8px 12px;box-shadow:0 3px 12px #254a3420}.prompt{position:fixed;z-index:3;left:50%;top:48%;transform:translate(-50%,-50%);background:#fff8e9ee;border:2px solid #ffffff;border-radius:14px;padding:9px 13px;font-weight:800;font-size:13px;display:none;white-space:nowrap;box-shadow:0 6px 20px #172d2520}.bottom{position:fixed;z-index:3;left:12px;right:12px;bottom:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;pointer-events:none}.controls{display:flex;gap:8px;align-items:flex-end;pointer-events:auto}.pad{width:124px;height:124px;position:relative;border-radius:50%;background:#fff8e9b8;border:2px solid #fff8e9;box-shadow:0 5px 20px #254a3420;touch-action:none}.stick{position:absolute;width:48px;height:48px;left:36px;top:36px;border-radius:50%;background:var(--green);border:3px solid #fff8e9;box-shadow:0 3px 8px #193b2a40;pointer-events:none}.actions{display:grid;grid-template-columns:repeat(2, minmax(72px,1fr));gap:7px;max-width:250px;pointer-events:auto;position:relative;z-index:6;touch-action:manipulation}.act{border:0;border-radius:15px;padding:12px 9px;background:#fff8e9;color:var(--ink);font-size:12px;font-weight:850;box-shadow:0 5px 15px #254a3420;min-height:47px}.act:active{transform:scale(.97)}.act.primary{background:var(--green);color:white}.act:disabled{opacity:.45}.hint{font-size:10px;max-width:160px;line-height:1.4;text-align:right;color:#24332e;background:#fff8e9dc;padding:8px 10px;border-radius:12px}.toast{position:fixed;z-index:5;top:90px;left:50%;transform:translateX(-50%);background:#24332e;color:white;border-radius:12px;padding:10px 15px;font-size:12px;font-weight:750;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}.toast.show{opacity:1}.help{position:fixed;z-index:20;pointer-events:auto;touch-action:pan-y;inset:0;background:#1b3028a8;display:flex;align-items:center;justify-content:center;padding:20px}.modal{max-width:390px;width:100%;background:var(--cream);border-radius:24px;padding:24px;box-shadow:0 20px 70px #12251e66}.modal h1{font-size:27px;line-height:1.05;margin:0 0 8px}.modal p{font-size:13px;line-height:1.55}.modal button{position:relative;z-index:21;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;width:100%;border:0;border-radius:13px;padding:13px;background:var(--green);color:white;font-weight:850;font-size:14px}.tag{display:inline-block;background:#e5eedf;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:800;margin:3px 3px 3px 0}@media(min-width:760px){.meters{grid-template-columns:repeat(4,minmax(92px,1fr));min-width:410px}.actions{max-width:390px;grid-template-columns:repeat(4,minmax(78px,1fr))}.pad{width:140px;height:140px}.stick{left:43px;top:43px}.bottom{align-items:flex-end}.brand{font-size:18px}}@media(max-width:430px){.sub{max-width:130px}.meters{min-width:145px;grid-template-columns:repeat(2,minmax(64px,1fr));padding:9px}.panel{padding:9px}.brand{font-size:14px}.topright .pill{font-size:10px;padding:7px 9px}.actions{max-width:190px;grid-template-columns:repeat(2,minmax(75px,1fr))}.act{padding:10px 6px;min-height:43px;font-size:11px}.pad{width:105px;height:105px}.stick{width:42px;height:42px;left:29px;top:29px}.hint{display:none}}
+</style></head><body><div id="game"></div>
+<div class="hud"><div class="panel"><div class="brand">🐾 PURRFECT HOME</div><div class="sub">A quiet home, a cat who depends on you.</div></div><div class="panel meters"><div class="meter">🍗 HUNGER<div class="track"><div id="hunger" class="fill hunger"></div></div></div><div class="meter">💧 THIRST<div class="track"><div id="thirst" class="fill"></div></div></div><div class="meter">🧹 LITTER CLEAN<div class="track"><div id="litter" class="fill litter"></div></div></div><div class="meter">💗 BOND<div class="track"><div id="love" class="fill love"></div></div></div><div class="meter" id="bowls" style="grid-column:1/-1;font-size:10px;font-weight:700;opacity:.85;line-height:1.35"></div></div><div class="topright"><div class="pill" id="clock">☀️ Day 1 · 08:00</div><div class="pill" id="zone">🏡 Home</div></div></div>
+<div id="prompt" class="prompt">Press interact</div><div id="toast" class="toast"></div>
+<div class="bottom"><div class="controls"><div id="pad" class="pad" aria-label="Movement joystick"><div id="stick" class="stick"></div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div class="hint">Drag the pad to walk · Drag open screen to rotate camera<br>Tap an activity to move to it and interact · PC: WASD / arrows + E</div><div class="actions"><button class="act" id="feed">🍗 Feed</button><button class="act" id="clean">🧹 Clean litter</button><button class="act" id="pet">💗 Pet cat</button><button class="act" id="water">💧 Refill water</button><button class="act" id="mess">🧽 Clean mess</button></div></div></div>
+<div id="load-error" style="display:none;position:fixed;z-index:30;left:16px;right:16px;top:18%;padding:16px;background:#fff8e9;border-radius:16px;color:#24332e;font-weight:700">The 3D engine did not load. Check your internet connection and reload this page.</div><div class="help" id="welcome"><div class="modal"><h1>Welcome home. 🐈</h1><p>Your fluffy housemate needs a little care. Explore your home, garden, street and local shops. Get close to the cat or its things, then tap an activity.</p><span class="tag">🍗 Feed</span><span class="tag">🧹 Clean litter</span><span class="tag">💗 Pet</span><span class="tag">💧 Water</span><p><b>Visual style:</b> improved materials, textured surfaces, softer lighting and more detailed scenery. <b>Phone:</b> drag the round pad to move. <b>Computer:</b> WASD or arrow keys; press E nearby.</p><p><b>Kitty's routine</b> (1 game hour = 1 real minute): eats every 2h, drinks every 4h, pees every 2h and poops every 6h in the litter tray. The tray needs cleaning every 12h; if it gets too dirty she will go on the floor (tap 🧽 Clean mess), and her bond drops 20% every hour, so keep petting her. Each meal uses 25% of the food bowl and each drink 25% of the water bowl.</p><button id="start" type="button">Let's take care of kitty!</button></div></div>
+<script>
+function bootGame(){
+(()=>{'use strict';
+const root=document.getElementById('game');root.innerHTML='';if(!window.THREE){root.innerHTML='<div style="padding:30px;font:16px system-ui">The 3D engine could not load. Please check your internet connection and reload.</div>';return;}
+const scene=new THREE.Scene();scene.background=new THREE.Color('#b9cbd5');scene.fog=new THREE.Fog('#b9cbd5',48,125);
+const camera=new THREE.PerspectiveCamera(49,innerWidth/innerHeight,.1,150);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight('#eaf4ff','#4b5745',1.9));const ambient=new THREE.AmbientLight('#fff4e6',.38);scene.add(ambient);const sun=new THREE.DirectionalLight('#fff1dc',2.8);sun.position.set(-12,22,8);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0004;sun.shadow.normalBias=.04;sun.shadow.radius=3;sun.shadow.camera.left=-30;sun.shadow.camera.right=30;sun.shadow.camera.top=30;sun.shadow.camera.bottom=-30;sun.shadow.camera.far=90;scene.add(sun);scene.add(sun.target);const hemi=scene.children.find(o=>o.isHemisphereLight);
+const mat=(color,roughness=.92)=>new THREE.MeshStandardMaterial({color,roughness,metalness:0});const M={grass:mat('#718d61'),floor:mat('#b99b77'),wall:mat('#d8cdb9'),roof:mat('#665d58'),wood:mat('#76563f'),darkwood:mat('#49382d'),leaf:mat('#416747'),leaf2:mat('#648550'),road:mat('#50585c'),line:mat('#f6e8bd'),white:mat('#e6e1d6'),blue:mat('#6f8d9b'),pink:mat('#b87d7a'),black:mat('#343b3b'),skin:mat('#c58f6c'),shirt:mat('#596b60'),pants:mat('#343f4b'),cat:mat('#a77b51'),cat2:mat('#d8c6a9'),eye:mat('#242d2b'),bowl:mat('#8e5545'),water:mat('#6c9fa8'),dirt:mat('#665444'),plant:mat('#39714b'),glass:new THREE.MeshStandardMaterial({color:'#b9e2e6',roughness:.25,transparent:true,opacity:.65})};
+// Lightweight procedural surface maps add believable grain, plaster and ground variation without extra downloads.
+function surfaceTexture(base, fleck, count=900, size=256){const c=document.createElement('canvas');c.width=c.height=size;const ctx=c.getContext('2d');ctx.fillStyle=base;ctx.fillRect(0,0,size,size);for(let i=0;i<count;i++){const x=Math.random()*size,y=Math.random()*size,r=.3+Math.random()*2.1;ctx.globalAlpha=.025+Math.random()*.12;ctx.fillStyle=fleck;ctx.beginPath();ctx.ellipse(x,y,r,r*(.3+Math.random()),Math.random()*3,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t;}
+function addSurface(material,base,fleck,repeatX=4,repeatY=4){material.map=surfaceTexture(base,fleck);material.map.repeat.set(repeatX,repeatY);material.needsUpdate=true;}
+addSurface(M.grass,'#718d61','#c2d29b',18,18);addSurface(M.floor,'#b99b77','#f0d5aa',5,4);addSurface(M.wall,'#d8cdb9','#fff7e7',3,2);addSurface(M.wood,'#76563f','#d9ad7d',3,2);addSurface(M.darkwood,'#49382d','#b78a61',3,2);addSurface(M.road,'#50585c','#a4aaa8',12,3);addSurface(M.cat,'#a77b51','#f0d8ad',3,2);
+function box(parent,x,y,z,w,h,d,material,shadow=true){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=shadow;o.receiveShadow=true;parent.add(o);return o;}function sphere(parent,x,y,z,sx,sy,sz,material){const o=new THREE.Mesh(new THREE.SphereGeometry(1,32,24),material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}function cyl(parent,x,y,z,r1,r2,h,material,segments=12){const o=new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,Math.max(24,segments)),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}function group(parent,x=0,y=0,z=0){const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g;}
+// World ground, walkable garden and road
+box(scene,0,-.22,0,100,.4,100,M.grass,false);box(scene,0,-.5,0,400,.2,400,mat('#68875a'),false);box(scene,0,-.01,22.6,70,.12,5.4,M.road,false);for(let x=-33;x<34;x+=5)box(scene,x,.06,22.6,2.2,.02,.13,M.line,false);box(scene,0,.01,11.5,55,.12,1.5,mat('#d7c6a0'),false);
+// House interior: open front for gameplay visibility
+box(scene,0,.02,0,16,.18,13,M.floor);// Low back/side wall sections preserve the house shape without blocking the camera or trapping the player.
+box(scene,-5.2,1.05,-6.45,5.6,2.1,.35,M.wall);box(scene,5.2,1.05,-6.45,5.6,2.1,.35,M.wall);box(scene,-7.85,1.05,-3.5,.3,2.1,5.8,M.wall);box(scene,-7.85,1.05,3.5,.3,2.1,5.8,M.wall);box(scene,7.85,1.05,-3.5,.3,2.1,5.8,M.wall);box(scene,7.85,1.05,3.5,.3,2.1,5.8,M.wall);box(scene,-4,.65,6.35,8,1.3,.3,M.wall);box(scene,5.2,.65,6.35,5.6,1.3,.3,M.wall);// Roof intentionally omitted in the playable version so the camera can see the interior.
+// roof side trims and window
+box(scene,-3.9,2.8,-6.23,3.2,1.5,.12,M.glass,false);box(scene,-3.9,2.8,-6.15,.12,1.6,.15,M.white,false);box(scene,-3.9,2.8,-6.1,3.2,.12,.15,M.white,false);
+// room divider low/open doorway
+box(scene,-4.7,1.05,-1.6,.35,2.1,.22,mat('#f7e8cf'));box(scene,4.7,1.05,-1.6,.35,2.1,.22,mat('#f7e8cf'));
+// rug and living room
+box(scene,-3,.14,2.1,5.2,.1,3.4,mat('#d99a80'));box(scene,-3,.2,2.1,4.8,.04,3,mat('#edc4a6'),false);box(scene,-3,.55,1.1,1.3,.55,.8,M.wood);box(scene,-3,.84,1.1,1.35,.08,.85,M.darkwood);
+// Kitchen counter / fridge
+box(scene,4.7,.65,-4.7,4.5,1.2,1.1,M.wood);box(scene,4.7,1.3,-4.7,4.6,.12,1.15,M.white);box(scene,6.6,1.25,-3.8,1.15,2.4,.9,M.white);box(scene,6.6,1.3,-3.32,.85,.08,.06,M.blue,false);box(scene,4.1,1.1,-4.5,.7,.07,.7,M.black);cyl(scene,4.1,1.18,-4.5,.18,.18,.05,M.black);
+// Bedroom bed
+
+// cat necessities in room
+// Bowls (hollow dishes whose contents visibly shrink) and a clearly visible litter tray
+function dish(color){const pts=[[0,0],[.34,0],[.45,.15],[.49,.19],[.45,.19],[.32,.045],[0,.045]].map(p=>new THREE.Vector2(p[0],p[1]));const m=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshStandardMaterial({color,roughness:.35,side:THREE.DoubleSide}));m.castShadow=true;m.receiveShadow=true;return m}
+const foodBowl=group(scene,-1.1,.11,-4.4);foodBowl.add(dish('#8e5545'));
+const kibbleMat=mat('#8a5a35',.9);kibbleMat.map=surfaceTexture('#8a5a35','#d09a60',1800,128);kibbleMat.bumpMap=kibbleMat.map;kibbleMat.bumpScale=3;
+const foodMound=sphere(foodBowl,0,.045,0,.33,.11,.33,kibbleMat);
+const waterBowl=group(scene,.3,.11,-4.4);waterBowl.add(dish('#6f8d9b'));
+const waterDisc=cyl(waterBowl,0,.16,0,.34,.34,.01,M.water,40);waterDisc.castShadow=false;
+const ripple=new THREE.Mesh(new THREE.RingGeometry(.9,1,40),new THREE.MeshBasicMaterial({color:'#ffffff',transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));ripple.rotation.x=-Math.PI/2;waterBowl.add(ripple);
+function updateBowlVisuals(){const f=bowl.food/100,w=bowl.water/100;foodMound.visible=f>.01;foodMound.scale.set(.18+.15*f,.012+.1*f,.18+.15*f);waterDisc.visible=w>.01;waterDisc.position.y=.05+.11*w;const r=.31+.1*w;waterDisc.scale.set(r/.34,1,r/.34)}
+const litterMat=new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1});litterMat.map=surfaceTexture('#e2d3b0','#a8946c',2400,256);litterMat.map.repeat.set(3,3);litterMat.bumpMap=litterMat.map;litterMat.bumpScale=2;
+const litter=group(scene,1.9,.11,-3.0);{const tray=mat('#4fa39a',.45),rim=mat('#7fc7be',.4);
+ box(litter,0,.08,0,1.8,.16,1.4,tray);box(litter,0,.19,0,1.6,.08,1.2,litterMat);
+ box(litter,0,.26,-.68,1.8,.34,.1,tray);box(litter,-.85,.26,0,.1,.34,1.4,tray);box(litter,.85,.26,0,.1,.34,1.4,tray);box(litter,0,.19,.68,1.8,.22,.1,tray);
+ box(litter,0,.44,-.68,1.84,.05,.14,rim,false);box(litter,-.85,.44,0,.14,.05,1.4,rim,false);box(litter,.85,.44,0,.14,.05,1.4,rim,false);box(litter,0,.31,.68,1.84,.05,.14,rim,false);
+ box(litter,1.15,.04,.5,.12,.08,.5,mat('#e8a95f',.7));}      // little scoop beside the tray
+// Deformable sand surface: heights are sculpted as the cat digs, squats and buries her waste
+const sandGeo=new THREE.PlaneGeometry(1.6,1.2,32,24);sandGeo.rotateX(-Math.PI/2);
+const sandPos=sandGeo.attributes.position,sandH=new Float32Array(sandPos.count);let sandDirty=true,buriedCount=0;
+const sand=new THREE.Mesh(sandGeo,litterMat);sand.position.y=.25;sand.receiveShadow=true;litter.add(sand);
+function sandBump(lx,lz,sigma,amt){const r2=9*sigma*sigma;for(let i=0;i<sandPos.count;i++){const x=sandPos.getX(i),z=sandPos.getZ(i),dx=x-lx,dz=z-lz,d2=dx*dx+dz*dz;if(d2<r2){const edge=Math.max(0,Math.min(1,(.8-Math.abs(x))/.12,(.6-Math.abs(z))/.12));sandH[i]=Math.max(-.025,Math.min(.07,sandH[i]+amt*Math.exp(-d2/(2*sigma*sigma))*edge))}}sandDirty=true}
+function sandFlatten(){sandH.fill(0);sandDirty=true}
+function sandApply(){if(!sandDirty)return;sandDirty=false;for(let i=0;i<sandPos.count;i++)sandPos.setY(i,sandH[i]);sandPos.needsUpdate=true;sandGeo.computeVertexNormals()}
+const sandP=[];for(let i=0;i<14;i++){const m=sphere(scene,0,-9,0,.03,.03,.03,mat('#d8c8a0',1));m.visible=false;m.castShadow=false;sandP.push({m,vx:0,vy:0,vz:0,life:0})}
+function spawnSand(){const fx=Math.sin(cat.rotation.y),fz=Math.cos(cat.rotation.y);for(let k=0;k<3;k++){const p=sandP.find(o=>o.life<=0);if(!p)break;p.life=.6;p.m.visible=true;p.m.position.set(cat.position.x+fx*.4,.45,cat.position.z+fz*.4);p.vx=-fx*(.5+Math.random()*.7)+(Math.random()-.5)*.7;p.vz=-fz*(.5+Math.random()*.7)+(Math.random()-.5)*.7;p.vy=1+Math.random()*.9}}
+function updateSandParticles(dt){for(const p of sandP){if(p.life<=0)continue;p.life-=dt;p.vy-=6*dt;p.m.position.x+=p.vx*dt;p.m.position.y+=p.vy*dt;p.m.position.z+=p.vz*dt;if(p.life<=0||p.m.position.y<.37){p.life=0;p.m.visible=false}}}
+const messPee=[],messPoop=[];
+for(let i=0;i<4;i++){const m=sphere(litter,-.5+i*.34+(i%2)*.1,.255,-.3+(i*.37%.8),.13,.05,.11,mat('#8f7a52',1));m.visible=false;m.castShadow=false;messPee.push(m)}
+for(let i=0;i<4;i++){const g=group(litter,-.45+i*.3,.27,.25-(i%2)*.5);sphere(g,0,0,0,.1,.055,.055,mat('#4a3426',.8));sphere(g,.07,0,.05,.075,.05,.05,mat('#3d2a1e',.8));g.visible=false;messPoop.push(g)}
+function addLitterMess(kind,lx,lz){const arr=kind==='pee'?messPee:messPoop;const m=arr.find(o=>!o.visible);if(m){m.position.x=lx;m.position.z=lz;m.visible=true}}
+function buryLitterMess(lx,lz){[...messPee,...messPoop].forEach(o=>o.visible=false);buriedCount++;sandBump(lx,lz,.13,.03);sandBump(lx,lz-.15,.1,.008)}
+function clearLitterMess(){[...messPee,...messPoop].forEach(o=>o.visible=false);buriedCount=0;sandFlatten()}
+function litterHasMess(){return buriedCount>0||[...messPee,...messPoop].some(o=>o.visible)}
+// scratch post
+{const rc=document.createElement('canvas');rc.width=64;rc.height=256;const rx=rc.getContext('2d');rx.fillStyle='#c9ab7c';rx.fillRect(0,0,64,256);for(let y=0;y<256;y+=6){rx.fillStyle=y%12?'#a8895c':'#dcc190';rx.fillRect(0,y,64,3);}for(let i=0;i<500;i++){rx.globalAlpha=.25;rx.fillStyle=Math.random()>.5?'#7d6240':'#efdcb4';rx.fillRect(Math.random()*64,Math.random()*256,1+Math.random()*3,1);}const rt=new THREE.CanvasTexture(rc);rt.wrapS=rt.wrapT=THREE.RepeatWrapping;rt.repeat.set(3,1);rt.colorSpace=THREE.SRGBColorSpace;const rope=new THREE.MeshStandardMaterial({map:rt,bumpMap:rt,bumpScale:2,roughness:1});
+box(scene,-6,.06,-3.3,1.1,.12,1.1,mat('#d9c9ae',1));cyl(scene,-6,.8,-3.3,.18,.18,1.5,rope,24);cyl(scene,-6,1.58,-3.3,.42,.42,.14,mat('#e8b3b0',1),32);sphere(scene,-6,1.7,-3.3,.14,.1,.14,mat('#d6495b',1));}
+// Garden path and trees
+for(let i=0;i<7;i++)box(scene,-2.2+i*.7,.08,8.1,.6,.12,.65,mat(i%2?'#d9c5a2':'#c8b38d'),false);
+function tree(x,z){
+ // Layered, irregular foliage and visible branch structure instead of three perfect spheres.
+ cyl(scene,x,.95,z,.17,.27,1.9,M.wood,16);
+ for(const [ox,oy,oz,r,c] of [[0,2.05,0,.78,M.leaf],[-.48,2.12,.12,.59,M.leaf2],[.43,2.22,-.1,.62,M.leaf],[-.12,2.62,-.08,.57,M.leaf2],[.38,1.83,.32,.48,M.leaf2],[-.45,1.82,-.25,.47,M.leaf]]){
+ const f=sphere(scene,x+ox,oy,z+oz,r*.9,r,r*.86,c);f.material=c;
+ }
+ // small leaf clusters break up the silhouette and catch sunlight
+ for(let i=0;i<12;i++){const a=i*2.399,r=.28+(i%3)*.14;sphere(scene,x+Math.cos(a)*r,2.05+(i%4)*.19,z+Math.sin(a)*r,.19,.16,.18,i%3?M.leaf2:M.leaf);}
+ }
+/* trees are created in the visual upgrade block below */
+// fence around garden
+for(let x=-10;x<=10;x+=1.4){if(Math.abs(x)<1.5)continue;box(scene,x,.55,10.2,.12,1.05,.12,M.white);box(scene,x,.9,10.2,.18,.12,.16,M.wood);}box(scene,-5.75,.75,10.2,8.5,.12,.15,M.wood);box(scene,5.75,.75,10.2,8.5,.12,.15,M.wood);
+// street shops
+function shop(x,z,name,color){const g=group(scene,x,0,z);box(g,0,1.45,0,4,2.9,3.2,M.wall);box(g,0,3.05,0,4.3,.25,3.5,mat(color));box(g,0,2.25,1.64,2.5,.95,.08,M.glass);box(g,0,1.7,1.72,1.05,1.25,.12,M.wood);box(g,-1.5,2.7,1.72,1,.25,.1,M.white);const canvas=document.createElement('canvas');canvas.width=256;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle=color;ctx.fillRect(0,0,256,64);ctx.fillStyle='#fff8e9';ctx.font='bold 30px system-ui';ctx.textAlign='center';ctx.fillText(name,128,42);const tex=new THREE.CanvasTexture(canvas);const sign=new THREE.Mesh(new THREE.PlaneGeometry(3.4,.85),new THREE.MeshBasicMaterial({map:tex}));sign.position.set(0,2.8,1.84);g.add(sign);return g;}
+shop(-9,17,'PAWS & PETS','#5d9873');shop(-3.5,17,'GROCER','#df9c65');shop(3.5,17,'FLOWERS','#cc8793');shop(9,17,'CORNER CAFE','#779bb6');
+// character assembled from real 3D meshes
+const player=group(scene,0,0,3.5);const body=group(player);
+{ // Person: warm natural skin tone, detailed face, hair, sleeves, hands and shoes
+ M.skin.color.set('#e0b08a');M.skin.roughness=.75;
+ const hairM=mat('#2a1c16',.85),lipM=mat('#b86a6a',.6),browM=mat('#241812',.9),shoeM=mat('#2b2521',.7),soleM=mat('#e9e4da',.8),skinDk=mat('#cf9a76',.8);
+ sphere(body,0,1.23,0,.40,.55,.26,M.shirt);                     // torso
+ sphere(body,0,1.62,0,.44,.2,.27,M.shirt);                       // shoulders
+ cyl(body,0,1.8,0,.085,.1,.18,M.skin,20);                        // neck
+ const head=group(body,0,1.98,0);
+ sphere(head,0,0,0,.225,.265,.245,M.skin);                       // cranium
+ sphere(head,0,-.115,.04,.175,.15,.18,M.skin);                   // jaw & chin
+ sphere(head,-.225,-.01,-.01,.04,.065,.035,M.skin);sphere(head,.225,-.01,-.01,.04,.065,.035,M.skin);          // ears
+ sphere(head,-.228,-.01,.0,.022,.04,.02,skinDk);sphere(head,.228,-.01,.0,.022,.04,.02,skinDk);
+ // hair: cap on top & back, temples, side-swept fringe
+ sphere(head,0,.075,-.045,.245,.255,.265,hairM);
+ sphere(head,-.2,.0,-.05,.065,.16,.16,hairM);sphere(head,.2,.0,-.05,.065,.16,.16,hairM);
+ const fringe=sphere(head,.03,.17,.15,.2,.075,.12,hairM);fringe.rotation.z=-.12;
+ // eyes: sclera, iris, pupil, catchlight, upper lid line
+ for(const s of [-1,1]){
+  sphere(head,s*.088,.035,.205,.048,.032,.03,mat('#f8f5ef',.35));
+  sphere(head,s*.088,.035,.228,.026,.026,.014,mat('#4a2d1c',.4));
+  sphere(head,s*.088,.035,.238,.012,.012,.008,M.black);
+  sphere(head,s*.081,.045,.243,.005,.005,.004,mat('#ffffff',.1));
+  sphere(head,s*.088,.062,.21,.056,.011,.03,skinDk);            // upper lid crease
+  const brow=box(head,s*.09,.1,.222,.085,.017,.022,browM,false);brow.rotation.z=-s*.1;
+ }
+ sphere(head,0,-.03,.243,.034,.05,.032,M.skin);                  // nose bridge/tip
+ sphere(head,-.017,-.052,.255,.012,.008,.01,skinDk);sphere(head,.017,-.052,.255,.012,.008,.01,skinDk); // nostrils
+ sphere(head,0,-.108,.222,.052,.011,.018,lipM);                  // mouth
+ sphere(head,0,-.125,.218,.04,.01,.016,mat('#c97b78',.6));       // lower lip
+ sphere(head,-.13,-.07,.17,.05,.04,.04,mat('#e6a58a',.8));sphere(head,.13,-.07,.17,.05,.04,.04,mat('#e6a58a',.8)); // cheeks
+}
+const armL=group(body,-.45,1.55,0),armR=group(body,.45,1.55,0);
+for(const a of [armL,armR]){sphere(a,0,-.2,0,.115,.27,.12,M.shirt);sphere(a,0,-.52,0,.085,.22,.09,M.skin);sphere(a,0,-.76,.01,.075,.095,.06,M.skin);}
+const legL=group(body,-.19,.72,0),legR=group(body,.19,.72,0);
+for(const l of [legL,legR]){sphere(l,0,-.28,0,.16,.5,.17,M.pants);sphere(l,0,-.7,.07,.14,.075,.22,mat('#2b2521',.7));sphere(l,0,-.74,.07,.145,.03,.225,mat('#e9e4da',.8));}
+// Animated rigged 3D human model (Three.js sample asset); keep procedural avatar as a reliable fallback.
+let humanModel=null,humanMixer=null,humanActions={};let activeHumanAction='';
+// cat with tail, ears, face and articulated legs
+const cat=group(scene,-.4,0,-2.6);const catBody=group(cat);
+{ // Fluffy calico-dilute Persian: orange/grey split face, white blaze, grey saddle & plume tail, rainbow plush collar
+ const furW=mat('#f7f3ec',1),furG=mat('#8c8e99',1),furO=mat('#e3a062',1);
+ for(const [m,b,f] of [[furW,'#f7f3ec','#cfc7ba'],[furG,'#8c8e99','#5d5f6b'],[furO,'#e3a062','#b0692c']]){m.map=surfaceTexture(b,f,2600);m.map.repeat.set(1.5,1.5);m.bumpMap=m.map;m.bumpScale=1.6;m.side=THREE.DoubleSide;m.needsUpdate=true}
+ const pink=mat('#e8a1a0',.7),dark=mat('#3a2a22',.6),amber=mat('#d08a2c',.3);
+ function half(parent,x,y,z,sx,sy,sz,material,side){const o=new THREE.Mesh(new THREE.SphereGeometry(1,32,24,side<0?-Math.PI/2:Math.PI/2,Math.PI),material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+ // body
+ sphere(catBody,0,.42,-.02,.28,.27,.5,furW);sphere(catBody,0,.3,0,.24,.18,.4,furW);sphere(catBody,0,.42,.34,.2,.26,.16,furW);
+ sphere(catBody,.03,.54,-.12,.25,.19,.42,furG);sphere(catBody,.04,.42,-.38,.2,.2,.18,furG);
+ sphere(catBody,-.2,.34,-.3,.12,.2,.2,furW);sphere(catBody,.2,.34,-.3,.12,.2,.2,furW);
+ sphere(catBody,0,.6,.38,.23,.22,.2,furW);                       // neck ruff
+ // head
+ const head=group(catBody,0,.74,.52);var catHead=head;var catEars=[],catLids=[],catTears=[],catJaw,catTongue;
+ half(head,0,0,0,.27,.235,.24,furO,-1);half(head,0,0,0,.27,.235,.24,furG,1);
+ sphere(head,0,.05,.17,.06,.15,.08,furW);                        // white blaze
+ sphere(head,0,-.07,.19,.13,.1,.085,furW);                       // flat muzzle
+ sphere(head,-.15,-.08,.12,.1,.09,.12,furW);sphere(head,.15,-.08,.12,.1,.09,.12,furW); // fluffy cheeks
+ sphere(head,0,-.03,.272,.035,.026,.03,pink);                    // nose
+ sphere(head,0,-.082,.268,.014,.02,.01,dark);
+ catJaw=sphere(head,0,-.118,.258,.045,.004,.03,mat('#b84b5a',.5));catTongue=sphere(head,0,-.125,.268,.02,.012,.03,mat('#f08a9a',.5));catTongue.visible=false;
+ for(const s of [-1,1]){const tr=sphere(head,s*.1,-.02,.245,.012,.018,.01,mat('#9fd6ff',.2));tr.visible=false;catTears.push(tr)}
+ for(const s of [-1,1]){
+  sphere(head,s*.1,.045,.195,.073,.078,.036,dark);               // eyeliner
+  sphere(head,s*.1,.045,.2,.066,.07,.04,amber);                  // amber eye
+  sphere(head,s*.1,.045,.234,.03,.045,.014,M.black);             // pupil
+  sphere(head,s*.1+.015,.062,.247,.011,.011,.008,mat('#ffffff',.1));
+  const lid=sphere(head,s*.1,.1,.2,.078,.03,.045,s<0?furO:furG);lid.rotation.z=s*.18;catLids.push(lid); // sleepy lid
+  const ear=sphere(head,s*.17,.2,-.02,.075,.1,.04,furG);ear.rotation.z=-s*.4;
+  const inner=sphere(head,s*.165,.19,.012,.04,.06,.015,pink);inner.rotation.z=-s*.4;catEars.push([ear,inner,s]);
+  for(let k=-1;k<=1;k++){const w=box(head,s*.2,-.075+k*.025,.24,.22,.004,.004,mat('#ffffff',.5),false);w.rotation.y=-s*.35;w.rotation.z=s*k*.12;}
+ }
+ // rainbow plush flower collar
+ const collar=group(catBody,0,.6,.38);collar.rotation.x=-.3;
+ ['#a98be0','#8dd04a','#f7a7c3','#8ad8e4','#ff5b55','#ffd84f','#ff9a3d','#ffb35c'].forEach((c,i)=>{const a=i/8*Math.PI*2;const p=group(collar,0,0,0);p.rotation.y=a;const m=new THREE.MeshStandardMaterial({color:c,roughness:1});m.map=surfaceTexture(c,'#ffffff',1400);m.bumpMap=m.map;m.bumpScale=1.2;sphere(p,0,0,.28,.12,.1,.15,m)});
+ cyl(catBody,0,.42,.66,.012,.012,.3,mat('#f3efe6',1),8).rotation.x=-.12;                 // drawstring
+ sphere(catBody,0,.27,.675,.04,.04,.04,mat('#f3efe6',1));
+ for(let i=-1;i<=1;i++){const f=cyl(catBody,i*.02,.2,.68,.008,.008,.1,mat('#f3efe6',1),6);f.rotation.z=i*.2}
+ // legs (white, fluffy paws)
+ var legs=[];for(const [x,z] of [[-.12,.32],[.12,.32],[-.15,-.3],[.15,-.3]]){const l=group(catBody,x,.34,z);sphere(l,0,-.13,.02,.075,.2,.085,furW);sphere(l,0,-.29,.04,.095,.06,.12,furW);legs.push(l)}
+ // fluffy grey plume tail
+ var tail=group(catBody,0,.5,-.42);[[0,.08],[.1,.1],[.2,.12],[.31,.135],[.42,.14],[.53,.125],[.63,.095]].forEach(([y,r])=>sphere(tail,0,y,0,r,r*1.15,r,furG));
+}
+// Load a textured domestic-cat GLB model; keep the procedural cat as a reliable fallback.
+/* external cat/human models removed: the hand-built cat and person are always used */
+// ===== VISUAL UPGRADE: sky, bump maps, furniture, nature, street life, day/night =====
+// Sky dome with gradient
+const skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,uniforms:{top:{value:new THREE.Color('#5f9fd8')},mid:{value:new THREE.Color('#bcdcf0')},bot:{value:new THREE.Color('#f4ead2')}},vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 vP;uniform vec3 top,mid,bot;void main(){float h=vP.y;vec3 c=h>0.?mix(mid,top,pow(clamp(h,0.,1.),.55)):mix(mid,bot,clamp(-h*4.,0.,1.));gl_FragColor=vec4(c,1.);}'});
+const sky=new THREE.Mesh(new THREE.SphereGeometry(120,32,16),skyMat);sky.renderOrder=-1;scene.add(sky);
+// Reuse albedo canvases as bump maps for tactile depth
+for(const k of ['grass','floor','wall','wood','darkwood','road','cat']){const m=M[k];if(m.map){m.bumpMap=m.map;m.bumpScale=k==='grass'?2.2:1.2;m.needsUpdate=true}}
+M.floor.roughness=.55;M.wood.roughness=.7;M.white.roughness=.5;M.glass.roughness=.08;M.glass.metalness=.1;
+// Plank lines on the floor
+const plankTex=(()=>{const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');x.fillStyle='#b99b77';x.fillRect(0,0,512,512);for(let i=0;i<8;i++){const y=i*64;x.fillStyle=`hsl(32,${28+Math.random()*10}%,${52+Math.random()*10}%)`;x.fillRect(0,y,512,62);for(let j=0;j<60;j++){x.globalAlpha=.08;x.strokeStyle='#5b3d24';x.beginPath();const yy=y+Math.random()*62;x.moveTo(0,yy);x.bezierCurveTo(150,yy+3,350,yy-3,512,yy);x.stroke()}x.globalAlpha=1;x.fillStyle='#6b4a30';x.fillRect(0,y+62,512,2);x.fillRect((i%2)*256+Math.random()*100,y,2,62)}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,1.6);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t})();
+M.floor.map=plankTex;M.floor.bumpMap=plankTex;M.floor.bumpScale=.8;M.floor.needsUpdate=true;
+// Clouds
+const clouds=[];const cloudMat=new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1,transparent:true,opacity:.92,fog:false,emissive:'#ffffff',emissiveIntensity:.25});
+for(let i=0;i<9;i++){const g=group(scene,-70+i*18,34+(i%3)*4,-40+(i*13%50));for(let j=0;j<5;j++)sphere(g,j*2.4-4,Math.sin(j*1.7)*.8,Math.cos(j)*1.2,3+Math.random()*1.8,1.6+Math.random(),2.4,cloudMat).castShadow=false;clouds.push(g)}
+// Better trees: richer canopy, sway groups
+const treeSways=[];function tree2(x,z,s=1,autumn=false){const g=group(scene,x,0,z);g.scale.setScalar(s);const trunk=cyl(g,0,1.5,0,.2,.38,3,M.wood,16);cyl(g,.3,2.8,.1,.07,.13,1.2,M.wood,8).rotation.z=-.7;cyl(g,-.3,2.6,-.1,.07,.13,1.1,M.wood,8).rotation.z=.7;const cm=[mat(autumn?'#c9742f':'#3f7a4a',.85),mat(autumn?'#dd9b3a':'#5c9a56',.85),mat(autumn?'#a85428':'#2e5f3f',.85)];const crown=group(g,0,3.2,0);for(let i=0;i<16;i++){const a=i*2.399,r=.2+(i%5)*.32;sphere(crown,Math.cos(a)*r,.2+(i%4)*.5+Math.sin(i)*.2,Math.sin(a)*r,.9+Math.random()*.4,.8+Math.random()*.3,.9+Math.random()*.4,cm[i%3])}sphere(crown,0,1.2,0,1.1,.9,1.1,cm[1]);treeSways.push({g:crown,p:Math.random()*6});return g}
+[[-12,3,1.25],[-11,11.5,1.1],[11,4,1.3,1],[13,11.5,1.15],[-17,5,1],[17,6,1.1,1],[-15,26,1.2],[15,27,1.3],[0,29,1.4]].forEach(a=>tree2(a[0],a[1],a[2],a[3]));
+// Bushes + flowers along garden
+function bush(x,z,s=1){const c=[mat('#3f7a4a',.9),mat('#4f8c52',.9)];for(let i=0;i<4;i++)sphere(scene,x+(i-1.5)*.35*s,.38*s,z+(i%2)*.2*s,.45*s,.4*s,.42*s,c[i%2])}
+for(let x=-9;x<=9;x+=3)if(x!==0)bush(x,9.3,1);
+const flowerCols=['#ef6f8e','#f7d154','#fff3f0','#b88ae0','#ff9a52'];
+for(let i=0;i<70;i++){const x=-9.5+Math.random()*19,z=8.4+Math.random()*1.5;if(Math.abs(x+.2)<2.4&&z>8)continue;cyl(scene,x,.2,z,.012,.012,.4,M.plant,6);sphere(scene,x,.42,z,.07,.05,.07,mat(flowerCols[i%5],.7))}
+// Grass tufts (instanced)
+{const gm=new THREE.ConeGeometry(.05,.34,4);const im=new THREE.InstancedMesh(gm,mat('#6fa05a',.9),900);const d=new THREE.Object3D();for(let i=0;i<900;i++){let x,z;do{x=-45+Math.random()*90;z=-30+Math.random()*68}while((Math.abs(x)<8.2&&z>-6.8&&z<6.8)||(z>10.5&&z<20.5&&Math.abs(x)<36));d.position.set(x,.14,z);d.rotation.set((Math.random()-.5)*.4,Math.random()*3,(Math.random()-.5)*.4);d.scale.setScalar(.6+Math.random()*.9);d.updateMatrix();im.setMatrixAt(i,d.matrix)}im.receiveShadow=true;scene.add(im)}
+// Pavement + curbs + street lamps + benches + cars
+box(scene,0,.05,20.25,70,.14,.7,mat('#bfb8aa'),false);box(scene,0,.08,19.6,70,.16,.14,mat('#8f8a80'),false);
+const lampLights=[];function lamp(x,z){const g=group(scene,x,0,z);cyl(g,0,1.6,0,.06,.09,3.2,M.black,10);box(g,0,3.25,.35,.1,.1,.8,M.black);const bulb=sphere(g,0,3.15,.7,.16,.1,.16,new THREE.MeshStandardMaterial({color:'#fff3c8',emissive:'#ffd98a',emissiveIntensity:0}));const L=new THREE.PointLight('#ffd9a0',0,11,2);L.position.set(x,3.1,z+.7);scene.add(L);lampLights.push({L,bulb})}
+[-24,-12,0,12,24].forEach(x=>lamp(x,19.9));
+function bench(x,z){const g=group(scene,x,0,z);box(g,0,.5,0,1.6,.08,.5,M.wood);box(g,0,.85,-.22,1.6,.4,.06,M.wood);box(g,-.7,.25,0,.08,.5,.46,M.black);box(g,.7,.25,0,.08,.5,.46,M.black)}bench(-6.2,19.7);bench(6.5,19.7);
+function car(x,z,color,dir=1){const g=group(scene,x,0,z);g.rotation.y=dir>0?Math.PI/2:-Math.PI/2;const paint=new THREE.MeshStandardMaterial({color,roughness:.28,metalness:.55});box(g,0,.55,0,1.7,.55,3.9,paint);box(g,0,1.05,-.1,1.5,.5,2.1,paint);box(g,0,1.08,-.1,1.52,.38,1.9,M.glass,false);for(const [wx,wz] of [[-.85,1.2],[.85,1.2],[-.85,-1.2],[.85,-1.2]]){const w=cyl(g,wx,.34,wz,.34,.34,.26,M.black,20);w.rotation.z=Math.PI/2}box(g,-.55,.6,1.96,.3,.15,.05,new THREE.MeshStandardMaterial({color:'#fff6c9',emissive:'#fff0a0',emissiveIntensity:.6}),false);box(g,.55,.6,1.96,.3,.15,.05,new THREE.MeshStandardMaterial({color:'#fff6c9',emissive:'#fff0a0',emissiveIntensity:.6}),false);return g}
+const cars=[car(-20,23.8,'#c4473a',1),car(14,21.5,'#3c6aa8',-1),car(30,23.8,'#e0b341',1)];
+// Shop upgrades: awnings, planters, window glow
+for(const [x,c] of [[-9,'#5d9873'],[-3.5,'#df9c65'],[3.5,'#cc8793'],[9,'#779bb6']]){const aw=box(scene,x,2.62,2.1+17-.4+.0,3.6,.1,1.3,mat(c,.8));aw.rotation.x=.35;aw.position.z=18.3;box(scene,x-1.6,.35,18.8,.5,.7,.5,mat('#a46a4c'));bush(x-1.6,18.8,.6);box(scene,x+1.6,.35,18.8,.5,.7,.5,mat('#a46a4c'));bush(x+1.6,18.8,.6)}
+// ---- Interior dressing ----
+// Skirting boards + window frame + curtains
+box(scene,-5.2,.18,-6.25,5.6,.24,.08,M.white);box(scene,5.2,.18,-6.25,5.6,.24,.08,M.white);
+for(const s of [-1,1]){box(scene,-3.9+s*1.7,2.8,-6.05,.12,1.7,.1,M.white,false);box(scene,-3.9+s*1.45,2.8,-6.0,.55,1.7,.08,mat('#e6a69a',.95),false)}
+// Bookshelf + books
+const shelf=group(scene,-7.45,0,-.2);box(shelf,0,1.2,0,.5,2.4,2.2,M.darkwood);for(let r=0;r<4;r++){box(shelf,.05,.35+r*.6,0,.46,.05,2.1,M.wood);for(let b=0;b<9;b++)box(shelf,.08,.6+r*.6-.0,-.92+b*.22,.3,.38+Math.random()*.1,.14,mat(`hsl(${Math.random()*360},45%,55%)`,.8))}
+// TV unit + TV
+box(scene,-3,.35,-5.9,2.6,.7,.5,M.darkwood);box(scene,-3,1.35,-6.02,2.2,1.25,.08,M.black);box(scene,-3,1.35,-5.97,2.05,1.1,.02,new THREE.MeshStandardMaterial({color:'#223548',emissive:'#1a3b5c',emissiveIntensity:.7,roughness:.2}),false);
+// Floor lamp + plant + side table + wall art
+const fl=group(scene,-4.75,.225,3.2);cyl(fl,0,.04,0,.3,.3,.08,M.black);cyl(fl,0,1,0,.03,.03,1.9,M.black,8);const shade=cyl(fl,0,2.05,0,.3,.42,.45,new THREE.MeshStandardMaterial({color:'#ffe9b8',emissive:'#ffd48a',emissiveIntensity:.5,roughness:.9}));const roomLamp=new THREE.PointLight('#ffd9a0',.0,9,2);roomLamp.position.set(-4.75,2.2,3.2);scene.add(roomLamp);
+function pot(x,z,s=1){cyl(scene,x,.3*s,z,.3*s,.22*s,.6*s,mat('#b5694a',.9));for(let i=0;i<7;i++){const a=i*.9;const l=sphere(scene,x+Math.cos(a)*.18*s,.9*s+(i%3)*.15*s,z+Math.sin(a)*.18*s,.1*s,.32*s,.1*s,M.plant);l.rotation.z=Math.cos(a)*.6;l.rotation.x=Math.sin(a)*.6}}
+pot(-7.2,5.6,1.3);pot(7.2,-1,1.1);pot(1.6,-5.8,.9);
+for(const [x,c] of [[-5.5,'#e5a85f'],[-4.3,'#7fa8b8'],[-3.1,'#d98c86']])box(scene,x,2.7,-6.24,.9,.7,.04,mat(c,.7),false);
+// Kitchen upper cabinets + sink + pendant
+box(scene,4.7,2.8,-6.1,4.5,.9,.5,M.wood);for(let i=0;i<4;i++)box(scene,3.2+i*1.1,2.8,-5.83,.05,.08,.12,mat('#d9d2c2',.3),false);const faucet=cyl(scene,5.4,1.55,-4.6,.03,.03,.5,mat('#cfd6d9',.2),10);box(scene,5.4,1.34,-4.6,.9,.04,.6,mat('#8c979c',.3),false);
+// Bed details: duvet folds, bedside table & lamp
+// ---- Sofa: faces the TV (seat toward -z), centred on the TV, backrest toward the viewer ----
+const sofaG=group(scene,-3,.11,3.55);{const sf=sofaG,cush=mat('#8fb6c8',.95),pil=mat('#f2d9a8',.95);
+ box(sf,0,.3,0,2.5,.4,1.0,M.blue);for(const x of [-1,1])for(const z of [-.4,.4])cyl(sf,x*1.15,.04,z,.05,.05,.1,M.darkwood,8);
+ box(sf,-.58,.58,-.06,1.1,.2,.8,cush);box(sf,.58,.58,-.06,1.1,.2,.8,cush);            // seat cushions
+ box(sf,0,.95,.42,2.5,.8,.2,M.blue);box(sf,-.58,.9,.3,1.1,.55,.16,cush);box(sf,.58,.9,.3,1.1,.55,.16,cush); // backrest (behind the sitter)
+ box(sf,-1.2,.62,0,.22,.55,1.0,M.blue);box(sf,1.2,.62,0,.22,.55,1.0,M.blue);        // armrests
+ const p1=box(sf,-.8,.82,.1,.4,.34,.12,pil);p1.rotation.z=.18;const p2=box(sf,.8,.82,.1,.4,.34,.12,mat('#d98c86',.95));p2.rotation.z=-.18;}
+// ---- Bed: head (headboard, pillows, bedside table + lamp) against the street-side wall ----
+const bedG=group(scene,4.95,0,4.39);{const bd=bedG;bd.rotation.y=Math.PI;
+ box(bd,0,.35,0,3.4,.45,3.6,M.wood);box(bd,0,.66,0,3.25,.2,3.45,M.white);                 // frame + mattress
+ var duvetM=box(bd,0,.8,.55,3.3,.14,2.3,mat('#8eb9d0',.95)),foldM=box(bd,0,.86,-.6,3.3,.07,.38,mat('#a7cde0',.95)); // duvet + folded top
+ box(bd,-.85,.9,-1.2,1.25,.26,.7,mat('#f2d9a8',.95));box(bd,.85,.9,-1.2,1.25,.26,.7,mat('#f2d9a8',.95)); // pillows at the head
+ box(bd,0,.95,-1.72,3.5,1.1,.18,M.wood);box(bd,0,.6,1.78,3.4,.35,.1,M.wood);}               // headboard (north) + footboard (south)
+box(scene,2.85,.45,5.85,.7,.9,.7,M.darkwood);box(scene,2.85,.92,5.85,.78,.05,.78,M.wood);cyl(scene,2.85,1.0,5.85,.1,.12,.08,M.black);cyl(scene,2.85,1.14,5.85,.025,.025,.2,M.black,8);
+const bedShade=cyl(scene,2.85,1.38,5.85,.12,.2,.28,new THREE.MeshStandardMaterial({color:'#fff0c8',emissive:'#ffd48a',emissiveIntensity:.5,roughness:.9}),24);
+// Rug pattern ring + cat bed + yarn ball
+cyl(scene,-3,.2,2.1,1.1,1.1,.02,mat('#c9806a',.95),48);cyl(scene,-3,.22,2.1,.6,.6,.02,mat('#f1d3b5',.95),48);
+{const cb=group(scene,-6.2,.1,-1.6);cyl(cb,0,.15,0,.62,.55,.3,mat('#a85f58',.95),32);cyl(cb,0,.24,0,.46,.42,.22,mat('#e9cfc0',1),32);sphere(scene,-4.6,.2,-2.6,.18,.18,.18,mat('#d6495b',.95))}
+// Food bowl kibble + bowl rim polish
+M.water.roughness=.05;M.water.metalness=.2;M.water.transparent=true;M.water.opacity=.85;
+// Day/night cycle
+const dayCols={top:new THREE.Color('#5f9fd8'),mid:new THREE.Color('#bcdcf0'),bot:new THREE.Color('#f4ead2')},nightCols={top:new THREE.Color('#0b1030'),mid:new THREE.Color('#2a3358'),bot:new THREE.Color('#40395a')},duskCols={top:new THREE.Color('#4b5aa0'),mid:new THREE.Color('#f0a37a'),bot:new THREE.Color('#ffd9a0')};
+const tmpA=new THREE.Color(),sunDay=new THREE.Color('#fff1dc'),sunDusk=new THREE.Color('#ff9a5a'),moon=new THREE.Color('#8fa2ff');
+function visualUpdate(t,minutes){const h=minutes/60;const ang=(h-6)/12*Math.PI;const sunH=Math.sin(ang);const day=THREE.MathUtils.clamp(sunH*3+.2,0,1);const dusk=THREE.MathUtils.clamp(1-Math.abs(sunH)*3.2,0,1)*(sunH>-.25?1:0);
+sun.position.set(Math.cos(ang)*-24,Math.max(Math.abs(sunH),.15)*26+2,10);sun.intensity=.15+2.8*day;tmpA.copy(sunDay).lerp(sunDusk,dusk);if(day<.1)tmpA.copy(moon);sun.color.copy(tmpA);
+hemi.intensity=.55+1.35*day;ambient.intensity=.2+.2*day;renderer.toneMappingExposure=.8+.25*day;
+for(const k of ['top','mid','bot']){skyMat.uniforms[k].value.copy(nightCols[k]).lerp(dayCols[k],day).lerp(duskCols[k],dusk*.65)}
+scene.background.copy(skyMat.uniforms.mid.value);scene.fog.color.copy(skyMat.uniforms.mid.value);
+const night=1-day;for(const l of lampLights){l.L.intensity=night*14;l.bulb.material.emissiveIntensity=night*2.2}roomLamp.intensity=night*9+.8;shade.material.emissiveIntensity=.4+night*1.4;bedShade.material.emissiveIntensity=.4+night*1.4;
+clouds.forEach((c,i)=>{c.position.x+=.004*(1+i%3);if(c.position.x>90)c.position.x=-90});cloudMat.emissiveIntensity=.05+.2*day;
+treeSways.forEach(s=>{s.g.rotation.z=Math.sin(t*.8+s.p)*.02;s.g.rotation.x=Math.cos(t*.6+s.p)*.015});
+cars.forEach((c,i)=>{const sp=(i%2?-1:1)*(.018+i*.004);c.position.x+=sp;if(c.position.x>45)c.position.x=-45;if(c.position.x<-45)c.position.x=45})}
+
+// ===== Ground heights + solid objects (nothing can be walked through) =====
+function groundY(x,z){
+ if(Math.abs(x)<8&&Math.abs(z)<6.5)return .11;                                    // house floor
+ if(z>7.75&&z<8.45){const i=Math.round((x+2.2)/.7);if(i>=0&&i<7&&Math.abs(x-(-2.2+i*.7))<.3)return .14}  // garden stepping stones
+ if(z>10.75&&z<12.25&&Math.abs(x)<27.5)return .07;                                // garden pavement
+ if(z>19.9&&z<25.3&&Math.abs(x)<35)return z<20.6?.12:.05;                         // shop pavement / road
+ return -.02}                                                                       // grass
+const SOLIDS=[];const rectS=(x0,x1,z0,z1,cat=true)=>SOLIDS.push({x0,x1,z0,z1,cat});const boxS=(cx,cz,w,d,cat=true)=>rectS(cx-w/2,cx+w/2,cz-d/2,cz+d/2,cat);const circS=(x,z,r,cat=true)=>SOLIDS.push({circle:1,x,z,r,cat});
+// house walls (doorways stay open: back x -2.4..2.4, sides z -.6...6, front x 0..2.4)
+rectS(-8,-2.4,-6.65,-6.25);rectS(2.4,8,-6.65,-6.25);rectS(-8,-7.7,-6.4,-.6);rectS(-8,-7.7,.6,6.4);rectS(7.7,8,-6.4,-.6);rectS(7.7,8,.6,6.4);rectS(-8,0,6.2,6.5);rectS(2.4,8,6.2,6.5);
+boxS(-4.7,-1.6,.35,.22);boxS(4.7,-1.6,.35,.22);
+// furniture
+rectS(-4.3,-1.7,3.0,4.1);boxS(-3,1.1,1.3,.8);rectS(2.45,6.95,-5.25,-4.15);rectS(6.0,7.2,-4.25,-3.35);rectS(3.25,6.65,2.6,6.2);boxS(2.85,5.85,.7,.7);
+rectS(-7.7,-7.2,-1.3,.9);rectS(-4.3,-1.7,-6.15,-5.65);circS(-6,-3.3,.24);circS(-4.75,3.2,.3);circS(-7.2,5.6,.4);circS(7.2,-1,.33);circS(1.6,-5.8,.27);
+// things only the player must avoid (the cat walks into / onto these)
+boxS(1.9,-3.0,1.8,1.4,false);circS(-1.1,-4.4,.5,false);circS(.3,-4.4,.5,false);
+// garden: trees, bushes, fence with a gate in the middle
+[[-12,3,1.25],[-11,11.5,1.1],[11,4,1.3],[13,11.5,1.15],[-17,5,1],[17,6,1.1],[-15,26,1.2],[15,27,1.3],[0,29,1.4]].forEach(a=>circS(a[0],a[1],.42*a[2]));
+for(let x=-9;x<=9;x+=3)if(x!==0)boxS(x,9.3,1.7,.9);rectS(-10.2,-1.5,10.1,10.3);rectS(1.5,10.2,10.1,10.3);
+// street: shops, planters, lamps, benches
+for(const x of [-9,-3.5,3.5,9]){boxS(x,17,4,3.2);boxS(x-1.6,18.8,.55,.55);boxS(x+1.6,18.8,.55,.55)}
+[-24,-12,0,12,24].forEach(x=>circS(x,19.9,.2));boxS(-6.2,19.7,1.6,.5);boxS(6.5,19.7,1.6,.5);
+function pushRect(p,r,x0,x1,z0,z1){const cx=Math.max(x0,Math.min(p.x,x1)),cz=Math.max(z0,Math.min(p.z,z1)),dx=p.x-cx,dz=p.z-cz,d2=dx*dx+dz*dz;
+ if(d2>=r*r)return;if(d2>1e-8){const d=Math.sqrt(d2),k=(r-d)/d;p.x+=dx*k;p.z+=dz*k;return}
+ const l=p.x-x0,rt=x1-p.x,t=p.z-z0,b=z1-p.z,m=Math.min(l,rt,t,b);if(m===l)p.x=x0-r;else if(m===rt)p.x=x1+r;else if(m===t)p.z=z0-r;else p.z=z1+r}
+function collide(p,r,isCat){for(let it=0;it<3;it++){for(const o of SOLIDS){if(isCat&&!o.cat)continue;
+  if(o.circle){const dx=p.x-o.x,dz=p.z-o.z,d=Math.hypot(dx,dz),m=r+o.r;if(d<m){if(d>1e-5){p.x+=dx/d*(m-d);p.z+=dz/d*(m-d)}else p.x+=m}}else pushRect(p,r,o.x0,o.x1,o.z0,o.z1)}
+  if(!isCat)for(const c of cars)pushRect(p,r,c.position.x-1.95,c.position.x+1.95,c.position.z-.85,c.position.z+.85)}}
+function blockedPoint(x,z,r){const p={x,z};const q={x,z};collide(q,r,true);return Math.hypot(q.x-p.x,q.z-p.z)>.001}
+function collidePlayer(dt){collide(player.position,.35,false);
+ const dx=player.position.x-cat.position.x,dz=player.position.z-cat.position.z,d=Math.hypot(dx,dz),m=.35+.28;if(d<m&&d>1e-4){player.position.x=cat.position.x+dx/d*m;player.position.z=cat.position.z+dz/d*m;collide(player.position,.35,false)}
+ const gy=groundY(player.position.x,player.position.z)+.05;player.position.y+=(gy-player.position.y)*Math.min(1,dt*15)}
+
+// Interactive state
+const GAME_MIN_PER_SEC=1; // 1 real second = 1 game minute, so 1 game hour = 1 real minute. Change this to speed up / slow down the whole simulation.
+const DEC={hunger:100/120,thirst:100/240,love:20/60,litter:100/720}; // % lost per game minute: eats every 2h, drinks every 4h, bond -20%/h, tray needs cleaning every 12h
+let stats={hunger:74,thirst:76,litter:100,love:48};let bowl={food:100,water:100};let clocks={pee:70,poop:200};// clocks = game minutes since last pee / poop
+let savedFloor=[];let day=1,mins=8*60,walking=false,moveX=0,moveY=0,near=null,toastTimer;const keys={};let purring=0,cleaned=0,foods=0,actionAnim=0,actionType='';let audioCtx=null;
+const SND={purr:['sine',72,72,.045,.55],clean:['triangle',420,180,.035,.24],eat:['triangle',240,190,.03,.09],water:['sine',520,720,.03,.2],lap:['sine',900,1100,.02,.07],meow:['triangle',650,900,.04,.45],sad:['triangle',520,230,.04,.75],scratch:['sawtooth',300,150,.012,.14]};
+function sound(kind){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const now=audioCtx.currentTime;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.connect(gain);gain.connect(audioCtx.destination);const [type,f0,f1,vol,dur]=SND[kind]||SND.eat;osc.type=type;osc.frequency.setValueAtTime(f0,now);if(f1!==f0)osc.frequency.exponentialRampToValueAtTime(f1,now+dur);gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(vol,now+.03);gain.gain.exponentialRampToValueAtTime(.0001,now+dur);osc.start(now);osc.stop(now+dur+.03);}catch(e){}}
+try{const saved=JSON.parse(localStorage.getItem('purrfect-home-save2')||'null');if(saved){stats={...stats,...saved.stats};bowl={...bowl,...saved.bowl};clocks={...clocks,...saved.clocks};day=saved.day||1;mins=saved.mins||480;savedFloor=saved.floor||[];if(saved.sand&&saved.sand.length===sandH.length){saved.sand.forEach((v,i)=>sandH[i]=v/1000);buriedCount=saved.buried||0;sandDirty=true}}}catch(e){}
+const prompt=document.getElementById('prompt');const toastEl=document.getElementById('toast');function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2300)}
+function setStat(k,v){stats[k]=Math.max(0,Math.min(100,v));document.getElementById(k).style.width=stats[k]+'%'}
+function saveGame(){try{localStorage.setItem('purrfect-home-save2',JSON.stringify({stats,bowl,clocks,day,mins,floor:floorMess.map(m=>[m.x,m.z,m.kind]),sand:Array.from(sandH,v=>Math.round(v*1000)),buried:buriedCount}));}catch(e){}}
+function updateUI(){for(const k in stats)setStat(k,stats[k]);const h=Math.floor(mins/60)%24,m=Math.floor(mins%60);document.getElementById('clock').textContent=`${h>=6&&h<18?'☀️':'🌙'} Day ${day} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;document.getElementById('bowls').textContent=`🍗 Food bowl ${Math.round(bowl.food)}% · 💧 Water bowl ${Math.round(bowl.water)}% · 🐱 ${catStateText()}`;const dirt=1-stats.litter/100;litterMat.color.setRGB(1-.45*dirt,1-.5*dirt,1-.55*dirt)}
+function simulate(dtReal){if(typeof startRequested==='undefined'||!startRequested)return;const dm=dtReal*GAME_MIN_PER_SEC;mins+=dm;if(mins>=1440){mins-=1440;day++}for(const k of ['hunger','thirst','love','litter'])stats[k]=Math.max(0,stats[k]-DEC[k]*dm);clocks.pee+=dm;clocks.poop+=dm}
+function dist(a,b){return Math.hypot(a.position.x-b.position.x,a.position.z-b.position.z)}function getNear(){const things=[{id:'cat',obj:cat,label:stats.love<=0?'Comfort your sad kitty':'Pet your cat',d:1.8},{id:'food',obj:foodBowl,label:'Fill the food bowl · '+Math.round(bowl.food)+'% left',d:2},{id:'water',obj:waterBowl,label:'Refill water bowl · '+Math.round(bowl.water)+'% left',d:2},{id:'litter',obj:litter,label:'Clean the litter tray · '+Math.round(stats.litter)+'% clean',d:2.5},{id:'sofa',obj:sofaG,label:(sit.spot==='sofa'&&sit.state==='sitting'?'Get up from the sofa':'Sit on the sofa'),d:2.4},{id:'bed',obj:bedG,label:(sit.spot==='bed'&&sit.state!=='none'&&sit.state!=='approach'?'Get up from the bed':'Lie down on the bed'),d:3}];const fm=nearestMess();if(fm)things.push({id:'mess',obj:fm.g,label:'Clean up the mess',d:2});let best=null,bd=999;for(const t of things){const d=dist(player,t.obj);if(d<t.d&&d<bd){best=t;bd=d}}return best}
+function action(type){
+  const n=getNear();
+  if(type==='interact'&&n&&(n.id==='sofa'||n.id==='bed')){toggleSpot(n.id);return}
+  if(sit.state!=='none'){toast('Get up first 🚶');return}
+  if(type==='cleanmess'||(type==='interact'&&n&&n.id==='mess')){const m=nearestMess();if(!m){toast('There is no mess to clean up 😺');return}
+   const dx=player.position.x-m.x,dz=player.position.z-m.z,len=Math.hypot(dx,dz)||1;if(len>1.6){player.position.x=m.x+dx/len*1.1;player.position.z=m.z+dz/len*1.1}
+   actionAnim=1.15;actionType='clean';removeFloorMess(m);sound('clean');toast(floorMess.length?'Mess cleaned up ✨ There is more to clean.':'Mess cleaned up ✨');saveGame();return}
+  if(type==='interact'&&!n){toast('Walk closer to kitty or its things first 🐾');return;}
+  const resolved=type==='interact'?({cat:'pet',food:'feed',water:'water',litter:'clean'}[n.id]):type;
+  const obj={pet:cat,feed:foodBowl,water:waterBowl,clean:litter}[resolved];
+  if(!obj){toast('That action is not available yet.');return;}
+  if(resolved==='feed'&&bowl.food>=99.5){toast('The food bowl is already full 🍗');return;}
+  if(resolved==='water'&&bowl.water>=99.5){toast('The water bowl is already full 💧');return;}
+  if(resolved==='clean'&&stats.litter>=99.5&&!litterHasMess()){toast('The tray is already spotless ✨');return;}
+  // Step the player to a safe spot beside the target so a tap always performs the activity.
+  const dx=player.position.x-obj.position.x, dz=player.position.z-obj.position.z, len=Math.hypot(dx,dz)||1, off=resolved==='clean'?1.6:1.15;
+  player.position.x=obj.position.x+(dx/len)*off;player.position.z=obj.position.z+(dz/len)*off;
+  actionAnim=1.15; actionType=resolved;
+  const U=cat.userData;
+  if(resolved==='pet'){
+    const wasSad=stats.love<=0;stats.love=Math.min(100,stats.love+17);U.happy=2;U.follow=8;U.task='';U.stage='';U.wait=0;
+    sound('purr'); toast(wasSad?'Kitty perks up. She missed you! 💗':'Purr purr! Kitty loves the attention. 💗');
+  } else if(resolved==='feed'){
+    bowl.food=100; sound('eat'); toast('Food bowl filled to 100% 🍗 Kitty eats 25% of it at each meal.');
+  } else if(resolved==='water'){
+    bowl.water=100; sound('water'); toast('Water bowl filled to 100% 💧 Kitty drinks 25% of it each time.');
+  } else if(resolved==='clean'){
+    stats.litter=100; clearLitterMess(); sound('clean'); toast('Litter tray is sparkling clean! ✨');
+  }
+  updateUI();saveGame();
+}
+// ===== Cat brain: needs, tasks and body language =====
+const bubbleCv=document.createElement('canvas');bubbleCv.width=bubbleCv.height=128;const bubbleCtx=bubbleCv.getContext('2d');const bubbleTex=new THREE.CanvasTexture(bubbleCv);
+const bubble=new THREE.Sprite(new THREE.SpriteMaterial({map:bubbleTex,transparent:true,depthTest:false}));bubble.scale.set(.55,.55,1);bubble.position.set(0,1.55,0);bubble.renderOrder=20;bubble.visible=false;cat.add(bubble);let bubbleText='';
+function setBubble(txt){if(txt===bubbleText)return;bubbleText=txt;bubble.visible=!!txt;if(!txt)return;const c=bubbleCtx;c.clearRect(0,0,128,128);c.fillStyle='rgba(255,248,233,.96)';c.strokeStyle='rgba(36,51,46,.2)';c.lineWidth=4;c.beginPath();c.arc(64,56,46,0,Math.PI*2);c.fill();c.stroke();c.beginPath();c.moveTo(50,94);c.lineTo(64,120);c.lineTo(78,94);c.fill();c.font='54px system-ui,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji"';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#24332e';c.fillText(txt,64,58);bubbleTex.needsUpdate=true}
+function angDiff(a,b){return ((a-b+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI}
+function pendingNeed(){const U=cat.userData,due=clocks.pee>=120||clocks.poop>=360;
+ if(stats.hunger<=0&&bowl.food>0)return 'eat';if(stats.thirst<=0&&bowl.water>0)return 'drink';if(due&&stats.litter>0)return 'litter';
+ if(stats.hunger<=0)return 'beg-food';if(stats.thirst<=0)return 'beg-water';if(due)return (U.refuseCD||0)>0?'accident':'refuse';return null}
+function startTask(name){const U=cat.userData,T=U.target;U.task=name;U.stage='goto';U.t=0;U.face=null;U.avoid=Math.random()<.5?1:-1;U.speed=.65;
+ const at=(o,dz,f)=>{T.set(o.position.x,0,o.position.z+dz);U.face=f;U.speed=.95};
+ switch(name){
+  case 'eat':at(foodBowl,.82,Math.PI);break;case 'beg-food':at(foodBowl,.95,Math.PI);break;
+  case 'drink':at(waterBowl,.82,Math.PI);break;case 'beg-water':at(waterBowl,.95,Math.PI);break;
+  case 'litter':at(litter,.02+Math.random()*.1,Math.PI);T.x+=(Math.random()-.5)*.8;U.doPoop=clocks.poop>=360;U.doPee=clocks.pee>=120||!U.doPoop;U.done=false;break;
+  case 'refuse':at(litter,1.35,Math.PI);break;
+  case 'accident':{let x,z,k=0;do{x=-5+Math.random()*9;z=-2.2+Math.random()*5;k++}while(k<30&&(Math.hypot(x-litter.position.x,z-litter.position.z)<1.9||blockedPoint(x,z,.45)));T.set(x,0,z);U.speed=.95;U.doPoop=clocks.poop>=360;U.doPee=clocks.pee>=120||!U.doPoop;U.done=false;break}
+  case 'scratch':T.set(-5.5,0,-3.3);U.face=-Math.PI/2;break;
+  case 'nap':T.set(-6.2,0,-1.6);U.face=2.2;break;
+  case 'sulk':T.set(-3.2,0,-4.6);U.face=Math.PI;break;
+  default:{let x,z,k=0;do{x=(Math.random()-.5)*10;z=(Math.random()-.5)*8-1.5;k++}while(k<30&&blockedPoint(x,z,.4));T.set(x,0,z)}}}
+function endTask(){const U=cat.userData;U.task='';U.stage='';U.wait=(stats.love<=0?2.5:.6)+Math.random()*2.2}
+function pickIdle(){const r=Math.random();if(stats.love<=0)return r<.55?'sulk':r<.8?'wander':'nap';return r<.42?'wander':r<.68?'scratch':r<.84?'nap':'wander'}
+function stepCat(dx,dz,d,step,dt){const U=cat.userData,base=Math.atan2(dx,dz),sg=U.avoid||1;let use=base;
+ for(const a of [0,.8*sg,-.8*sg,1.6*sg,-1.6*sg]){const ang=base+a,q={x:cat.position.x+Math.sin(ang)*step,z:cat.position.z+Math.cos(ang)*step};collide(q,.25,true);if(Math.hypot(q.x-cat.position.x,q.z-cat.position.z)>=step*.6){use=ang;if(a!==0)U.avoid=Math.sign(a);break}}
+ cat.position.x+=Math.sin(use)*step;cat.position.z+=Math.cos(use)*step;cat.rotation.y+=angDiff(use,cat.rotation.y)*Math.min(1,dt*7);U.moving=true;collide(cat.position,.25,true);cat.position.x=Math.max(-7.3,Math.min(7.3,cat.position.x));cat.position.z=Math.max(-6,Math.min(5.8,cat.position.z))}
+function enterDo(){const U=cat.userData;U.stage='do';U.t=0;
+ switch(U.task){
+  case 'eat':U.f0=bowl.food;U.dur=6.5;break;case 'drink':U.w0=bowl.water;U.dur=4.5;break;
+  case 'litter':U.dur=2.2+(U.doPoop?6:4)+2.2;break;
+  case 'scratch':U.dur=8;break;case 'nap':U.dur=11;break;case 'sulk':U.dur=7;break;
+  case 'beg-food':U.dur=1e9;U.meow=0;toast('Kitty is hungry, but the food bowl is empty! 🍗');break;
+  case 'beg-water':U.dur=1e9;U.meow=0;toast('Kitty is thirsty, but the water bowl is empty! 💧');break;
+  case 'refuse':U.dur=3;U.refuseCD=45;toast('The litter tray is too dirty. Kitty refuses to use it! 🧹');sound('meow');break;
+  case 'accident':U.dur=1.2+(U.doPoop?6:4)+1;break;
+  default:U.dur=1+Math.random()*2.5}}
+const floorMess=[];const puddleMat=new THREE.MeshStandardMaterial({color:'#d9c24a',roughness:.15,transparent:true,opacity:.78});
+function addFloorMess(kind,x,z){const g=group(scene,x,.115,z);if(kind==='pee'){const r=.26+Math.random()*.12;const p=cyl(g,0,0,0,r,r,.012,puddleMat,28);p.castShadow=false;p.scale.z=.8+Math.random()*.3;sphere(g,r*.55,0,.08,r*.4,.006,r*.35,puddleMat).castShadow=false}
+ else{sphere(g,0,.05,0,.11,.06,.06,mat('#4a3426',.8));sphere(g,.1,.045,.06,.08,.05,.05,mat('#3d2a1e',.8))}
+ floorMess.push({g,x,z,kind});if(floorMess.length>6)removeFloorMess(floorMess[0])}
+function removeFloorMess(m){const i=floorMess.indexOf(m);if(i>=0)floorMess.splice(i,1);scene.remove(m.g)}
+function nearestMess(){let best=null,bd=1e9;for(const m of floorMess){const d=Math.hypot(player.position.x-m.x,player.position.z-m.z);if(d<bd){bd=d;best=m}}return best}
+savedFloor.forEach(f=>addFloorMess(f[2],f[0],f[1]));
+function updateCat(dt){const U=cat.userData,sad=stats.love<=0;
+ if(!U.init){U.init=1;U.task='';U.stage='';U.t=0;U.wait=1;U.target=new THREE.Vector3(cat.position.x,0,cat.position.z);U.face=null;U.P={};U.happy=0;U.follow=0;U.refuseCD=0;U.meow=0;U.sadT=3;U.moving=false;U.speed=.65}
+ U.refuseCD=Math.max(0,U.refuseCD-dt);U.moving=false;U.sadT-=dt;if(sad&&U.sadT<=0){U.sadT=9;sound('sad')}
+ if(U.happy>0){U.happy-=dt;return}                                   // being petted: purrs in place
+ if(U.follow>0){U.follow-=dt;const dx=player.position.x-cat.position.x,dz=player.position.z-cat.position.z,d=Math.hypot(dx,dz);if(d>1.7)stepCat(dx,dz,d,.95*dt,dt);return}
+ const need=pendingNeed(),locked=U.task==='eat'||U.task==='drink'||U.task==='litter';
+ if(need&&!locked&&need!==U.task)startTask(need);else if(!need&&(U.task==='beg-food'||U.task==='beg-water'))endTask();
+ if(!U.task){U.wait-=dt;if(U.wait>0)return;startTask(pickIdle())}
+ if(U.stage==='goto'){const dx=U.target.x-cat.position.x,dz=U.target.z-cat.position.z,d=Math.hypot(dx,dz);U.t+=dt;if(U.task==='wander'&&U.t>14){endTask();return}
+  if(d<.1||U.t>30){cat.position.x=U.target.x;cat.position.z=U.target.z;enterDo()}else stepCat(dx,dz,d,U.speed*(sad?.55:1)*dt,dt);return}
+ U.t+=dt;const k=Math.min(1,dt*4);cat.position.x+=(U.target.x-cat.position.x)*k;cat.position.z+=(U.target.z-cat.position.z)*k;
+ if(U.face!==null)cat.rotation.y+=angDiff(U.face,cat.rotation.y)*Math.min(1,dt*6);
+ const tick=(n)=>Math.floor(U.t*n)!==Math.floor((U.t-dt)*n);
+ switch(U.task){
+  case 'eat':{const f=Math.min(1,U.t/U.dur);bowl.food=U.f0-Math.min(25,U.f0)*f;stats.hunger=Math.max(stats.hunger,100*f);if(tick(3))sound('eat');if(f>=1){stats.hunger=100;toast('Kitty finished her meal 😋 · food bowl '+Math.round(bowl.food)+'%');endTask()}break}
+  case 'drink':{const f=Math.min(1,U.t/U.dur);bowl.water=U.w0-Math.min(25,U.w0)*f;stats.thirst=Math.max(stats.thirst,100*f);if(tick(5))sound('lap');if(f>=1){stats.thirst=100;toast('Kitty had a good drink 💧 · water bowl '+Math.round(bowl.water)+'%');endTask()}break}
+  case 'litter':{const sqEnd=2.2+(U.doPoop?6:4),lx=cat.position.x-litter.position.x,lz=cat.position.z-litter.position.z;
+   if(U.t<2.2&&tick(8)){sound('scratch');sandBump(lx+(Math.random()-.5)*.5,lz+(Math.random()-.5)*.3,.08,-.004);sandBump(lx+(Math.random()-.5)*.7,lz+(Math.random()-.5)*.5,.07,.0025)}
+   if(U.t>=sqEnd&&!U.done){U.done=true;if(U.doPee){clocks.pee=0;addLitterMess('pee',lx,lz+.3)}if(U.doPoop){clocks.poop=0;addLitterMess('poop',lx+.05,lz+.3)}}
+   if(U.t>=sqEnd&&tick(8)){sound('scratch');sandBump(lx+(Math.random()-.5)*.3,lz-.12,.08,-.003);sandBump(lx+(Math.random()-.5)*.35,lz+.1+Math.random()*.25,.09,.004);spawnSand()}
+   if(U.t>=U.dur){buryLitterMess(lx,lz+.3);endTask()}break}
+  case 'scratch':if(tick(4))sound('scratch');if(U.t>=U.dur)endTask();break;
+  case 'beg-food':case 'beg-water':U.meow-=dt;if(U.meow<=0){U.meow=5;sound('meow')}break;
+  case 'accident':{const aq=1.2+(U.doPoop?6:4);if(U.t<1.2&&tick(6))sound('scratch');if(U.t>=aq&&!U.done){U.done=true;const fx=Math.sin(cat.rotation.y),fz=Math.cos(cat.rotation.y),mx=cat.position.x-fx*.4,mz=cat.position.z-fz*.4;if(U.doPee){clocks.pee=0;addFloorMess('pee',mx,mz)}if(U.doPoop){clocks.poop=0;addFloorMess('poop',mx-fz*.1,mz+fx*.1)}toast('Oh no! The tray was too dirty, so Kitty went on the floor 😿 Tap 🧽 Clean mess.');sound('sad')}if(U.t>=U.dur)endTask();break}
+  default:if(U.t>=U.dur){const wasRefuse=U.task==='refuse';endTask();if(wasRefuse&&stats.litter<=0)startTask('accident')}}}
+function catStateText(){const U=cat.userData,tk=U.stage==='do'?U.task:U.task?'walk':'';if(U.happy>0)return 'Purring 💗';if(tk==='beg-food')return 'Hungry — bowl empty!';if(tk==='beg-water')return 'Thirsty — bowl empty!';
+ if(stats.love<=0)return 'Sad 😿';return {eat:'Eating 😋',drink:'Drinking 💧',litter:'Using the tray 🚽',scratch:'Scratching 🐾',nap:'Napping 💤',refuse:'Dirty tray! 🧹',accident:'Having an accident 😿',sulk:'Sulking',wander:'Roaming'}[tk]||(tk==='walk'?'Walking':'Relaxing')}
+function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THREE.MathUtils.lerp;
+ const sad=stats.love<=0,tk=U.stage==='do'?U.task:'',sqEnd=2.2+(U.doPoop?6:4),ph=tk==='litter'?(U.t<2.2?'dig':U.t<sqEnd?'sq':'cv'):tk==='accident'?(U.t<1.2?'dig':U.t<1.2+(U.doPoop?6:4)?'sq':''):'';
+ const tg={sc:tk==='scratch',nb:tk==='nap',hd:tk==='eat'||tk==='drink',chew:tk==='eat',lap:tk==='drink',dg:ph==='dig',sq:ph==='sq',cv:ph==='cv',sd:sad||tk==='sulk',beg:tk==='beg-food'||tk==='beg-water',pur:U.happy>0,lt:tk==='litter'};
+ for(const k in tg)P[k]=L(P[k]||0,tg[k]?1:0,Math.min(1,dt*(k==='sq'?3:5)));
+ const sc=P.sc,nb=P.nb,hd=P.hd,sd=P.sd;let by=0;
+ if(U.moving){const g=sad?5:8,sw=Math.sin(t*g)*(sad?.1:.16);legs[0].rotation.x=sw;legs[1].rotation.x=-sw;legs[2].rotation.x=-sw;legs[3].rotation.x=sw;by=Math.abs(Math.sin(t*g))*.025}else{legs.forEach(l=>l.rotation.x=0);by=Math.sin(t*2.5)*.018}
+ legs.forEach(l=>l.scale.y=1);catBody.rotation.set(0,0,0);catBody.position.x=0;catBody.scale.y=1;catHead.position.set(0,.74,.52);catHead.rotation.set(0,0,0);cat.position.y=groundY(cat.position.x,cat.position.z)+.01;
+ tail.rotation.x=-.8+Math.sin(t*3)*.18;tail.rotation.z=Math.sin(t*2)*.2;
+ const rake=Math.sin(t*9);
+ if(sc>.001){catBody.rotation.x+=-.7*sc+rake*.035*sc;by+=.273*sc;legs[0].rotation.x=L(legs[0].rotation.x,-1.6+rake*.4,sc);legs[1].rotation.x=L(legs[1].rotation.x,-1.6-rake*.4,sc);legs[2].rotation.x=L(legs[2].rotation.x,.7,sc);legs[3].rotation.x=L(legs[3].rotation.x,.7,sc);catHead.rotation.x+=.5*sc}
+ if(nb>.001){by-=.14*nb;cat.position.y+=.2*nb;legs.forEach(l=>l.scale.y=1-.75*nb);catHead.rotation.x+=.38*nb;catBody.scale.y=1+Math.sin(t*2)*.02*nb;tail.rotation.z+=nb*.9}
+ cat.position.y+=.24*P.lt;
+ if(hd>.001){catHead.position.y-=.38*hd;catHead.position.z+=.12*hd;catHead.rotation.x+=.95*hd+Math.sin(t*14)*.07*P.chew+Math.sin(t*9)*.05*P.lap;by-=.03*hd;legs[0].rotation.x=L(legs[0].rotation.x,-.3,hd);legs[1].rotation.x=L(legs[1].rotation.x,-.3,hd);catBody.rotation.x+=.08*hd;tail.rotation.z+=Math.sin(t*4)*.15*hd}
+ if(P.dg>.001){legs[0].rotation.x=L(legs[0].rotation.x,-.3+Math.sin(t*13)*.6,P.dg);legs[1].rotation.x=L(legs[1].rotation.x,-.3-Math.sin(t*13)*.6,P.dg);catBody.rotation.x+=.12*P.dg;catHead.rotation.x+=.35*P.dg;by-=.03*P.dg}
+ if(P.sq>.001){by-=.14*P.sq;legs[2].scale.y=legs[3].scale.y=1-.55*P.sq;legs[0].scale.y=legs[1].scale.y=1-.3*P.sq;catBody.rotation.x+=-.1*P.sq;catHead.rotation.x+=.18*P.sq;tail.rotation.x=L(tail.rotation.x,-.2,P.sq);catBody.position.x=Math.sin(t*38)*.004*P.sq}
+ if(P.cv>.001){legs[0].rotation.x=L(legs[0].rotation.x,-.9+Math.sin(t*12)*.5,P.cv);legs[1].rotation.x=L(legs[1].rotation.x,-.9-Math.sin(t*12)*.5,P.cv);catBody.rotation.x+=.14*P.cv;catHead.rotation.x+=.5*P.cv;by-=.02*P.cv}
+ if(P.beg>.001){catHead.rotation.x+=-.25*P.beg;tail.rotation.z+=Math.sin(t*5)*.4*P.beg}
+ if(sd>.001){catHead.rotation.x+=.6*sd;catHead.position.y-=.13*sd;catBody.scale.y*=1-.06*sd;by-=.02*sd;tail.rotation.x=L(tail.rotation.x,-2.4,sd);tail.rotation.z*=1-sd}
+ if(P.pur>.5)by+=Math.sin(t*50)*.004;
+ catBody.position.y=by;
+ for(const [ear,inner,s] of catEars){const r=L(-s*.4,-s*1.3,sd);ear.rotation.z=r;inner.rotation.z=r}
+ const cl=Math.max(sd*.65,nb,P.sq*.5);for(const lid of catLids){lid.scale.y=.03+.055*cl;lid.position.y=.1-.065*cl}
+ const open=P.chew*(Math.sin(t*14)*.5+.5)+P.beg*Math.max(0,Math.sin(t*3));catJaw.scale.y=.004+.03*open;
+ catTongue.visible=P.lap>.3;if(catTongue.visible){catTongue.position.z=.268+.035*Math.max(0,Math.sin(t*10));catTongue.position.y=-.125-.01*Math.max(0,Math.sin(t*10))}
+ catTears.forEach((tr,i)=>{tr.visible=sd>.5;if(tr.visible){const f=(t*.5+i*.5)%1;tr.position.y=-.02-f*.2;tr.scale.set(.012,.018*(1-f*.5),.01)}});
+ ripple.material.opacity=tk==='drink'?.55*(1-(t*1.6)%1):0;if(tk==='drink'){const s=.08+((t*1.6)%1)*.26;ripple.scale.set(s,s,1);ripple.position.set(0,waterDisc.position.y+.008,.18)}
+ updateBowlVisuals();sandApply();updateSandParticles(dt);
+ setBubble(tk==='beg-food'?'🍗':tk==='beg-water'?'💧':tk==='refuse'?'🧹':sad?'😿':U.happy>0?'💗':tk==='nap'?'💤':'')}
+for(const [id,kind] of [['feed','feed'],['clean','clean'],['pet','pet'],['water','water'],['mess','cleanmess']]){const b=document.getElementById(id);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();action(kind)});b.addEventListener('pointerdown',e=>{e.stopPropagation()});}// Start is wired centrally below so mobile taps and delayed engine loading are handled consistently.window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();if(e.key.toLowerCase()==='e')action('interact')});window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+// joystick with pointer capture
+const pad=document.getElementById('pad'),stick=document.getElementById('stick');let pointer=null;function joy(e){const r=pad.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy;const max=r.width*.32,len=Math.hypot(dx,dy)||1;if(len>max){dx=dx/len*max;dy=dy/len*max}moveX=dx/max;moveY=dy/max;stick.style.transform=`translate(${dx}px,${dy}px)`}pad.addEventListener('pointerdown',e=>{pointer=e.pointerId;pad.setPointerCapture(pointer);joy(e)});pad.addEventListener('pointermove',e=>{if(e.pointerId===pointer)joy(e)});function resetJoy(){pointer=null;moveX=moveY=0;stick.style.transform='translate(0,0)'}pad.addEventListener('pointerup',resetJoy);pad.addEventListener('pointercancel',resetJoy);
+
+// ===== Sofa & bed: tap to walk over and sit. Bed: tap again to lie back, again to sit up, again to stand =====
+const sit={state:'none',spot:'sofa',t:0,pts:[],bestD:1e9,stuck:0,from:null,rTarget:0,yawLie:0,afterLie:false,chain:false,c:0,pull:0,lp:-1,lc:-1,wait:0,auto:false,autoRise:false};
+const SPOTS={
+ sofa:{obj:sofaG,seat:{x:-3,z:3.5,y:.235},front:{x:-3,z:2.4},hop:.06,yaw:Math.PI,name:'sofa',icon:'🛋️'},
+ bed:{obj:bedG,seat:{x:3.8,z:4.3,y:.22},front:{x:2.6,z:4.3},hop:.2,yaw:-Math.PI/2,name:'bed',icon:'🛏️'}
+};
+const LIE={x:4.45,z:3.62,y:.91}; // feet position when lying on the bed (head ends up on the left pillow)
+// The bed's own duvet: peels back to the foot when someone gets in, then is pulled up over them to the chest
+const DUV=[];
+for(const m of [duvetM,foldM]){const g=m.geometry.parameters,ng=new THREE.BoxGeometry(g.width,g.height,g.depth,60,1,40);m.geometry.dispose();m.geometry=ng;DUV.push({m,base:Float32Array.from(ng.attributes.position.array)})}
+function duvetApply(pull,c){
+  const len=1-.78*pull*(1-c);
+  for(const d of DUV){const pos=d.m.geometry.attributes.position,a=pos.array,bs=d.base,mx=d.m.position.x,mz=d.m.position.z;
+    for(let i=0;i<a.length;i+=3){
+      const bz=bs[i+2]+mz,bx=bs[i]+mx,zn=1.7-(1.7-bz)*len,wz=4.39-zn,wx=4.95-bx,dx=Math.abs(wx-LIE.x);
+      const hx=dx<.55?1:dx<1.1?.5*(1+Math.cos(Math.PI*(dx-.55)/.55)):0;
+      const rf=sm(Math.max(0,Math.min(1,(wz-2.75)/.8))),tr=sm(Math.max(0,Math.min(1,(wz-4.05)/.6)));
+      a[i+2]=zn-mz;a[i+1]=bs[i+1]+c*hx*rf*(.45+.21*tr)}
+    pos.needsUpdate=true;d.m.geometry.computeVertexNormals()}}
+function blanketApply(c){sit.c=c}
+function duvetTick(dt){
+  const S=sit,want=(S.spot==='bed'&&S.state!=='none')?1:0;
+  if(S.pull!==want){const st=dt/.8;S.pull=Math.abs(want-S.pull)<=st?want:S.pull+Math.sign(want-S.pull)*st}
+  if(S.pull!==S.lp||S.c!==S.lc){S.lp=S.pull;S.lc=S.c;duvetApply(S.pull,S.c)}}
+const calves=group(body,0,0,0);calves.visible=false;
+for(const sd of [-1,1]){const c=group(calves,sd*.19,.72,.5);sphere(c,0,-.3,0,.13,.33,.13,M.pants);sphere(c,0,-.7,.07,.14,.075,.22,mat('#2b2521',.7));sphere(c,0,-.74,.07,.145,.03,.225,mat('#e9e4da',.8))}
+const elbows=[];for(const a of [armL,armR]){const eb=new THREE.Group();eb.position.set(0,-.42,0);const parts=a.children.slice(1);for(const c of parts){a.remove(c);c.position.y+=.42;eb.add(c)}a.add(eb);elbows.push(eb)}
+const sm=t=>t*t*(3-2*t);
+function angTo(a,b){return Math.atan2(Math.sin(b-a),Math.cos(b-a))}
+function turnTo(cur,target,k){return cur+angTo(cur,target)*k}
+function sitLocked(){return sit.state!=='none'&&sit.state!=='approach'}
+function sitPose(k){for(const l of [legL,legR]){l.rotation.x=-1.5708*k;l.scale.y=1-.36*k}armL.rotation.x=-.15*k;armR.rotation.x=-.15*k;armL.rotation.z=.22*k;armR.rotation.z=-.22*k;for(const eb of elbows)eb.rotation.x=-.8*k;calves.visible=k>.55;for(const l of [legL,legR])for(let i=1;i<l.children.length;i++)l.children[i].visible=!(k>.55);if(k>0)body.position.y=-.02*k}
+function sitRoute(spot,p){
+  const f=SPOTS[spot].front,pts=[];
+  if(spot==='sofa'){
+    if(p.z>2.8&&p.x>-4.9&&p.x<-1.1+.3){const sideX=p.x<-3?-5.4:-1.1;pts.push({x:sideX,z:3.6},{x:sideX,z:f.z})}
+    else if(p.z>2.8&&p.x<=-4.9){pts.push({x:-5.4,z:3.6},{x:-5.4,z:f.z})}
+    else if(p.z>2.8){pts.push({x:-1.1,z:3.6},{x:-1.1,z:f.z})}
+  }else if(p.x>2.9){pts.push({x:p.x,z:2.1},{x:f.x,z:2.1})} // go round the foot of the bed to its open left side
+  pts.push({x:f.x,z:f.z});return pts}
+function toggleSpot(spot){
+  if(!startRequested)return;
+  const S=sit,sp=SPOTS[spot],p=player.position;
+  if(S.state==='approach'){
+    if(S.spot===spot){S.state='none';S.pts=[];toast('Changed your mind 🐾');return}
+    S.state='none';S.pts=[]; // tapped something else: start a new walk below
+  }else if(S.state!=='none'){
+    if(S.spot!==spot){toast('Get up first 🚶');return}
+    if(S.state==='sitting'){
+      if(S.auto||S.autoRise)return;
+      S.state='rising';S.t=0;S.from={x:p.x,z:p.z,y:p.y};sound('lap');toast('You got up 🚶');return}
+    if(S.state==='lying'){S.state='uncover';return}
+    return}
+  if(Math.hypot(p.x-sp.obj.position.x,p.z-sp.obj.position.z)>9||p.z>6.3){toast('Come a little closer to the '+sp.name+' '+sp.icon);return}
+  S.spot=spot;S.pts=sitRoute(spot,p);S.state='approach';S.bestD=1e9;S.stuck=0;S.afterLie=false;S.chain=false;
+}
+function lieApply(k){ // k: 0 = sitting on the bed edge, 1 = lying on the bed
+  const S=sit,p=player.position,sp=SPOTS.bed.seat,e=sm(k),re=sm(Math.min(1,k/.5)),tk=sm(Math.max(0,Math.min(1,(k-.2)/.8)));
+  p.x=sp.x+(LIE.x-sp.x)*e;p.z=sp.z+(LIE.z-sp.z)*e;p.y=sp.y+(LIE.y-sp.y)*e;
+  player.rotation.y=S.rTarget+(S.yawLie-S.rTarget)*re;
+  sitPose(1-tk);body.rotation.x=-1.4308*tk}
+function sitUpdate(dt,mag){
+  const S=sit,p=player.position;
+  if(S.state==='none')return false;
+  const sp=SPOTS[S.spot];
+  if(S.state==='approach'){
+    if(mag>.12){S.state='none';S.pts=[];return false}
+    const w=S.pts[0],dx=w.x-p.x,dz=w.z-p.z,d=Math.hypot(dx,dz);
+    if(d<.12){if(S.pts.length===1&&S.spot==='bed'&&S.pull<.98)return false;S.pts.shift();S.bestD=1e9;S.stuck=0;
+      if(!S.pts.length){S.state='sitIn';S.t=0;S.from={x:p.x,z:p.z,y:p.y,r:player.rotation.y};S.rTarget=S.from.r+angTo(S.from.r,sp.yaw);S.yawLie=S.rTarget+angTo(S.rTarget,Math.PI);return true}
+      return false}
+    const step=Math.min(d,dt*3.4);p.x+=dx/d*step;p.z+=dz/d*step;
+    player.rotation.y=turnTo(player.rotation.y,Math.atan2(dx,dz),Math.min(1,dt*12));
+    if(d<S.bestD-.05){S.bestD=d;S.stuck=0}else{S.stuck+=dt;if(S.stuck>.8){p.x=w.x;p.z=w.z;S.stuck=0}}
+    walking=true;const swing=Math.sin(elapsed*10)*.45;legL.rotation.x=swing;legR.rotation.x=-swing;armL.rotation.x=-swing*.6;armR.rotation.x=swing*.6;body.position.y=Math.abs(Math.sin(elapsed*10))*.045;
+    return false}
+  if(S.state==='sitIn'){
+    S.t=Math.min(1,S.t+dt/.9);const k=S.t,e=sm(k),rk=Math.min(1,k/.6),re=sm(rk),st=sp.seat;
+    p.x=S.from.x+(st.x-S.from.x)*e;p.z=S.from.z+(st.z-S.from.z)*e;p.y=S.from.y+(st.y-S.from.y)*e+Math.sin(Math.PI*k)*sp.hop;
+    player.rotation.y=S.from.r+(S.rTarget-S.from.r)*re;sitPose(e);
+    if(k>=1){S.state='sitting';S.auto=S.spot==='bed';S.autoRise=false;S.wait=.5;if(S.spot==='sofa')toast('Comfy! 🛋️ Tap the sofa again to get up.')}
+    return true}
+  if(S.state==='sitting'){
+    p.x=sp.seat.x;p.z=sp.seat.z;p.y=sp.seat.y;player.rotation.y=S.rTarget;body.rotation.x=0;sitPose(1);
+    if(S.auto){S.wait-=dt;if(S.wait<=0){S.auto=false;S.state='lieIn';S.t=0}}
+    else if(S.autoRise){S.wait-=dt;if(S.wait<=0){S.autoRise=false;S.state='rising';S.t=0;S.from={x:p.x,z:p.z,y:p.y};toast('You got up 🚶')}}
+    if(mag>.12){S.auto=false;S.autoRise=false;S.state='rising';S.t=0;S.from={x:p.x,z:p.z,y:p.y}}
+    return true}
+  if(S.state==='lieIn'){
+    S.t=Math.min(1,S.t+dt/1.5);lieApply(S.t);
+    if(S.t>=1){S.state='cover';S.c=0}
+    return true}
+  if(S.state==='cover'){
+    lieApply(1);S.c=Math.min(1,S.c+dt/1.0);blanketApply(S.c);
+    if(S.c>=1){S.state='lying';toast('Sweet dreams 😴 Tap the bed again to get up.')}
+    return true}
+  if(S.state==='lying'){
+    lieApply(1);blanketApply(1);
+    if(mag>.12)S.state='uncover';
+    return true}
+  if(S.state==='uncover'){
+    lieApply(1);S.c=Math.max(0,S.c-dt/.8);blanketApply(S.c);
+    if(S.c<=0){S.state='lieOut';S.t=1}
+    return true}
+  if(S.state==='lieOut'){
+    S.t=Math.max(0,S.t-dt/1.2);lieApply(S.t);
+    if(S.t<=0){body.rotation.x=0;S.state='sitting';S.auto=false;S.autoRise=true;S.wait=.3}
+    return true}
+  if(S.state==='rising'){
+    S.t=Math.min(1,S.t+dt/.8);const k=S.t,e=sm(k),fr=sp.front,gy=groundY(fr.x,fr.z)+.05;
+    p.x=S.from.x+(fr.x-S.from.x)*e;p.z=S.from.z+(fr.z-S.from.z)*e;p.y=S.from.y+(gy-S.from.y)*e+Math.sin(Math.PI*k)*.05;
+    sitPose(1-e);
+    if(k>=1){S.state='none';sitPose(0);body.position.y=0;body.rotation.x=0;blanketApply(0)}
+    return true}
+  return false}
+// tap detection (ignores camera-drag gestures)
+{const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();let tapDown=null;
+renderer.domElement.addEventListener('pointerdown',e=>{tapDown={id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now()}});
+renderer.domElement.addEventListener('pointerup',e=>{
+  if(!tapDown||tapDown.id!==e.pointerId)return;
+  const moved=Math.hypot(e.clientX-tapDown.x,e.clientY-tapDown.y),held=performance.now()-tapDown.t;tapDown=null;
+  if(moved>10||held>500)return;
+  const r=renderer.domElement.getBoundingClientRect();
+  ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+  ray.setFromCamera(ndc,camera);
+  const hits=ray.intersectObjects([sofaG,bedG,player],true);if(!hits.length)return;
+  let o=hits[0].object,spot=null;
+  while(o){if(o===sofaG){spot='sofa';break}if(o===bedG){spot='bed';break}if(o===player){spot=sit.state!=='none'?sit.spot:null;break}o=o.parent}
+  if(spot)toggleSpot(spot)});
+renderer.domElement.addEventListener('pointercancel',()=>{tapDown=null})}
+let prev=performance.now(),elapsed=0,uiT=0,saveT=0;const camTarget=new THREE.Vector3();let cameraYaw=0,cameraPitch=.36,lookPointer=null,lastLookX=0,lastLookY=0;renderer.domElement.style.touchAction='none';renderer.domElement.addEventListener('pointerdown',e=>{if(e.clientY>innerHeight-175||e.clientX<145||e.clientY<105||e.target.closest?.('button,.pad,.panel,.help'))return;lookPointer=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookPointer)return;cameraYaw-=(e.clientX-lastLookX)*.008;cameraPitch=THREE.MathUtils.clamp(cameraPitch+(e.clientY-lastLookY)*.004,-.05,.85);lastLookX=e.clientX;lastLookY=e.clientY});function stopLook(e){if(e.pointerId===lookPointer)lookPointer=null}renderer.domElement.addEventListener('pointerup',stopLook);renderer.domElement.addEventListener('pointercancel',stopLook);function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-prev)/1000,.05);prev=now;elapsed+=dt;if(humanMixer){humanMixer.update(dt);const wanted=walking?(Object.keys(humanActions).find(k=>k.includes('walk')&&!k.includes('brisk'))||Object.keys(humanActions).find(k=>k.includes('walk'))):(Object.keys(humanActions).find(k=>k.includes('idle'))||Object.keys(humanActions)[0]);if(wanted&&wanted!==activeHumanAction){if(humanActions[activeHumanAction])humanActions[activeHumanAction].fadeOut(.2);humanActions[wanted].reset().fadeIn(.2).play();activeHumanAction=wanted;}}const forward=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-moveY;const side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+moveX;const mag=Math.hypot(forward,side);walking=mag>.12;if(walking&&!sitLocked()){const speed=dt*3.8/Math.max(1,mag);/* Camera-relative movement: camera looks toward the player from the opposite of the forward vector. */const fwdX=-Math.sin(cameraYaw),fwdZ=-Math.cos(cameraYaw);const rightX=Math.cos(cameraYaw),rightZ=-Math.sin(cameraYaw);const dx=rightX*side+fwdX*forward;const dz=rightZ*side+fwdZ*forward;player.position.x+=dx*speed;player.position.z+=dz*speed;player.position.x=THREE.MathUtils.clamp(player.position.x,-17,17);player.position.z=THREE.MathUtils.clamp(player.position.z,-8,25);/* Character faces exactly the direction it is travelling. */player.rotation.y=Math.atan2(dx,dz);const swing=Math.sin(elapsed*10)*.45;legL.rotation.x=swing;legR.rotation.x=-swing;armL.rotation.x=-swing*.6;armR.rotation.x=swing*.6}else{legL.rotation.x=legR.rotation.x=0;armL.rotation.x=0;actionAnim=Math.max(0,actionAnim-dt);armR.rotation.x=actionAnim>0?-Math.sin((1.15-actionAnim)/1.15*Math.PI)*(actionType==='clean'?1.35:actionType==='pet'?.85:1.05):Math.sin(elapsed*1.5)*.025; if(actionAnim>0&&actionType==='clean')armL.rotation.x=-.65*Math.sin((1.15-actionAnim)/1.15*Math.PI)}body.position.y=walking?Math.abs(Math.sin(elapsed*10))*.045:Math.sin(elapsed*2)*.012;
+duvetTick(dt);if(!sitUpdate(dt,mag))collidePlayer(dt);updateCat(dt);poseCat(dt,elapsed);simulate(dt);uiT+=dt;if(uiT>.25){uiT=0;updateUI()}saveT+=dt;if(saveT>2){saveT=0;saveGame()}
+near=getNear();if(near){prompt.style.display='block';prompt.textContent='✨ '+near.label+' · tap action';}else prompt.style.display='none';document.getElementById('zone').textContent=player.position.z>13?'🛍️ Shops':player.position.z>7?'🌳 Garden':player.position.x>2&&player.position.z>-.5?'🛏️ Bedroom':player.position.x>1&&player.position.z<-1.7?'🍽️ Kitchen':'🏡 Home';
+visualUpdate(elapsed,mins);camTarget.set(player.position.x,player.position.y+2.1,player.position.z);const radius=7.8,desired=new THREE.Vector3(player.position.x+Math.sin(cameraYaw)*radius,player.position.y+2.2+cameraPitch*5,player.position.z+Math.cos(cameraYaw)*radius);camera.position.lerp(desired,1-Math.pow(.001,dt));camera.lookAt(camTarget);renderer.render(scene,camera)}window.purrDebug=()=>({stats,bowl,clocks,day,mins,task:cat.userData.task,stage:cat.userData.stage,action,cat,floorMess,player,groundY,sandH,buried:()=>buriedCount});requestAnimationFrame(animate);updateUI();gameBooted=true;if(startRequested){document.getElementById('welcome').style.display='none';toast('Find kitty inside the house!');}
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.35))});
+})();
+}
+// Mobile-safe start control: accept pointer, touch, and click; don't hide the welcome screen before engine readiness.
+const startButton=document.getElementById('start');
+let gameBooted=false, startRequested=false;
+function beginGame(e){if(e){e.preventDefault();e.stopPropagation();}if(startRequested)return;document.getElementById('load-error').style.display='none';startRequested=true;startButton.textContent='Loading your home…';startButton.disabled=true;startButton.style.opacity='.85';if(gameBooted){document.getElementById('welcome').style.display='none';if(window.purrToast)window.purrToast('Find kitty inside the house!');return;}startButton.textContent='Loading 3D world…';}
+startButton.addEventListener('pointerup',beginGame);
+startButton.addEventListener('click',beginGame);
+startButton.addEventListener('touchend',beginGame,{passive:false});
+function showLoadError(){startRequested=false;startButton.disabled=false;startButton.textContent='Tap to try again';document.getElementById('load-error').style.display='block';}
+
+(function loadThree(){
+  const urls=['https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js','https://unpkg.com/three@0.128.0/build/three.min.js'];
+  let index=0;
+  function runBoot(){const loader=document.createElement('script');loader.src='https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js';loader.onload=()=>{try{bootGame();}catch(err){console.error('Purrfect Home boot failed:',err);document.getElementById('load-error').style.display='block';document.getElementById('load-error').textContent='The 3D world could not start: '+(err&&err.message?err.message:'unknown error')+'. Reload the page and try again.';startRequested=false;startButton.disabled=false;startButton.textContent='Tap to try again';}};loader.onerror=()=>{console.warn('GLTF loader failed; starting with built-in cat.');try{bootGame();}catch(err){showLoadError();}};document.head.appendChild(loader);}
+  function attempt(){
+    if(window.THREE){runBoot();return;}
+    if(index>=urls.length){showLoadError();return;}
+    const script=document.createElement('script');script.src=urls[index++];script.onload=()=>runBoot();script.onerror=()=>{script.remove();attempt();};document.head.appendChild(script);
+  }
+  attempt();
+})();
+</script></body></html>
