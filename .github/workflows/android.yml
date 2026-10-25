@@ -19,6 +19,8 @@ jobs:
         run: |
           [ -d android ] || npx cap add android
           npx cap sync android
+      - name: Allow vibration (haptics)
+        run: grep -q VIBRATE android/app/src/main/AndroidManifest.xml || sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.VIBRATE" />#' android/app/src/main/AndroidManifest.xml
       - name: Build debug APK
         working-directory: android
         run: ./gradlew assembleDebug
