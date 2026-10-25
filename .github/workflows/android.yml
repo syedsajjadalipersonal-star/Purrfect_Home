@@ -1,0 +1,26 @@
+# Builds a debug APK you can install on any Android phone, and (once you add signing secrets) a release bundle for Google Play.
+# Run it from the GitHub "Actions" tab -> "Android build" -> "Run workflow". Free for public repos; private repos get free monthly minutes.
+name: Android build
+on: { workflow_dispatch: {} }
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Stage web files
+        run: |
+          mkdir www && cp -r index.html sw.js manifest.webmanifest vendor icons www/
+      - run: npm install
+      - name: Create Android project (first run only)
+        run: |
+          [ -d android ] || npx cap add android
+          npx cap sync android
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with: { name: purrfect-home-debug-apk, path: android/app/build/outputs/apk/debug/app-debug.apk }

@@ -1,0 +1,7 @@
+{
+  "appId": "com.yourstudio.purrfecthome",
+  "appName": "Purrfect Home",
+  "webDir": "www",
+  "backgroundColor": "#2e7658",
+  "android": { "allowMixedContent": false }
+}

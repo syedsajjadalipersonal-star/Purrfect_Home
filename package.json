@@ -1,0 +1,14 @@
+{
+  "name": "purrfect-home",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "npx http-server . -p 8080 -c-1",
+    "cap:sync": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
