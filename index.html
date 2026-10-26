@@ -1964,11 +1964,13 @@ function removeFloorMess(m){const i=floorMess.indexOf(m);if(i>=0)floorMess.splic
 function nearestMess(){let best=null,bd=1e9;for(const m of floorMess){const d=Math.hypot(player.position.x-m.x,player.position.z-m.z);if(d<bd){bd=d;best=m}}return best}
 
 savedFloor.forEach(f=>addFloorMess(f[2],f[0],f[1]));
+function tutHold(){try{return QM.hold()}catch(e){return false}}
 function updateCat(dt){const U=cat.userData,sad=stats.love<=0;
  if(!U.init){U.init=1;U.task='';U.stage='';U.t=0;U.wait=1;U.target=new THREE.Vector3(cat.position.x,0,cat.position.z);U.face=null;U.P={};U.happy=0;U.follow=0;U.refuseCD=0;U.meow=0;U.sadT=3;U.moving=false;U.speed=.65}
  if(U.zoom>0){U.zoom-=dt;if(!U.task&&U.wait>0)U.wait=Math.min(U.wait,.05)}U.refuseCD=Math.max(0,U.refuseCD-dt);U.annoyed=Math.max(0,(U.annoyed||0)-dt);U.moving=false;U.sadT-=dt;if(sad&&U.sadT<=0){U.sadT=9;catSound('sad')}
  if(U.happy>0){U.happy-=dt;return}                                   // being petted: purrs in place
  if(U.follow>0){U.follow-=dt;const dx=player.position.x-cat.position.x,dz=player.position.z-cat.position.z,d=Math.hypot(dx,dz);if(d>1.7)stepCat(dx,dz,d,.95*dt,dt);return}
+ if(tutHold()){if(U.task)endTask();U.wait=1;U.zoom=0;return}
  const locked=U.task==='eat'||U.task==='drink'||U.task==='litter';
  {const sl=sleepInfo(mins);if(sl&&U.task!=='sleep'&&!locked&&!(HV&&HV.on)){if(U.task)endTask();U.sleepKind=sl;startTask('sleep')}else if(!sl&&U.task==='sleep'){const k=U.sleepKind;endTask();U.wait=.5;onCatWake(k)}}
  if(U.potty>0&&U.task!=='sleep'){U.potty-=dt;if(U.potty<=0){clocks.pee=Math.max(clocks.pee,PEE_DUE);if(Math.random()<.45)clocks.poop=Math.max(clocks.poop,POOP_DUE)}}
@@ -2266,6 +2268,7 @@ var QM=(function(){
   T('Fresh water','Now the water bowl. Walk over and tap it.',{allow:CARE,guide:'at:waterbowl',ev:'water',r:80}),
   T('Cuddle time','{c} would love a cuddle. Walk up to {c} and tap them, then tap in the green zone.',{allow:CARE,guide:'at:cat',ev:'pet',r:120}),
   T('Groceries','Time to shop! Walk out of the garden to Fresh Grocery, pick a drink or ready meal and pay at the checkout.',{allow:'*',ev:'groc',r:100}),
+  T('Head home','Leave the shop and walk back to your garden. Your home is waiting!',{allow:'*',poll:()=>!SH.on&&!SH.tr&&player.position.x>LOT.x0&&player.position.x<LOT.x1&&player.position.z>LOT.z0&&player.position.z<LOT.z1}),
   T('A kitchen','Your food needs a home. Tap 🔨 Build.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>build.on}),
   T('A kitchen','Open the Furniture tab.',sel('#bCatFurn')),
   T('A kitchen','Open the 🍳 Kitchen section.',grp('kitchen')),
@@ -2311,7 +2314,7 @@ var QM=(function(){
   e.stopImmediatePropagation();e.preventDefault()},{capture:true,passive:false});
  window.addEventListener('keydown',e=>{if(!locked())return;const s=curStep();if(s.allow.includes('#pad'))return;if(/^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright| |e)$/i.test(e.key)){e.stopImmediatePropagation();e.preventDefault()}},true);
  // ---- spotlight + pointing hand ----
- function spotTick(){if(!ui.sp)return;const s=curStep();let el=null,r=null;
+ function spotTick(){if(!ui.sp)return;if(ui.b&&ui.btn){const qr=ui.btn.getBoundingClientRect();if(qr.height>0)ui.b.style.top=Math.max(56,Math.round(qr.bottom+8))+'px'}const s=curStep();let el=null,r=null;
   if(s&&s.spot&&started&&!OB.on){el=document.querySelector(s.spot);if(el){r=el.getBoundingClientRect();if(r.width<2||r.height<2)el=null}}
   if(!el){ui.sp.style.display='none';ui.hd.style.display='none';return}
   if((r.left<4||r.right>innerWidth-4)&&el.scrollIntoView){try{el.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}r=el.getBoundingClientRect()}
@@ -2341,7 +2344,9 @@ var QM=(function(){
   denyFix(e,type){const s=curStep();if(!locked()||!s)return false;return !(s.guide==='door'&&type==='door'&&e.o==='h'&&e.z===HX.z1&&(e.x===-1||e.x===0))},
   cells(list){const s=curStep();if(!locked()||!s)return list;if(s.guide!=='floor'){toast('Not yet ✨');return []}const out=list.filter(c=>inHouse(c[0],c[1]));if(out.length<list.length)toast('Stay inside the glowing area ✨');return out},
   denyFurn(t,sp){const s=curStep();if(!locked()||!s)return false;return !(s.guide==='furn'&&s.fp===t&&inHouse(Math.floor(sp.x0+.01),Math.floor(sp.z0+.01)))}};
- setInterval(()=>{try{if(started&&!OB.on){if(Q.tut!=='done')poll();refresh();spotTick();gUpdate()}}catch(e){}},140);
+ const IDXW=TUT.findIndex(s=>s.guide==='at:foodbowl');
+ function catHome(){const U=cat.userData;let x=0,z=0;for(const it of furn.values())if(it.type==='foodbowl'){x=it.x0+.5;z=it.z0+1.5}x=Math.max(HX.x0+.8,Math.min(HX.x1-.8,x));z=Math.max(HX.z0+.8,Math.min(HX.z1-.8,z||0));cat.position.set(x,0,z);if(U.target)U.target.set(x,0,z);U.path=null;U.follow=0;U.happy=0}
+ setInterval(()=>{try{if(started&&!OB.on){if(Q.tut!=='done'&&Q.tut>=IDXW&&IDXW>=0&&!inHouse(Math.floor(cat.position.x),Math.floor(cat.position.z)))catHome();if(Q.tut!=='done')poll();refresh();spotTick();gUpdate()}}catch(e){}},140);
  function panel(){let p=document.getElementById('qPanel');if(p){p.remove();return}p=document.createElement('div');p.id='qPanel';
   p.style.cssText='position:fixed;z-index:50;right:max(12px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 60px);width:min(330px,92vw);max-height:70vh;overflow:auto;background:#fff8e9;border-radius:18px;padding:14px;box-shadow:0 10px 34px #0004;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:13px';
   let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Today’s goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
@@ -2353,7 +2358,7 @@ var QM=(function(){
  function init(){if(Q.tv!==2){Q.tv=2;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
  setTimeout(()=>{try{init();refresh()}catch(e){}},0);
  function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();refresh()}
- return {ev,tick,panel,refresh,dayEnd,need,xp,save,get Q(){return Q},TUT,POOL}
+ return {ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,get Q(){return Q},TUT,POOL}
 })();
 function qev(n,c){try{QM.ev(n,c)}catch(e){}}
 // ===== Kitty's personality and little random events =====
