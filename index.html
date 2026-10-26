@@ -882,15 +882,12 @@ Object.assign(FURN,{
   sphere(g,0,.1,0,.4,.07,.3,mat('#d98f86',.95));sphere(g,-.2,.15,0,.13,.06,.2,mat('#f2d9a8',.95));for(const x of [-.4,.4])for(const z of [-.12,.12]){const r=box(g,x*.95,.27,z,.015,.34,.015,mat('#e8dcc0',.9),false);r.rotation.z=x>0?.5:-.5}}}
 });
 FURN_ORDER.push('fireplace','aquarium','desk','coffeemaker','hammock');
-const WALLET={base:1200};
+const WALLET={base:450};
 const WALLP={normal:10,brick:15,wallpaper:20},FLOORP={cement:1,carpet:2,wood:5},FIXP={door:20,window:15,dbl_a:15,dbl_b:15},ACCP={door:20,double:30,window:15};
-const FPRICE={bed:50,side:10,sofa:35,chair:25,tv:15,lamp:5,coffee:5,rug:10,plant:5,shelf:20,dining:30,wardrobe:30,
- fridge:25,stove:20,hood:10,counter:10,ksink:20,toilet:20,shower:20,tub:20,vanity:20,washer:25,wallcab:15,bin:5,towel:5,bathmat:5,
- walllight:5,lantern:5,paintland:5,paintabs:5,paintcat:5,clock:5,mirror:5,wshelf:5,
- palm:8,fvase:6,pouf:8,basket:8,rrug:10,succ:3,fvase2:3,books:3,candles:3,photo:3,fruit:3,desklamp:5,teddy:3,catbed:15,fireplace:60,aquarium:70,desk:35,coffeemaker:25,hammock:20};
+const FPRICE={bed:50,side:10,chair:25,lamp:10,plant:10,shelf:25,fridge:40,stove:40,counter:15,ksink:30,toilet:30,bin:8,catbed:20,sofa:70,coffee:15,rug:20,clock:10,mirror:15,towel:10,bathmat:10,wshelf:12,walllight:15,succ:8,books:8,fruit:8,hood:25,hammock:35,desk:70,coffeemaker:50,dining:80,tv:80,wardrobe:70,shower:60,vanity:45,wallcab:30,rrug:30,basket:20,pouf:20,candles:12,photo:10,fvase:15,fvase2:10,desklamp:15,tub:80,washer:70,lantern:25,teddy:15,paintland:40,paintabs:40,paintcat:40,palm:45,fireplace:220,aquarium:260};
 for(const k in FURN)FURN[k].price=FPRICE[k]||0;
 // Home Level gating: the basics are free from the start, nicer things unlock as the home levels up
-{const L={2:'hammock sofa coffee rug clock mirror towel bathmat wshelf walllight succ books fruit hood',3:'desk coffeemaker dining tv wardrobe shower vanity wallcab rrug basket pouf candles photo fvase fvase2 desklamp',4:'tub washer palm lantern teddy paintland paintabs paintcat fireplace aquarium'};for(const lv in L)for(const k of L[lv].split(' '))if(FURN[k])FURN[k].lvl=+lv}
+{const L={2:'hammock sofa coffee rug clock mirror towel bathmat wshelf walllight succ books fruit hood',3:'desk coffeemaker dining tv wardrobe shower vanity wallcab rrug basket pouf candles photo fvase fvase2 desklamp',4:'tub washer lantern teddy paintland',5:'paintabs paintcat palm',6:'fireplace',7:'aquarium'};for(const lv in L)for(const k of L[lv].split(' '))if(FURN[k])FURN[k].lvl=+lv}
 
 // ---- furniture groups: one room per chip ----
 {const G={home:'sofa chair tv coffee rug rrug shelf lamp plant palm pouf basket fvase fireplace aquarium',bed:'bed wardrobe side desklamp mirror teddy desk',kitchen:'dining fridge stove ksink counter wallcab hood bin fruit coffeemaker',bath:'toilet vanity tub shower washer bathmat towel',decor:'walllight lantern paintland paintabs paintcat clock wshelf succ fvase2 books candles photo',cat:'foodbowl waterbowl litter scratch catbed yarn hammock mouse ball feather tree tower'};
@@ -902,14 +899,14 @@ const BEN={bed:['cosy',12],sofa:['cosy',8],chair:['cosy',5],pouf:['cosy',3],bask
  tv:['fun',6],mouse:['fun',4],ball:['fun',4],feather:['fun',5],yarn:['fun',4],scratch:['fun',6],tree:['fun',10],tower:['fun',14],aquarium:['fun',8],
  coffee:['style',3],dining:['style',4],shelf:['style',3],wardrobe:['style',3],side:['style',2],desk:['style',4],lamp:['style',2],desklamp:['style',2],walllight:['style',2],lantern:['style',2],plant:['style',3],palm:['style',4],succ:['style',2],fvase:['style',2],fvase2:['style',2],
  paintland:['style',5],paintabs:['style',5],paintcat:['style',5],clock:['style',2],mirror:['style',3],wshelf:['style',2],books:['style',2],candles:['style',3],photo:['style',2],fruit:['style',2],vanity:['style',3],coffeemaker:['style',3]};
-const TIP={desk:'Tap to work a short shift and earn coins (once every 3 hours).',coffeemaker:'Tap to brew a coffee, so you can work at the desk again straight away.',dining:'Eat at home with a dining set and your cat gets Bond +3.',hammock:'Your cat naps here, just like in the cat bed.',aquarium:'Keeps your cat entertained.',bed:'Tap to sleep. Time runs 20x faster while you sleep.',sofa:'Tap to sit and relax.',chair:'Tap to sit and relax.',tv:'Tap to turn it on or off.',lamp:'Tap to switch the light on or off.',side:'Tap to switch the lamp on or off.',desklamp:'Tap to switch the light on or off.',walllight:'Tap to switch the light on or off.',lantern:'Tap to switch the light on or off.',fireplace:'Tap to light or put out the fire.',
+const TIP={desk:'Tap to work a short shift and earn a few coins (once every 4 hours).',coffeemaker:'Tap to brew a coffee. Your next desk shift pays 50% more.',dining:'Eat at home with a dining set and your cat gets Bond +3.',hammock:'Your cat naps here, just like in the cat bed.',aquarium:'Keeps your cat entertained.',bed:'Tap to sleep. Time runs 20x faster while you sleep.',sofa:'Tap to sit and relax.',chair:'Tap to sit and relax.',tv:'Tap to turn it on or off.',lamp:'Tap to switch the light on or off.',side:'Tap to switch the lamp on or off.',desklamp:'Tap to switch the light on or off.',walllight:'Tap to switch the light on or off.',lantern:'Tap to switch the light on or off.',fireplace:'Tap to light or put out the fire.',
  fridge:'Open it to see your food and eat.',stove:'Cook meals here.',ksink:'Tap to wash your hands.',vanity:'Tap to wash your hands.',toilet:'Tap to use it.',tub:'Tap to take a bath.',shower:'Tap to take a shower.',wardrobe:'Change your outfit.',
  foodbowl:'Your cat eats here. Keep it filled.',waterbowl:'Your cat drinks here. Keep it filled.',litter:'Your cat needs this. Scoop it often.',scratch:'Your cat scratches here, not your sofa.',tree:'Your cat climbs it for fun.',tower:'Your cat climbs it for fun.',mouse:'Your cat chases it.',ball:'Your cat bats it around.',feather:'Your cat chases it.',yarn:'Your cat plays with it.',catbed:'A cosy place for your cat to nap.'};
 const ASPECT={cosy:['Cosy','bond fades slower'],fun:['Fun','bond fades slower and your cat plays more'],style:['Style','visitors tip you coins each morning']};
 let HSc={t:0,cosy:0,fun:0,style:0};
 function homeScore(force){const n=performance.now();if(!force&&n-HSc.t<800)return HSc;const cnt={},a={cosy:0,fun:0,style:0};for(const it of furn.values())cnt[it.type]=(cnt[it.type]||0)+1;for(const k in cnt){const b=BEN[k];if(b)a[b[0]]+=b[1]*Math.min(cnt[k],2)}HSc={t:n,cosy:Math.min(100,Math.round(a.cosy/40*100)),fun:Math.min(100,Math.round(a.fun/40*100)),style:Math.min(100,Math.round(a.style/50*100))};return HSc}
 function homeLoveK(){const h=homeScore();return 1-.25*h.cosy/100-.2*h.fun/100}
-function homeTip(){return Math.round(homeScore().style*.4)}
+function homeTip(){return Math.round(homeScore().style*.15)}
 function fxHtml(){if(build.cat!=='furn')return '';const k=build.fsel,f=FURN[k],h=homeScore();let a='';
  if(f){const b=BEN[k],t=TIP[k];a='<b>'+f.n+'</b>'+(t?' · '+t:'')+(b?' <span class="fxp">'+ASPECT[b[0]][0]+' +'+b[1]+'</span>':'');if(b&&!t)a+=' <small>'+ASPECT[b[0]][1]+'</small>'}
  const pct=Math.round((1-homeLoveK())*100);return (a?a+'<br>':'')+'<small>Your home: Cosy '+h.cosy+'% · Fun '+h.fun+'% · Style '+h.style+'%'+(pct?' → bond fades '+pct+'% slower':'')+(homeTip()?' · +'+homeTip()+' coins/day':'')+'</small>'}
@@ -1242,11 +1239,11 @@ ctxBtn.addEventListener('pointerdown',e=>e.stopPropagation());
 function napList(){const c=[];if(isPlaced(catBed))c.push(catBed);for(const o of furn.values())if(o.type==='hammock')c.push(o.group);return c}
 function napTarget(){const c=napList();if(!c.length)return null;const U=cat.userData;if(!U.napObj||!c.includes(U.napObj))U.napObj=c[Math.floor(Math.random()*c.length)];return U.napObj}
 function napObj(){const U=cat.userData;return U.napObj&&napList().includes(U.napObj)?U.napObj:(isPlaced(catBed)?catBed:null)}
-let deskNext=0;
+let deskNext=0,deskBoost=false;
 function deskWork(it){if(seat||act){toast(seat?'Get up first 🚶':'Finish first ✋');return}const now=day*1440+mins;if(now<deskNext){const m=Math.ceil(deskNext-now);toast('Take a break first ☕ Ready in '+(m>=60?Math.round(m/60)+' h':m+' min'));return}
  const px=player.position.x,pz=player.position.z,cx=it.x0+it.fw/2,cz=it.z0+it.fd/2;if(Math.hypot(px-cx,pz-cz)>4){toast('Come a little closer first 🚶');return}
- deskNext=now+180;toast('Working at the desk… 💻');setTimeout(()=>{if(Math.hypot(player.position.x-cx,player.position.z-cz)>5){toast('You walked away, no pay this time');deskNext=now;return}const c=8+Math.round(homeScore().style/12);WALLET.base+=c;try{saveBuild()}catch(e){}sound('good');toast('Shift done! +'+c+' 🪙')},4000)}
-function coffeeBrew(it){const now=day*1440+mins;if(now<(it.coffeeAt||0)){toast('The coffee is still warm ☕');return}it.coffeeAt=now+60;deskNext=0;sound('sizzle');toast('Fresh coffee ☕ You can work at the desk again!')}
+ deskNext=now+240;const boost=deskBoost;deskBoost=false;toast('Working at the desk… 💻');setTimeout(()=>{if(Math.hypot(player.position.x-cx,player.position.z-cz)>5){toast('You walked away, no pay this time');deskNext=now;return}const c=Math.round((4+homeScore().style/40)*(boost?1.5:1));WALLET.base+=c;try{saveBuild()}catch(e){}sound('good');toast('Shift done! +'+c+' 🪙')},4000)}
+function coffeeBrew(it){const now=day*1440+mins;if(now<(it.coffeeAt||0)){toast('The coffee is still warm ☕');return}it.coffeeAt=now+120;deskBoost=true;sound('sizzle');toast('Fresh coffee ☕ Your next desk shift pays 50% more!')}
 function tvMenu(it){const on=it.tvOn!==false;showCtx(it,on?'📺 Turn off the TV':'📺 Turn on the TV',()=>{it.tvOn=!on;tvApply(it);sound();toast(it.tvOn?'TV on 📺':'TV off 🌙')})}
 function lampMenu(it){const on=it.lampOn!==false,fp=it.type==='fireplace';showCtx(it,fp?(on?'🔥 Put out the fire':'🔥 Light the fire'):on?'💡 Turn off the lamp':'💡 Turn on the lamp',()=>{it.lampOn=!on;sound();toast(fp?(it.lampOn?'Fire lit 🔥':'Fire out'):it.lampOn?'Lamp on 💡':'Lamp off 🌙')})}
 function furnTap(it){
@@ -1471,26 +1468,26 @@ const SHP_CAT=[
  {id:'wet1',cat:'food',ic:'🥫',n:'Tuna Pâté',d:'Wet food can · 1 serving',price:5,food:'wet',srv:1,love:8},
  {id:'wet2',cat:'food',ic:'🐠',n:'Salmon Flakes',d:'Wet food can · 1 serving',price:6,food:'wet',srv:1,love:10},
  {id:'wet3',cat:'food',ic:'🍖',n:'Chicken Gravy',d:'Wet food pouch · 1 serving',price:6,food:'wet',srv:1,love:10},
- {id:'yarn',cat:'toys',ic:'🧶',n:'Yarn Ball',d:'Kitty loves to chase it',price:8,furn:'yarn'},
- {id:'mouse',cat:'toys',ic:'🐭',n:'Toy Mouse',d:'A squeaky little friend',price:6,furn:'mouse'},
- {id:'ball',cat:'toys',ic:'🔴',n:'Jingle Ball',d:'Rolls and jingles',price:6,furn:'ball'},
- {id:'feather',cat:'toys',ic:'🪶',n:'Feather Wand',d:'Flutters on the floor',price:10,furn:'feather'},
- {id:'scratch',cat:'furn',ic:'🪵',n:'Scratching Post',d:'Saves your sofa',price:30,furn:'scratch'},
- {id:'tree',cat:'furn',ic:'🌳',n:'Cat Tree',d:'Two perches and a toy',price:80,furn:'tree'},
- {id:'tower',cat:'furn',ic:'🏰',n:'Cat Tower',d:'Tall tower with cosy condos',price:140,furn:'tower'},
+ {id:'yarn',cat:'toys',ic:'🧶',n:'Yarn Ball',d:'Kitty loves to chase it',price:10,furn:'yarn'},
+ {id:'mouse',cat:'toys',ic:'🐭',n:'Toy Mouse',d:'A squeaky little friend',price:8,furn:'mouse'},
+ {id:'ball',cat:'toys',ic:'🔴',n:'Jingle Ball',d:'Rolls and jingles',price:8,furn:'ball'},
+ {id:'feather',cat:'toys',ic:'🪶',n:'Feather Wand',d:'Flutters on the floor',price:12,furn:'feather'},
+ {id:'scratch',cat:'furn',ic:'🪵',n:'Scratching Post',d:'Saves your sofa',price:40,furn:'scratch'},
+ {id:'tree',cat:'furn',ic:'🌳',n:'Cat Tree',d:'Two perches and a toy',price:120,furn:'tree'},
+ {id:'tower',cat:'furn',ic:'🏰',n:'Cat Tower',d:'Tall tower with cosy condos',price:220,furn:'tower'},
  {id:'sand1',cat:'litter',ic:'📦',n:'Litter Sand 1 L',d:'Small pack · pour into the tray',price:5,sand:1,col:'#c9a45a'},
  {id:'sand5',cat:'litter',ic:'📦',n:'Litter Sand 5 L',d:'Fills a whole empty tray',price:20,sand:5,col:'#8fb85a'},
  {id:'sand10',cat:'litter',ic:'📦',n:'Litter Sand 10 L',d:'Two full trays · better value',price:36,sand:10,col:'#4aa3c8'},
  {id:'sand20',cat:'litter',ic:'📦',n:'Litter Sand 20 L',d:'Bulk bag · best value',price:66,sand:20,col:'#a56bd1'},
- {id:'bowl3',cat:'gear',ic:'🥣',n:'Family Bowl',d:'Holds 3 servings of food',price:30,gear:['food',3,'#d98a3d']},
- {id:'bowl5',cat:'gear',ic:'🍲',n:'Mega Feeder',d:'Holds 5 servings of food',price:60,gear:['food',5,'#4a86d8']},
- {id:'wat3',cat:'gear',ic:'💧',n:'Family Water Bowl',d:'Holds 3 drinks',price:30,gear:['water',3,'#3a9ad9']},
- {id:'wat5',cat:'gear',ic:'⛲',n:'Water Fountain',d:'Holds 5 drinks',price:60,gear:['water',5,'#2f7fb8']},
- {id:'tray2',cat:'gear',ic:'🏖️',n:'Large Litter Tray',d:'Only 25% used per visit · twice the visits',price:40,gear:['tray',25,'#4fa39a']},
- {id:'tray3',cat:'gear',ic:'🏝️',n:'Jumbo Litter Tray',d:'Only 15% used per visit · lasts ages',price:80,gear:['tray',15,'#d98a8a']},
- {id:'bowred',cat:'acc',ic:'🎀',n:'Red Bow',d:'A cute bow for her head',price:12,acc:true},
- {id:'bowblue',cat:'acc',ic:'💙',n:'Blue Bow',d:'A cute bow for her head',price:12,acc:true},
- {id:'flower',cat:'acc',ic:'🌸',n:'Flower Clip',d:'A little blossom',price:15,acc:true}];
+ {id:'bowl3',cat:'gear',ic:'🥣',n:'Family Bowl',d:'Holds 3 servings of food',price:40,gear:['food',3,'#d98a3d']},
+ {id:'bowl5',cat:'gear',ic:'🍲',n:'Mega Feeder',d:'Holds 5 servings of food',price:90,gear:['food',5,'#4a86d8']},
+ {id:'wat3',cat:'gear',ic:'💧',n:'Family Water Bowl',d:'Holds 3 drinks',price:40,gear:['water',3,'#3a9ad9']},
+ {id:'wat5',cat:'gear',ic:'⛲',n:'Water Fountain',d:'Holds 5 drinks',price:90,gear:['water',5,'#2f7fb8']},
+ {id:'tray2',cat:'gear',ic:'🏖️',n:'Large Litter Tray',d:'Only 25% used per visit · twice the visits',price:60,gear:['tray',25,'#4fa39a']},
+ {id:'tray3',cat:'gear',ic:'🏝️',n:'Jumbo Litter Tray',d:'Only 15% used per visit · lasts ages',price:120,gear:['tray',15,'#d98a8a']},
+ {id:'bowred',cat:'acc',ic:'🎀',n:'Red Bow',d:'A cute bow for her head',price:90,acc:true},
+ {id:'bowblue',cat:'acc',ic:'💙',n:'Blue Bow',d:'A cute bow for her head',price:90,acc:true},
+ {id:'flower',cat:'acc',ic:'🌸',n:'Flower Clip',d:'A little blossom',price:110,acc:true}];
 const FEED_BASIC={id:'basic',ic:'🥣',n:'Basic Kibble',d:'Plain kibble · free',love:0};
 const SHP_TABS=[['food','🍗','Food'],['toys','🧶','Toys'],['furn','🌳','Trees & Posts'],['gear','🥣','Bowls & Trays'],['litter','🏖️','Litter Sand'],['acc','🎀','Accessories']];
 const SHP_BY={};for(const i of SHP_CAT)SHP_BY[i.id]=i;
@@ -2322,9 +2319,9 @@ var QM=(function(){
  try{Object.assign(Q,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(Q))}catch(e){}};
  const reward=(n,msg)=>{WALLET.base+=n;try{saveBuild()}catch(e){}sound('good');toast(msg+' +'+n+' 🪙')};
- const need=L=>80+40*(L-1),XPT={feed:3,water:2,litter:4,pet:4,play:3,eat:4,cook:8,photo:4,buy:3,build:1,sit:1,cafe:8};
- function xp(n,key){if(Q.xd.day!==day)Q.xd={day,m:{}};const m=Q.xd.m;m[key]=(m[key]||0)+n;if(m[key]>40)return;Q.xp+=n;let up=0;while(Q.xp>=need(Q.lv)){Q.xp-=need(Q.lv);Q.lv++;up=Q.lv;const c=100+30*Q.lv;reward(c,'⭐ Home Level '+Q.lv+'!');const un=Object.keys(FURN).filter(k=>FURN[k].lvl===Q.lv).map(k=>FURN[k].n);if(un.length)setTimeout(()=>toast('🔓 Unlocked: '+un.slice(0,5).join(', ')+(un.length>5?'…':'')),2400)}}
- function dayEnd(){try{const a=(stats.hunger+stats.thirst+stats.litter+stats.love+stats.health+stats.clean)/6;if(a>=50&&started){const c=Math.round((a-40)*1.2)+homeTip();WALLET.base+=c;saveBuild();toast('☀️ New day! Kitty was '+(a>=85?'spoiled':a>=70?'happy':'okay')+' · +'+c+' 🪙');sound('coin')}}catch(e){}}
+ const need=L=>100+60*(L-1),XPT={feed:3,water:2,litter:4,pet:4,play:3,eat:4,cook:8,photo:4,buy:3,build:1,sit:1,cafe:8};
+ function xp(n,key){if(Q.xd.day!==day)Q.xd={day,m:{}};const m=Q.xd.m;m[key]=(m[key]||0)+n;if(m[key]>40)return;Q.xp+=n;let up=0;while(Q.xp>=need(Q.lv)){Q.xp-=need(Q.lv);Q.lv++;up=Q.lv;const c=40+15*Q.lv;reward(c,'⭐ Home Level '+Q.lv+'!');const un=Object.keys(FURN).filter(k=>FURN[k].lvl===Q.lv).map(k=>FURN[k].n);if(un.length)setTimeout(()=>toast('🔓 Unlocked: '+un.slice(0,5).join(', ')+(un.length>5?'…':'')),2400)}}
+ function dayEnd(){try{const a=(stats.hunger+stats.thirst+stats.litter+stats.love+stats.health+stats.clean)/6;if(a>=50&&started){const c=Math.round((a-50)*.6)+homeTip();WALLET.base+=c;saveBuild();toast('☀️ New day! Kitty was '+(a>=85?'spoiled':a>=70?'happy':'okay')+' · +'+c+' 🪙');sound('coin')}}catch(e){}}
  const nF=t=>{let c=0;for(const it of furn.values())if(it.type===t)c++;return c};
  // guided steps: poll = checked automatically from the state of the house, ev = happens when the player does it
  // ---------- guided first day: spotlight + tap-locking, like a modern builder ----------
@@ -2385,11 +2382,12 @@ var QM=(function(){
  function newDay(){if(Q.day===day||Q.tut!=='done')return;Q.day=day;Q.g=pickDay(day);Q.full=false;if(Q.lastFull&&Q.lastFull<day-1)Q.streak=0;save();refresh()}
  function ev(name,n){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);
   if(Q.tut!=='done'){const s=TUT[Q.tut];if(s&&s.ev===name)adv()}
-  if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g.k);reward(p.r,p.i+' Goal done!');xp(15,'goal')}}
-   if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=120+20*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
+  if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g.k);reward(Math.round(p.r*.45),p.i+' Goal done!');xp(15,'goal')}}
+   if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=40+10*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
    save()}refresh()}catch(e){}}
- function adv(){const s=TUT[Q.tut];Q.tut++;if(s.r){reward(s.r,'✅ '+nameT(s.t));xp(25,'tut')}else{try{sound('good')}catch(e){}}if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
- function poll(){if(Q.tut==='done'){newDay();return}const s=TUT[Q.tut];
+ function adv(){const s=TUT[Q.tut];Q.tut++;if(s.r){reward(Math.max(5,Math.round(s.r*.3)),'✅ '+nameT(s.t));xp(25,'tut')}else{try{sound('good')}catch(e){}}if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
+ let LD=0;const LK='purrfect-login';function loginBonus(){const dk=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(),t=new Date();let o={};try{o=JSON.parse(localStorage.getItem(LK)||'{}')||{}}catch(e){}if(o.d===dk(t))return;const st=o.d===dk(new Date(t-864e5))?(o.s||0)+1:1;try{localStorage.setItem(LK,JSON.stringify({d:dk(t),s:st}))}catch(e){}const c=20+10*Math.min(st,7);setTimeout(()=>reward(c,'📅 Welcome back! Day '+st),2500)}
+ function poll(){if(Q.tut==='done'){if(!LD){LD=1;try{loginBonus()}catch(e){}}newDay();return}const s=TUT[Q.tut];
   // never let a step be blocked: if the bowl is already full, empty it so Feed / Water can be done
   if(s&&s.ev==='feed'&&bowl.food>=99.5){bowl.food=0;try{updateBowlVisuals();saveCat()}catch(e){}}
   if(s&&s.ev==='water'&&bowl.water>=99.5){bowl.water=0;try{updateBowlVisuals();saveCat()}catch(e){}}
@@ -2477,12 +2475,12 @@ var PERS=(function(){
  const busy=()=>PG.on||SG.on||(typeof HV!=='undefined'&&HV&&HV.on)||CI.on||GE.on||seat||act||DN.on||SH.on||ck.on||GR.ui||build.on||cat.userData.task==='sleep'||cat.userData.held>0||stats.love<=0;
  const EV={
   zoom:{w:3,f(){const U=cat.userData;U.zoom=8;if(U.task&&U.task!=='wander')endTask();U.wait=0;catSound('meow');toast('💨 Zoomies! Kitty is racing around the house')}},
-  gift:{w:1.5,f(){const c=20+Math.floor(Math.random()*40);WALLET.base+=c;saveBuild();sound('good');toast('🎁 Kitty found a present for you! +'+c+' 🪙');catSound('purr')}},
+  gift:{w:1.5,f(){const c=10+Math.floor(Math.random()*20);WALLET.base+=c;saveBuild();sound('good');toast('🎁 Kitty found a present for you! +'+c+' 🪙');catSound('purr')}},
   hair:{w:1.5,f(){const x=cat.position.x-Math.sin(cat.rotation.y)*.4,z=cat.position.z-Math.cos(cat.rotation.y)*.4;addFloorMess('hair',x,z);catSound('sad');toast('🤢 Kitty coughed up a hairball! Clean it up')}},
   cuddle:{w:3,f(){const U=cat.userData;U.follow=14;U.happy=0;P.want=Date.now()+90000;catSound('meow');toast('💗 Kitty wants cuddles! Pet her for a surprise')}}};
  function fire(){const t=T[P.t],cand=[];for(const k in EV){const w=EV[k].w*((t&&t.ev[k]!==undefined)?t.ev[k]:1);if(w>0)cand.push([k,w])}if(!cand.length)return;let tot=0;for(const c of cand)tot+=c[1];let x=Math.random()*tot;for(const c of cand){if((x-=c[1])<=0){EV[c[0]].f();return}}}
  function tick(dt){if(!started)return;roll();timer-=dt;if(timer>0)return;if(busy()){timer=10;return}timer=100+Math.random()*120;fire()}
- function petBonus(){if(P.want&&Date.now()<P.want){P.want=0;const c=40;WALLET.base+=c;saveBuild();sound('good');toast('💗 Kitty adored that cuddle! +'+c+' 🪙');qxp(10,'cuddle')}if(P.t==='cuddly'){stats.love=Math.min(100,stats.love+6)}}
+ function petBonus(){if(P.want&&Date.now()<P.want){P.want=0;const c=25;WALLET.base+=c;saveBuild();sound('good');toast('💗 Kitty adored that cuddle! +'+c+' 🪙');qxp(10,'cuddle')}if(P.t==='cuddly'){stats.love=Math.min(100,stats.love+6)}}
  function feedBonus(){if(P.t==='foodie')stats.love=Math.min(100,stats.love+5)}
  function panel(){let p=document.getElementById('pPanel');if(p){p.remove();return}const t=T[P.t]||T.playful;p=document.createElement('div');p.id='pPanel';
   p.style.cssText='position:fixed;z-index:50;right:max(12px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 60px);width:min(300px,90vw);background:#fff8e9;border-radius:18px;padding:14px;box-shadow:0 10px 34px #0004;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:13px';
