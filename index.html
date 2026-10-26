@@ -44,7 +44,22 @@ html,body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-we
 
 #qBtn,#audBtn,#agePill{pointer-events:auto;cursor:pointer;touch-action:manipulation}#qBtn,#audBtn{border:0;font-family:inherit;color:var(--ink);min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}button,input,textarea,select{font-family:inherit}#start{margin-top:12px}#howto{margin:10px 0 4px;background:#2e76580f;border-radius:14px;padding:10px 14px}#howto summary{font-weight:800;cursor:pointer;color:var(--green)}#howto p{font-size:13px}.prompt{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 206px);background:#fff8e9;color:var(--ink);border-radius:20px;font-weight:800;box-shadow:0 4px 14px #0003}.toast{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 256px);border-radius:16px;box-shadow:0 4px 14px #0004}.building .pill{white-space:nowrap}.building #agePill,.building #zone{display:none}.building #clock{font-size:10px}.building .toast{bottom:auto!important;top:calc(max(10px,env(safe-area-inset-top)) + 64px)}#onb{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;background:linear-gradient(#cfe7f3dd,#f7e9c8dd);backdrop-filter:blur(3px)}#onb .obc{background:#fff8e9;border-radius:26px;padding:26px 22px;width:min(100%,360px);text-align:center;box-shadow:0 14px 44px #0003}#onb .obe{font-size:54px;line-height:1}#onb h1{margin:8px 0 4px;font-size:22px}#onb p{margin:6px 0 16px;font-size:14px;opacity:.85}#onb input{width:100%;font:800 20px Nunito,system-ui;text-align:center;border:2px solid #e0d3b0;border-radius:16px;padding:12px;background:#fff;color:var(--ink);outline:none}#onb input:focus{border-color:var(--green)}#onb button{width:100%;margin-top:14px;border:0;border-radius:16px;padding:14px;background:var(--green);color:#fff;font:900 17px Nunito,system-ui}#onb button:disabled{opacity:.35}
 #obBar{position:fixed;left:12px;right:12px;top:calc(max(10px,env(safe-area-inset-top)) + 4px);z-index:90;display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fff8e9;border-radius:18px;padding:8px 8px 8px 16px;box-shadow:0 6px 20px #0003;font-weight:900;font-size:15px}#obBar button{border:0;border-radius:14px;padding:11px 16px;background:var(--green);color:#fff;font:900 14px Nunito,system-ui}
-body.ob .fx{display:none!important}body.ob .hud,body.ob #buildBtn,body.ob #controls,body.ob #phBtn,body.ob #gaBtn,body.ob #qBanner,body.ob #hint{display:none!important}</style></head><body><div id="game"></div>
+body.ob .fx{display:none!important}body.ob .hud,body.ob #buildBtn,body.ob #controls,body.ob #phBtn,body.ob #gaBtn,body.ob #qBanner,body.ob #hint{display:none!important}
+/* ---- polish pass: compact build dock, motion, press feedback ---- */
+#buildMenu{gap:5px!important;padding-top:7px;animation:sheetUp .22s ease-out}
+@keyframes sheetUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+#buildMenu .chips{display:flex;overflow-x:auto;scrollbar-width:none;touch-action:pan-x;gap:5px}#buildMenu .chips::-webkit-scrollbar{display:none}
+#buildMenu>.row{flex:none}#buildMenu .chips{min-height:32px}#buildMenu .chips .bt{flex:0 0 auto;padding:4px 11px;min-height:30px;white-space:nowrap}
+#buildMenu .util .bt{min-height:30px}
+#buildMenu .tabs .bt{min-height:42px}
+#buildMenu .opts .bt{min-height:52px}
+#buildMenu .opts.scroll .bt{flex:0 0 72px}
+#buildMenu .bt,button{transition:transform .08s,background .15s}
+button:active:not(:disabled){transform:scale(.96)}
+.modal,#audPanel,#qPanel{animation:popIn .2s ease-out}
+@keyframes popIn{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+#audPanel button{white-space:nowrap}
+</style></head><body><div id="game"></div>
 <div class="hud"><div class="panel"><div class="brand">🏡 PURRFECT HOME</div><div class="sub">Build your home, then make it yours.</div></div><div class="panel meters"><div class="meter">🍗 HUNGER<div class="track"><div id="hunger" class="fill hunger"></div></div></div><div class="meter">💧 THIRST<div class="track"><div id="thirst" class="fill"></div></div></div><div class="meter">🧹 LITTER CLEAN<div class="track"><div id="litter" class="fill litter"></div></div></div><div class="meter">💗 BOND<div class="track"><div id="love" class="fill love"></div></div></div><div class="meter">🩺 HEALTH<div class="track"><div id="health" class="fill health"></div></div></div><div class="meter">🛁 CLEAN<div class="track"><div id="clean" class="fill clean"></div></div></div><div class="meter" id="bowls" style="grid-column:1/-1;font-size:10px;font-weight:700;opacity:.85;line-height:1.35"></div></div><div class="topright"><div class="pill" id="agePill">🐱 Kitten · 2 mo</div><div class="pill" id="clock">☀️ Day 1 · 08:00</div><div class="pill" id="coinPill">🪙 10,000</div><div class="pill" id="zone">🏗️ Your lot</div><div style="display:flex;gap:6px;justify-content:flex-end"><button class="pill" id="qBtn" type="button" aria-label="Goals">🎯</button><button class="pill" id="audBtn" type="button" aria-label="Menu">⚙️</button></div><button class="pill" id="buildBtn" type="button">🔨 Build</button></div></div>
 <div id="prompt" class="prompt">Press interact</div><div id="toast" class="toast"></div>
 <div class="bottom"><div class="controls" id="controls"><div id="pad" class="pad" aria-label="Movement joystick"><div id="stick" class="stick"></div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div class="hint" id="hint">Drag the pad to walk · Drag open screen to look around<br>Tap 🔨 Build to build your house · PC: WASD / arrows</div><div id="buildMenu" style="display:none"><div class="row util"><button class="bt" id="bUndo" type="button"><span class="i">↶</span><span class="lbl">Undo</span></button><button class="bt" id="bClear" type="button"><span class="i">🗑</span><span class="lbl">Clear</span></button><button class="bt" id="bL" type="button"><span class="i">⟲</span></button><button class="bt" id="bR" type="button"><span class="i">⟳</span></button><button class="bt" id="bHalf" type="button">Full</button><button class="bt" id="bDock" type="button"><span class="i">⌄</span></button></div><div class="row tabs" id="catBar"><button class="bt sel" id="bCatWall" type="button"><span class="i">🧱</span>Wall</button><button class="bt" id="bCatFloor" type="button"><span class="i">🟫</span>Floor</button><button class="bt" id="bCatAcc" type="button"><span class="i">🚪</span>Doors</button><button class="bt" id="bCatFurn" type="button"><span class="i">🛋️</span>Furniture</button><button class="bt" id="bErase" type="button"><span class="i">🧽</span>Erase</button></div><div class="row chips" id="grpBar" style="display:none"></div><div class="row opts" id="subBar"></div></div></div></div>
@@ -163,7 +178,7 @@ for(const l of [legL,legR]){const sh=l===legL?shinL:shinR;sphere(l,0,-.17,0,.16,
 const skyMat=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,uniforms:{top:{value:new THREE.Color('#5f9fd8')},mid:{value:new THREE.Color('#bcdcf0')},bot:{value:new THREE.Color('#f4ead2')}},vertexShader:'varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 vP;uniform vec3 top,mid,bot;void main(){float h=vP.y;vec3 c=h>0.?mix(mid,top,pow(clamp(h,0.,1.),.55)):mix(mid,bot,clamp(-h*4.,0.,1.));gl_FragColor=vec4(c,1.);}'});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(120,32,16),skyMat);sky.renderOrder=-1;scene.add(sky);
 // Reuse albedo canvases as bump maps for tactile depth
-for(const k of ['grass','floor','wall','wood','darkwood','road','cat']){const m=M[k];if(m.map){m.bumpMap=m.map;m.bumpScale=k==='grass'?1.8:.12;m.needsUpdate=true}}
+for(const k of ['grass','floor','wall','wood','darkwood','road','cat']){const m=M[k];if(m.map){m.bumpMap=m.map;m.bumpScale=k==='grass'?.7:.12;m.needsUpdate=true}}
 M.floor.roughness=.55;M.wood.roughness=.7;M.white.roughness=.5;M.glass.roughness=.08;M.glass.metalness=.1;
 // Clouds
 const clouds=[];const cloudMat=new THREE.MeshStandardMaterial({color:'#ffffff',roughness:1,transparent:true,opacity:.92,fog:false,emissive:'#ffffff',emissiveIntensity:.25});
@@ -3667,6 +3682,70 @@ try{if(OBSKIP)setTimeout(()=>document.getElementById('start').click(),40);else o
  const doImp=e=>{e.preventDefault();e.stopPropagation();box('Restore a backup','Paste your backup text below. This replaces the game on this device.','Restore',(t,o)=>{try{const j=JSON.parse(t.value);if(!j||!j.purrfect||!j.data)throw 0;for(const k of Object.keys(j.data))if(k.indexOf('purrfect')===0)localStorage.setItem(k,j.data[k]);location.reload()}catch(er){t.value='';t.placeholder='That does not look like a Purrfect Home backup.'}})};
  q('svImp').onclick=doImp;window.purrRestore=()=>doImp({preventDefault(){},stopPropagation(){}});
  if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+
+// ---- cohesive icon set: swaps the emoji used as interface chrome for matching line icons (item and food emoji stay as content) ----
+(function(){
+ const A='class="a"';
+ const P={
+  hammer:`<rect x="10.5" y="3" width="11" height="5.5" rx="1.4" transform="rotate(45 16 5.75)" ${A}/><path d="M12.5 11.5L4.5 19.5"/>`,
+  wall:`<rect x="3" y="5" width="18" height="14" rx="2" ${A}/><path d="M3 10h18M3 15h18M9 5v5M15 10v5M9 15v4"/>`,
+  floor:`<path d="M12 4l9 5-9 5-9-5z" ${A}/><path d="M3 13.5l9 5 9-5M3 9v4.5M21 9v4.5"/>`,
+  door:`<rect x="6" y="3" width="12" height="18" rx="1.8" ${A}/><circle cx="15" cy="12.5" r="1.1" fill="currentColor" stroke="none"/>`,
+  sofa:`<path d="M5.5 11V8.5A2.5 2.5 0 018 6h8a2.5 2.5 0 012.5 2.5V11"/><rect x="3" y="11" width="18" height="6.5" rx="2.4" ${A}/><path d="M6 17.5V20M18 17.5V20"/>`,
+  eraser:`<path d="M4 15.5L12 6l8 6.2-6 7H8.5z" ${A}/><path d="M10 19.2h10"/>`,
+  undo:`<path d="M9 8L4.5 12.5 9 17"/><path d="M5 12.5h9.5a4.5 4.5 0 010 9"/>`,
+  trash:`<path d="M4.5 7h15M9.5 7V4h5v3"/><path d="M6.5 7l1 13h9l1-13z" ${A}/>`,
+  rotl:`<path d="M5 12a7 7 0 107-7"/><path d="M5 4.5V9h4.5"/>`,
+  rotr:`<path d="M19 12a7 7 0 11-7-7"/><path d="M19 4.5V9h-4.5"/>`,
+  layers:`<path d="M12 4l9 5-9 5-9-5z" ${A}/><path d="M3 14l9 5 9-5"/>`,
+  down:`<path d="M6 9.5l6 6 6-6"/>`,up:`<path d="M6 14.5l6-6 6 6"/>`,
+  camera:`<rect x="3" y="7" width="18" height="12.5" rx="3" ${A}/><circle cx="12" cy="13.3" r="3.4" fill="#fff"/><path d="M8 7l1.4-3h5.2L16 7"/>`,
+  picture:`<rect x="3" y="4" width="18" height="16" rx="2.6" ${A}/><circle cx="9" cy="10" r="1.7" fill="#fff"/><path d="M4 18l5-5 4 4 3-3 4 4"/>`,
+  target:`<circle cx="12" cy="12" r="9" ${A}/><circle cx="12" cy="12" r="5" fill="#fff"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/>`,
+  gear:`<circle cx="12" cy="12" r="3.4" ${A}/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>`,
+  coin:`<circle cx="12" cy="12" r="9" fill="#f3bd56"/><circle cx="12" cy="12" r="5.6" fill="#f8d77e"/><path d="M12 9v6" stroke-width="2"/>`,
+  sun:`<circle cx="12" cy="12" r="4.4" fill="#f3bd56"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7"/>`,
+  tree:`<circle cx="12" cy="9.2" r="6.2" fill="#7bbd78"/><path d="M12 15.4V21"/>`,
+  home:`<path d="M3 11.5L12 4l9 7.5"/><path d="M5.5 10.2V20h13V10.2z" ${A}/><rect x="10" y="14" width="4" height="6" fill="#fff"/>`,
+  paw:`<ellipse cx="12" cy="16" rx="4.8" ry="4" ${A}/><circle cx="5.8" cy="11" r="1.9" fill="currentColor" stroke="none"/><circle cx="9.7" cy="7.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="14.3" cy="7.2" r="1.9" fill="currentColor" stroke="none"/><circle cx="18.2" cy="11" r="1.9" fill="currentColor" stroke="none"/>`,
+  cat:`<path d="M5 10V4.2l4.2 3h5.6l4.2-3V10a7 7 0 01-14 0z" ${A}/><circle cx="9.6" cy="11" r=".9" fill="currentColor" stroke="none"/><circle cx="14.4" cy="11" r=".9" fill="currentColor" stroke="none"/><path d="M11 13.8h2"/>`,
+  meat:`<circle cx="15" cy="9" r="5.4" fill="#e8a24a"/><path d="M11.2 12.8L5 19"/><circle cx="4.5" cy="18.2" r="1.6" fill="#fff"/><circle cx="6.2" cy="19.9" r="1.6" fill="#fff"/>`,
+  drop:`<path d="M12 3c4 4.8 6 8 6 11a6 6 0 01-12 0c0-3 2-6.2 6-11z" fill="#6fb7e3"/>`,
+  broom:`<path d="M15 3l-4.5 8.5"/><path d="M6.5 11.5h9l2.5 9.5H4z" ${A}/>`,
+  heart:`<path d="M12 20s-8-4.7-8-10.5A4.5 4.5 0 0112 7.2a4.5 4.5 0 018 2.3C20 15.3 12 20 12 20z" fill="#ef9da2"/>`,
+  health:`<rect x="9" y="3.5" width="6" height="17" rx="2" fill="#5fb3b8"/><rect x="3.5" y="9" width="17" height="6" rx="2" fill="#5fb3b8"/>`,
+  tub:`<path d="M3 12h18v2.6A5.4 5.4 0 0115.6 20H8.4A5.4 5.4 0 013 14.6z" ${A}/><path d="M6 12V6.5a2.3 2.3 0 014.2-1.3M6 20l-1 2M18 20l1 2"/>`,
+  save:`<path d="M4 4h13l3 3v13H4z" ${A}/><rect x="8" y="4" width="7" height="5" fill="#fff"/><rect x="7" y="13" width="10" height="7" fill="#fff"/>`,
+  upload:`<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>`,download:`<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>`,
+  refresh:`<path d="M20 12a8 8 0 11-2.9-6.2"/><path d="M20.5 4v5h-5"/>`,
+  music:`<path d="M9 18V6l10-2v12"/><circle cx="6.8" cy="18" r="2.6" ${A}/><circle cx="16.8" cy="16" r="2.6" ${A}/>`,
+  bell:`<path d="M6 17v-6a6 6 0 0112 0v6l2 2H4z" ${A}/><path d="M10 21.5h4"/>`,
+  leaf:`<path d="M5 19C5 10.5 11 5 20 4c0 9-5 15-13 15z" fill="#7bbd78"/><path d="M5 19l9-9"/>`,
+  vibrate:`<rect x="8" y="3" width="8" height="18" rx="2.2" ${A}/><path d="M4 8v8M20 8v8"/>`,
+  mute:`<path d="M4 9.5v5h4l5 4v-13l-5 4z" ${A}/><path d="M16.5 9.5l4.5 5M21 9.5l-4.5 5"/>`,
+  star:`<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="#f3bd56"/>`,
+  move:`<path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/>`,
+  lock:`<rect x="5" y="11" width="14" height="9.5" rx="2.2" ${A}/><path d="M8 11V8a4 4 0 018 0v3"/>`,
+  search:`<circle cx="10.5" cy="10.5" r="6" ${A}/><path d="M15 15l5.5 5.5"/>`,
+  pan:`<circle cx="10" cy="13.5" r="6.2" ${A}/><path d="M15.5 9.5L21 5"/>`,
+  check:`<path d="M5 12.5l4.5 4.5L19 7.5"/>`,
+  close:`<path d="M6 6l12 12M18 6L6 18"/>`
+ };
+ const M={'🔨':'hammer','🧱':'wall','🟫':'floor','🚪':'door','🛋️':'sofa','🛋':'sofa','🧽':'eraser','↶':'undo','🗑️':'trash','🗑':'trash','⟲':'rotl','⟳':'rotr','⌄':'down','⌃':'up','📷':'camera','🖼️':'picture','🖼':'picture','🎯':'target','⚙️':'gear','⚙':'gear','🪙':'coin','☀️':'sun','☀':'sun','🌳':'tree','🏡':'home','🐾':'paw','🐱':'cat','🍗':'meat','💧':'drop','🧹':'broom','💗':'heart','🩺':'health','🛁':'tub','💾':'save','📤':'upload','📥':'download','🔄':'refresh','🎵':'music','🔔':'bell','🌿':'leaf','📳':'vibrate','🔇':'mute','⭐':'star','✋':'move','🔒':'lock','🔍':'search','🍳':'pan','✔':'check','✓':'check','✕':'close'};
+ const keys=Object.keys(M).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+ const RE=new RegExp('('+keys.join('|')+')\\uFE0F?','g'),HAS=new RegExp(keys.join('|'));
+ const SCOPE='.hud,#buildMenu,#audPanel,#qPanel,#buildBtn,#phBtn,#gaBtn,#catActions,#ctxBtn,#qBanner,#wdMenu,#feedMenu,#litMenu,#onb';
+ const mk=n=>'<span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24">'+P[n]+'</svg></span>';
+ const st=document.createElement('style');st.textContent='.ic{display:inline-flex;width:1.18em;height:1.18em;vertical-align:-.22em;flex:none}.ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible}.ic svg .a{fill:#f3d38a}#buildMenu .bt.sel .ic svg .a{fill:#f3bd56}#buildMenu .tabs .bt .i .ic{width:22px;height:22px}#buildMenu .util .bt .ic{width:18px;height:18px}';document.head.appendChild(st);
+ let busy=false;
+ function fix(t){if(t.nodeType!==3||!t.nodeValue||!HAS.test(t.nodeValue))return;const p=t.parentElement;if(!p||p.closest('script,style,textarea,input,.toast,#prompt')||!p.closest(SCOPE))return;
+  const parts=t.nodeValue.split(RE);if(parts.length<2)return;const html=parts.map((x,i)=>{const nm=M[x]||M[x.replace(/️/g,'')];return i%2===1&&nm?mk(nm):x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}).join('');
+  const sp=document.createElement('span');sp.style.display='contents';sp.innerHTML=html;busy=true;t.replaceWith(sp);busy=false}
+ function walk(n){if(n.nodeType===3){fix(n);return}if(n.nodeType!==1||/^(SCRIPT|STYLE|TEXTAREA|INPUT|SVG)$/i.test(n.tagName)||n.classList&&n.classList.contains('ic'))return;for(const c of [...n.childNodes])walk(c)}
+ window.purrIconize=()=>walk(document.body);
+ const mo=new MutationObserver(ms=>{if(busy)return;for(const m of ms){if(m.type==='characterData')fix(m.target);else for(const a of m.addedNodes)walk(a)}});
+ mo.observe(document.body,{childList:true,subtree:true,characterData:true});walk(document.body);
 })();
 
 </script></body></html>
