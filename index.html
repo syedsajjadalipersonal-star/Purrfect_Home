@@ -276,7 +276,7 @@ const fGhostMat=new THREE.MeshBasicMaterial({color:'#ffd24a',transparent:true,op
 function showFloorGhost(cells){while(fGhosts.length<cells.length){const m=new THREE.Mesh(new THREE.BoxGeometry(.96,.02,.96),fGhostMat);m.visible=false;scene.add(m);fGhosts.push(m)}
  fGhosts.forEach((m,i)=>{const c=cells[i];if(!c){m.visible=false;return}m.visible=true;m.position.set(c[0]+.5,.095,c[1]+.5)});fGhostMat.color.set(build.floor?FLOORS[build.floor].col:'#e05a4a')}
 function paintCells(cells){const to=build.floor,ch=[];let broke=0;for(const [cx,cz] of cells){const o=floors.get(fkey(cx,cz)),from=o?o.type:null;if(from!==(to||null)){const dl=(FLOORP[to]||0)-(FLOORP[from]||0);if(dl>0&&coins()<dl){broke=dl;break}setFloor(cx,cz,to);ch.push([cx,cz,from,to||null])}}if(broke)noCoins(broke);
- if(ch.length){build.undo.push({floor:ch});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build',added.length)}}
+ if(ch.length){build.undo.push({floor:ch});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}}
 // ===== Wall styles: plaster / brick / wallpaper. UVs follow world position so patterns line up between pieces. =====
 const WALL_STYLES={
  normal:{name:'Normal',mat:null},brick:{name:'Brick',mat:null},wallpaper:{name:'Wallpaper',mat:null}};
@@ -2075,11 +2075,11 @@ cv.addEventListener('pointermove',e=>{if(!bp||e.pointerId!==bp.id)return;
  bp.b=p.node;const end=endNode(bp.a,p.node);mB.visible=true;mB.position.set(end.x,.15,end.z);showGhost(pathEdges(bp.a,p.node))});
 function endDraw(e){if(!bp||e.pointerId!==bp.id)return;const g=bp;bp=null;mA.visible=mB.visible=false;showGhost([]);showFloorGhost([]);hideFurnGhost();
  if(g.mv){g.mv.group.visible=true;const sp=g.spot;if(e.type!=='pointercancel'&&sp&&sp.ok&&(sp.x0!==g.from[0]||sp.z0!==g.from[1]||sp.r!==g.from[2])){g.mv.x0=sp.x0;g.mv.z0=sp.z0;g.mv.rot=sp.r;placeModel(g.mv);build.undo.push({furnSet:[[g.mv.uid,g.from]]});saveBuild();sound()}else if(sp&&!sp.ok&&e.type!=='pointercancel')toast('No room there');return}
- if(g.fp){if(e.type==='pointercancel')return;const sp=g.spot;if(sp&&sp.ok&&g.ex&&furn.has(g.ex.uid)){const o=g.ex,from=[o.x0,o.z0,o.rot];o.x0=sp.x0;o.z0=sp.z0;o.rot=sp.r;placeModel(o);build.undo.push({furnSet:[[o.uid,from]]});saveBuild();sound();toast('Moved your '+FURN[g.fp].n.toLowerCase())}else if(sp&&sp.ok){const pr=FURN[g.fp].price||0;if(pr>coins()){noCoins(pr);return}const it=addFurn(g.fp,sp.x0,sp.z0,sp.r);build.undo.push({furnAdd:[it.uid]});if(build.undo.length>60)build.undo.shift();saveBuild();sound()}else toast('No room there');return}
+ if(g.fp){if(e.type==='pointercancel')return;const sp=g.spot;if(sp&&sp.ok&&g.ex&&furn.has(g.ex.uid)){const o=g.ex,from=[o.x0,o.z0,o.rot];o.x0=sp.x0;o.z0=sp.z0;o.rot=sp.r;placeModel(o);build.undo.push({furnSet:[[o.uid,from]]});saveBuild();sound();toast('Moved your '+FURN[g.fp].n.toLowerCase())}else if(sp&&sp.ok){const pr=FURN[g.fp].price||0;if(pr>coins()){noCoins(pr);return}const it=addFurn(g.fp,sp.x0,sp.z0,sp.r);build.undo.push({furnAdd:[it.uid]});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}else toast('No room there');return}
  if(e.type==='pointercancel')return;if(g.floor){paintCells(cellsRect(g.a,g.b));return}
  if(build.tool==='erase'){if(g.removed.length||g.removedF.length||g.removedFu.length){build.undo.push({remove:g.removed,floor:g.removedF,furnRemove:g.removedFu});saveBuild()}return}
  const added=[],styled=[];let broke=0;for(const [x,z,o] of pathEdges(g.a,g.b)){const ex=edges.get(ekey(x,z,o));if(!ex){const c=WALLP[build.wall]||10;if(coins()<c){broke=c;break}if(addEdge(x,z,o,'wall',build.wall))added.push([x,z,o])}else if(ex.style!==build.wall){const dl=edgeVal(ex.type,build.wall)-edgeVal(ex.type,ex.style);if(dl>0&&coins()<dl){broke=dl;break}styled.push([x,z,o,ex.style,build.wall]);const t=ex.type;removeEdge(ekey(x,z,o));addEdge(x,z,o,t,build.wall)}}if(broke)noCoins(broke);
- if(added.length||styled.length){build.undo.push({add:added,style:styled});if(build.undo.length>60)build.undo.shift();saveBuild();sound()}}
+ if(added.length||styled.length){build.undo.push({add:added,style:styled});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}}
 cv.addEventListener('pointerup',endDraw);cv.addEventListener('pointercancel',endDraw);
 // ===== Audio + haptics =====
 // Every sound is synthesised live from oscillators and noise: no audio files to license, nothing extra to download, works offline.
