@@ -13,7 +13,7 @@ jobs:
         with: { distribution: temurin, java-version: 17 }
       - name: Stage web files
         run: |
-          mkdir www && cp -r index.html sw.js manifest.webmanifest vendor icons www/
+          mkdir www && cp -r index.html sw.js manifest.webmanifest vendor icons fonts www/
       - run: npm install
       - name: Create Android project (first run only)
         run: |
