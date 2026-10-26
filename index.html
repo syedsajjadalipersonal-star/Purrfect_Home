@@ -2143,10 +2143,11 @@ function hideTick(dt){const H=LIFE.hide;if(!H)return false;H.t+=dt;const sh=Math
  H.sound-=dt;if(H.sound<=0){H.sound=7+Math.random()*5;catSound('meow')}
  if(Math.hypot(player.position.x-H.x,player.position.z-H.z)<1.7){hideEnd(true);return false}
  if(H.t>150||sleepInfo(mins)){hideEnd(false);return false}return true}
-function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.sneezeT-=dt;if(LIFE.sneezeT<=0&&!cat.userData.sleeping){LIFE.sneezeT=18+Math.random()*14;catSound('sad');toast('🤧 Kitty sneezed. She is under the weather')}
+function sickPay(n){const a=Math.max(0,Math.min(n,coins()));if(a>0){WALLET.base-=a;saveBuild()}return a}
+function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.payT=(LIFE.payT||30)-dt;if(LIFE.payT<=0){LIFE.payT=30;const a=sickPay(2);if(a)toast('💊 Medicine for Kitty −'+a+' 🪙')}LIFE.sneezeT-=dt;if(LIFE.sneezeT<=0&&!cat.userData.sleeping){LIFE.sneezeT=18+Math.random()*14;catSound('sad');toast('🤧 Kitty sneezed. She is under the weather')}
  LIFE.saveT-=dt;if(LIFE.saveT<=0||SICK.t<=0){LIFE.saveT=10;try{localStorage.setItem('purrfect-sick',String(Math.max(0,Math.round(SICK.t))))}catch(e){}}
  if(SICK.t<=0){toast('💚 Kitty is feeling better!')}}
-function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;catSound('sad');toast('🤒 Kitty seems unwell and is moving slowly. A vet visit cures her fast, or keep her fed, watered and clean');return true}
+function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;const bill=sickPay(Math.max(12,Math.min(60,Math.round(coins()*.08))));catSound('sad');toast('🤒 Kitty is unwell'+(bill?' · medicine −'+bill+' 🪙':'')+'. Medicine keeps costing coins until she recovers. A vet visit cures her fast');return true}
 function windowSpot(){const ws=[...edges.values()].filter(e=>e.type==='window');if(!ws.length)return null;const e=ws[Math.floor(Math.random()*ws.length)],o=[[0,.55],[0,-.55]],q=e.o==='h'?[[0,.55],[0,-.55]]:[[.55,0],[-.55,0]];
  let best=q[0],bs=-1;for(const [dx,dz] of q){const x=e.cx+dx,z=e.cz+dz,sc=(floorAt(x,z)?2:0)+(blockedPoint(x,z,.25)?-3:0)+Math.random();if(sc>bs){bs=sc;best=[dx,dz]}}
  return {e,x:e.cx+best[0],z:e.cz+best[1],face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
