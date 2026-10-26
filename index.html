@@ -42,7 +42,9 @@ html,body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-we
  .toast{top:calc(max(10px,env(safe-area-inset-top)) + 100px)}.panel{padding:7px 10px}.sub{display:none}
 }
 
-#qBtn,#audBtn,#agePill{pointer-events:auto;cursor:pointer;touch-action:manipulation}#qBtn,#audBtn{border:0;font-family:inherit;color:var(--ink);min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}button,input,textarea,select{font-family:inherit}#start{margin-top:12px}#howto{margin:10px 0 4px;background:#2e76580f;border-radius:14px;padding:10px 14px}#howto summary{font-weight:800;cursor:pointer;color:var(--green)}#howto p{font-size:13px}.prompt{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 206px);background:#fff8e9;color:var(--ink);border-radius:20px;font-weight:800;box-shadow:0 4px 14px #0003}.toast{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 256px);border-radius:16px;box-shadow:0 4px 14px #0004}.building .pill{white-space:nowrap}.building #agePill,.building #zone{display:none}.building #clock{font-size:10px}.building .toast{bottom:auto!important;top:calc(max(10px,env(safe-area-inset-top)) + 64px)}</style></head><body><div id="game"></div>
+#qBtn,#audBtn,#agePill{pointer-events:auto;cursor:pointer;touch-action:manipulation}#qBtn,#audBtn{border:0;font-family:inherit;color:var(--ink);min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}button,input,textarea,select{font-family:inherit}#start{margin-top:12px}#howto{margin:10px 0 4px;background:#2e76580f;border-radius:14px;padding:10px 14px}#howto summary{font-weight:800;cursor:pointer;color:var(--green)}#howto p{font-size:13px}.prompt{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 206px);background:#fff8e9;color:var(--ink);border-radius:20px;font-weight:800;box-shadow:0 4px 14px #0003}.toast{top:auto!important;bottom:calc(max(16px,env(safe-area-inset-bottom)) + 256px);border-radius:16px;box-shadow:0 4px 14px #0004}.building .pill{white-space:nowrap}.building #agePill,.building #zone{display:none}.building #clock{font-size:10px}.building .toast{bottom:auto!important;top:calc(max(10px,env(safe-area-inset-top)) + 64px)}#onb{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:18px;background:linear-gradient(#cfe7f3dd,#f7e9c8dd);backdrop-filter:blur(3px)}#onb .obc{background:#fff8e9;border-radius:26px;padding:26px 22px;width:min(100%,360px);text-align:center;box-shadow:0 14px 44px #0003}#onb .obe{font-size:54px;line-height:1}#onb h1{margin:8px 0 4px;font-size:22px}#onb p{margin:6px 0 16px;font-size:14px;opacity:.85}#onb input{width:100%;font:800 20px Nunito,system-ui;text-align:center;border:2px solid #e0d3b0;border-radius:16px;padding:12px;background:#fff;color:var(--ink);outline:none}#onb input:focus{border-color:var(--green)}#onb button{width:100%;margin-top:14px;border:0;border-radius:16px;padding:14px;background:var(--green);color:#fff;font:900 17px Nunito,system-ui}#onb button:disabled{opacity:.35}
+#obBar{position:fixed;left:12px;right:12px;top:calc(max(10px,env(safe-area-inset-top)) + 4px);z-index:90;display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fff8e9;border-radius:18px;padding:8px 8px 8px 16px;box-shadow:0 6px 20px #0003;font-weight:900;font-size:15px}#obBar button{border:0;border-radius:14px;padding:11px 16px;background:var(--green);color:#fff;font:900 14px Nunito,system-ui}
+body.ob .fx{display:none!important}body.ob .hud,body.ob #buildBtn,body.ob #controls,body.ob #phBtn,body.ob #gaBtn,body.ob #qBanner,body.ob #hint{display:none!important}</style></head><body><div id="game"></div>
 <div class="hud"><div class="panel"><div class="brand">🏡 PURRFECT HOME</div><div class="sub">Build your home, then make it yours.</div></div><div class="panel meters"><div class="meter">🍗 HUNGER<div class="track"><div id="hunger" class="fill hunger"></div></div></div><div class="meter">💧 THIRST<div class="track"><div id="thirst" class="fill"></div></div></div><div class="meter">🧹 LITTER CLEAN<div class="track"><div id="litter" class="fill litter"></div></div></div><div class="meter">💗 BOND<div class="track"><div id="love" class="fill love"></div></div></div><div class="meter">🩺 HEALTH<div class="track"><div id="health" class="fill health"></div></div></div><div class="meter">🛁 CLEAN<div class="track"><div id="clean" class="fill clean"></div></div></div><div class="meter" id="bowls" style="grid-column:1/-1;font-size:10px;font-weight:700;opacity:.85;line-height:1.35"></div></div><div class="topright"><div class="pill" id="agePill">🐱 Kitten · 2 mo</div><div class="pill" id="clock">☀️ Day 1 · 08:00</div><div class="pill" id="coinPill">🪙 10,000</div><div class="pill" id="zone">🏗️ Your lot</div><div style="display:flex;gap:6px;justify-content:flex-end"><button class="pill" id="qBtn" type="button" aria-label="Goals">🎯</button><button class="pill" id="audBtn" type="button" aria-label="Menu">⚙️</button></div><button class="pill" id="buildBtn" type="button">🔨 Build</button></div></div>
 <div id="prompt" class="prompt">Press interact</div><div id="toast" class="toast"></div>
 <div class="bottom"><div class="controls" id="controls"><div id="pad" class="pad" aria-label="Movement joystick"><div id="stick" class="stick"></div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div class="hint" id="hint">Drag the pad to walk · Drag open screen to look around<br>Tap 🔨 Build to build your house · PC: WASD / arrows</div><div id="buildMenu" style="display:none"><div class="row util"><button class="bt" id="bUndo" type="button"><span class="i">↶</span><span class="lbl">Undo</span></button><button class="bt" id="bClear" type="button"><span class="i">🗑</span><span class="lbl">Clear</span></button><button class="bt" id="bL" type="button"><span class="i">⟲</span></button><button class="bt" id="bR" type="button"><span class="i">⟳</span></button><button class="bt" id="bHalf" type="button">Full</button><button class="bt" id="bDock" type="button"><span class="i">⌄</span></button></div><div class="row tabs" id="catBar"><button class="bt sel" id="bCatWall" type="button"><span class="i">🧱</span>Wall</button><button class="bt" id="bCatFloor" type="button"><span class="i">🟫</span>Floor</button><button class="bt" id="bCatAcc" type="button"><span class="i">🚪</span>Doors</button><button class="bt" id="bCatFurn" type="button"><span class="i">🛋️</span>Furniture</button><button class="bt" id="bErase" type="button"><span class="i">🧽</span>Erase</button></div><div class="row chips" id="grpBar" style="display:none"></div><div class="row opts" id="subBar"></div></div></div></div>
@@ -426,7 +428,7 @@ function showFurnGhost(t,x0,z0,r,ok){if(fgType!==t){while(fgRoot.children.length
  const [fw,fd]=fdim(t,r),y=FURN[t].deco?decoYat(x0+fw/2,z0+fd/2,fw,fd):floorTop(x0,z0,fw,fd);fgRoot.visible=true;fgRoot.position.set(x0+fw/2,y,z0+fd/2);fgRoot.rotation.y=frot(r)*Math.PI/2;
  fgPlate.visible=true;fgPlate.scale.set(fw,fd,1);fgPlate.position.set(x0+fw/2,y+.02,z0+fd/2);const c=ok?'#7ddc8a':'#e8695c';fgMat.color.set(c);fgPlate.material.color.set(c)}
 function hideFurnGhost(){fgRoot.visible=false;fgPlate.visible=false}hideFurnGhost();
-const liftPick=e=>pick({clientX:e.clientX,clientY:e.clientY-(e.pointerType==='touch'?56:0)});
+const liftPick=e=>pick({clientX:e.clientX,clientY:e.clientY-(e.pointerType==='touch'&&!(GT&&GT.noLift&&GT.noLift())?56:0)});
 furnReady=true;
 function rotateFurn(it){const cx=it.x0+it.fw/2,cz=it.z0+it.fd/2,nr=frot(it.rot+1),[nw,nd]=fdim(it.type,nr);const xs=[Math.floor(cx-nw/2),Math.ceil(cx-nw/2)],zs=[Math.floor(cz-nd/2),Math.ceil(cz-nd/2)];
  for(const x of xs)for(const z of zs)if(canPlace(it.type,x,z,nr,it.uid)){const from=[it.x0,it.z0,it.rot];it.x0=x;it.z0=z;it.rot=nr;placeModel(it);build.undo.push({furnSet:[[it.uid,from]]});saveBuild();sound();return true}
@@ -620,7 +622,7 @@ function ctSpec(){return catSpec||catDefaults('persian')}
 function catPrev(){if(!CPV)return;if(CPV.m)CPV.sc.remove(CPV.m);const c=cat.clone(true);c.position.set(0,0,0);c.rotation.set(0,CPV.ry||.6,0);c.scale.setScalar(1.0);c.visible=true;CPV.sc.add(c);CPV.m=c}
 function ctSheet(){const sp=ctSpec();const on=(a,b)=>a===b?'on':'';
  const row=(t,items)=>'<div class="lk"><i>'+t+'</i>'+items+'</div>';
- ctEl.innerHTML='<div class="fh"><span>🐱 Choose your cat</span><button class="fx" type="button" data-x="1">✕</button></div><canvas id="catPv"></canvas><div class="lkw">'
+ ctEl.innerHTML='<div class="fh"><span>🐱 Pick your kitten’s look</span><button class="fx" type="button" data-x="1">✕</button></div><canvas id="catPv"></canvas><div class="lkw">'
   +row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''))
   +row('Coat pattern',CPAT.map(q=>'<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'">'+q[1]+'</button>').join(''))
   +row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''))
@@ -647,13 +649,28 @@ function ctClose(){ctEl.style.display='none'}
 ctBtn.addEventListener('click',e=>{e.stopPropagation();ctOpen()});ctBtn.addEventListener('pointerdown',e=>e.stopPropagation());
 ctEl.addEventListener('pointerdown',e=>e.stopPropagation());
 ctEl.addEventListener('click',e=>{e.stopPropagation();const t=e.target.closest('button');if(!t)return;if(t.dataset.x){ctClose();return}if(t.dataset.ck){const k=t.dataset.ck,v=t.dataset.v;let sp=ctSpec();if(k==='breed')sp=catDefaults(v);else sp=Object.assign({},sp,{[k]:v});const sl=ctEl.querySelector('.lkw'),top=sl?sl.scrollTop:0;catRebuild(sp);const pv=CPV;ctSheet();const sl2=ctEl.querySelector('.lkw');if(sl2)sl2.scrollTop=top;if(!ctRaf)ctRaf=requestAnimationFrame(ctLoop);try{sound()}catch(e2){}}});
-try{if(LOCKED)ctBtn.style.display='none';const w=document.getElementById('welcome');const sb=document.getElementById('start');
- if(w&&sb&&!LOCKED){const mk=(id,txt,fn)=>{const b=document.createElement('button');b.type='button';b.id=id;b.textContent=txt;b.style.cssText='display:block;width:100%;margin:10px 0 0;padding:13px;border:0;border-radius:14px;background:#efe4c8;color:#24332e;font:800 16px system-ui';sb.parentNode.insertBefore(b,sb);b.addEventListener('click',e=>{e.stopPropagation();fn()});return b};
-  const note=document.createElement('p');note.style.cssText='font-weight:800;margin:14px 0 0;color:#a2452f';note.textContent='Choose your character and your cat now. You can’t change them once you start.';sb.parentNode.insertBefore(note,sb);
-  const b1=mk('lookPick','🧑 Create your character',()=>{wdCat='look';openWardrobe()}),b2=mk('catPick','🐱 Choose your cat',ctOpen);
-  sb.addEventListener('click',e=>{if(LOCKED)return;if(!sb._c){e.stopImmediatePropagation();sb._c=1;sb.textContent='Lock in my look & cat — start!';toast('Your character and cat can’t be changed after this');return}
-   try{localStorage.setItem('purrfect-lock','1')}catch(e2){}LOCKED=true;try{applyLook(false)}catch(e2){}ctBtn.style.display='none';ctClose();closeWardrobe();b1.remove();b2.remove();note.remove()})}
-}catch(e){console.warn('catPick',e)}
+var PNAME='',CNAME='Kitty';try{PNAME=localStorage.getItem('purrfect-name')||'';CNAME=localStorage.getItem('purrfect-catname')||'Kitty'}catch(e){}
+const OB={on:false,el:null},OBSKIP=LOCKED&&!!PNAME;
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+// swap the default cat name for the one the player chose, everywhere text appears
+function ncRename(){if(!CNAME||/kitty/i.test(CNAME))return;
+ const fix=n=>{if(n.nodeType===3){const v=n.nodeValue;if(v&&/kitty/i.test(v))n.nodeValue=v.replace(/\bKitty\b/g,CNAME).replace(/\bkitty\b/g,CNAME)}else if(n.nodeType===1&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/.test(n.tagName)){for(const c of n.childNodes)fix(c)}};
+ if(!ncRename.mo){ncRename.mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')fix(m.target);else for(const a of m.addedNodes)fix(a)}});ncRename.mo.observe(document.body,{childList:true,subtree:true,characterData:true})}
+ fix(document.body)}
+function obHost(){if(!OB.el){OB.el=document.createElement('div');OB.el.id='onb';document.body.appendChild(OB.el);OB.el.addEventListener('pointerdown',e=>e.stopPropagation())}return OB.el}
+function obNameCard(kind,next){const me=kind==='me',h=obHost();OB.on=true;document.body.classList.add('ob');
+ h.innerHTML='<div class="obc"><div class="obe">'+(me?'🏡':'🐱')+'</div><h1>'+(me?'Welcome to Purrfect Home!':'Now meet your kitten, '+escH(PNAME)+'!')+'</h1><p>'+(me?'First things first. What should we call you?':'Every home needs a cat. What will you name your kitten?')+'</p><input id="obIn" maxlength="14" autocomplete="off" spellcheck="false" placeholder="'+(me?'Your name':'Kitten’s name')+'" value="'+escH(me?PNAME:(CNAME==='Kitty'?'':CNAME))+'"><button id="obNx" type="button">Next</button></div>';
+ const inp=h.querySelector('#obIn'),bt=h.querySelector('#obNx'),chk=()=>{bt.disabled=!inp.value.trim()};inp.addEventListener('input',chk);chk();
+ const go=()=>{const v=inp.value.trim().replace(/[<>&"]/g,'').slice(0,14);if(!v)return;if(me){PNAME=v;try{localStorage.setItem('purrfect-name',v)}catch(e){}}else{CNAME=v;try{localStorage.setItem('purrfect-catname',v)}catch(e){}ncRename()}h.style.display='none';next()};
+ bt.addEventListener('click',go);inp.addEventListener('keydown',e=>{if(e.key==='Enter')go()});h.style.display='flex';setTimeout(()=>{try{inp.focus()}catch(e){}},250)}
+function obSheet(kind,next){const bar=document.createElement('div');bar.id='obBar';
+ bar.innerHTML='<span>'+(kind==='me'?'Design yourself, '+escH(PNAME):'Design '+escH(CNAME))+'</span><button type="button" id="obGo">Continue ➜</button>';document.body.appendChild(bar);bar.addEventListener('pointerdown',e=>e.stopPropagation());
+ bar.querySelector('#obGo').addEventListener('click',e=>{e.stopPropagation();bar.remove();if(kind==='me')closeWardrobe();else ctClose();next()});
+ if(kind==='me'){wdCat='look';openWardrobe()}else ctOpen()}
+function obFinish(){try{localStorage.setItem('purrfect-lock','1')}catch(e){}LOCKED=true;try{applyLook(false)}catch(e){}ctBtn.style.display='none';ctClose();closeWardrobe();OB.on=false;document.body.classList.remove('ob');if(OB.el){OB.el.remove();OB.el=null}document.getElementById('start').click()}
+function obRun(){const w=document.getElementById('welcome');if(w)w.style.display='none';ctBtn.style.display='none';
+ if(!LOCKED)obNameCard('me',()=>obSheet('me',()=>obNameCard('cat',()=>obSheet('cat',obFinish))));else obNameCard('me',()=>obNameCard('cat',obFinish))}
+try{ctBtn.style.display='none';if(CNAME!=='Kitty')setTimeout(ncRename,0)}catch(e){}
 // ===== Cat accessories: one of each, placed from Build → Furniture → Cat =====
 let navVer=0;const tmpV=new THREE.Vector3();
 function dish(color){const pts=[[0,0],[.34,0],[.45,.15],[.49,.19],[.45,.19],[.32,.045],[0,.045]].map(p=>new THREE.Vector2(p[0],p[1]));const m=new THREE.Mesh(new THREE.LatheGeometry(pts,40),new THREE.MeshStandardMaterial({color,roughness:.35,side:THREE.DoubleSide}));m.castShadow=true;m.receiveShadow=true;return m}
@@ -1046,7 +1063,7 @@ function openWardrobe(){
   +OUTFITS.filter(o=>wdCat==='all'||o.c===wdCat).map(o=>'<button type="button" class="oc'+(INV.outfit===o.id?' on':'')+'" data-o="'+o.id+'"><div class="sw"><i style="background:'+o.top+'"></i><i style="background:'+o.bot+'"></i><span>'+o.ic+'</span></div><b>'+o.n+'</b></button>').join('')+'</div>');
  if(LOCKED&&wdCat==='look')wdCat='all';
  wdEl.style.display='block';wdBk.style.display='block';document.body.classList.add('petting');if(wdCat==='look'){lpMake();if(!lpRaf)lpRaf=requestAnimationFrame(lpLoop)}}
-wdBk.addEventListener('pointerdown',e=>{e.stopPropagation();closeWardrobe()});wdEl.addEventListener('pointerdown',e=>e.stopPropagation());
+wdBk.addEventListener('pointerdown',e=>{e.stopPropagation();if(OB.on)return;closeWardrobe()});wdEl.addEventListener('pointerdown',e=>e.stopPropagation());
 wdEl.addEventListener('click',e=>{e.stopPropagation();const t=e.target.closest('button');if(!t)return;if(t.dataset.x){closeWardrobe();return}if(t.dataset.c){wdCat=t.dataset.c;openWardrobe();return}if(t.dataset.k){const k=t.dataset.k;let v=t.dataset.v;if(k==='nose'||k==='glasses')v=+v;else if(v==='null')v=null;PLK[k]=v;applyLook(true);sound();openWardrobe();return}if(t.dataset.o){applyOutfit(t.dataset.o);openWardrobe()}});
 const bundle=group(scene,0,0,0);bundle.visible=false;box(bundle,-.17,0,0,.3,.4,.05,M.shirt);box(bundle,.17,-.04,0,.26,.5,.05,M.pants);
 const PANTS={p:0,blur:false,legs:[]};
@@ -2036,13 +2053,13 @@ const bRay=new THREE.Raycaster(),bNdc=new THREE.Vector2(),bPlane=new THREE.Plane
 function pick(e){const r=cv.getBoundingClientRect();bNdc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);if(!bRay.ray.intersectPlane(bPlane,bHit))return null;
  if(Math.abs(bHit.x)>LOT.x1+2||Math.abs(bHit.z)>LOT.z1+2)return null;
  return{pt:{x:bHit.x,z:bHit.z},node:{x:Math.max(LOT.x0,Math.min(LOT.x1,Math.round(bHit.x))),z:Math.max(LOT.z0,Math.min(LOT.z1,Math.round(bHit.z)))}}}
-let bp=null;
+var GT=null;let bp=null;
 function nearestEdge(pt,maxd=.6){let best=null,bd=maxd;for(const [k,e] of edges){const d=Math.hypot(pt.x-e.cx,pt.z-e.cz);if(d<bd){bd=d;best=[k,e]}}return best}
 function eraseAt(pt,ev){const fi=hitFurnMesh(ev)||hitFurn(pt);if(fi){bp.removedFu.push({uid:fi.uid,type:fi.type,x0:fi.x0,z0:fi.z0,rot:fi.rot});removeFurn(fi.uid);return}const b=nearestEdge(pt,.45);
  if(b){const pk=partnerKey(b[1]),pe=pk&&edges.get(pk);if(pe){bp.removed.push([pe.x,pe.z,pe.o,pe.type,pe.style]);removeEdge(pk)}bp.removed.push([b[1].x,b[1].z,b[1].o,b[1].type,b[1].style]);removeEdge(b[0]);return}
  const c={x:Math.floor(pt.x),z:Math.floor(pt.z)},f=floors.get(fkey(c.x,c.z));if(f){bp.removedF.push([c.x,c.z,f.type,null]);setFloor(c.x,c.z,null)}}
 function swapType(e,to){const x=e.x,z=e.z,o=e.o,st=e.style;removeEdge(ekey(x,z,o));addEdge(x,z,o,to,st)}
-function placeFixture(pt,type){const b=nearestEdge(pt,.7);if(!b){toast('Tap a wall to place a '+(type==='double'?'double door':type));return}const e=b[1];
+function placeFixture(pt,type){const b=nearestEdge(pt,.7);if(!b){toast('Tap a wall to place a '+(type==='double'?'double door':type));return}const e=b[1];if(GT&&GT.denyFix(e,type)){toast('Tap the glowing spot ✨');return}
  if(e.type==='dbl_a'||e.type==='dbl_b'){const pe=edges.get(partnerKey(e)),qs=[e,pe].filter(Boolean),set=qs.map(q=>[q.x,q.z,q.o,q.type,'wall']);for(const q of qs)swapType(q,'wall');build.undo.push({set});saveBuild();sound();toast('Double door removed');return}
  if(type==='double'){if(e.type!=='wall'){toast('Double doors go on plain wall');return}
   const side=(e.o==='h'?pt.x-e.cx:pt.z-e.cz)>=0?1:-1,nb=sd=>e.o==='h'?[e.x+sd,e.z]:[e.x,e.z+sd];let pick=null;
@@ -2079,10 +2096,10 @@ cv.addEventListener('pointermove',e=>{if(!bp||e.pointerId!==bp.id)return;
  bp.b=p.node;const end=endNode(bp.a,p.node);mB.visible=true;mB.position.set(end.x,.15,end.z);showGhost(pathEdges(bp.a,p.node))});
 function endDraw(e){if(!bp||e.pointerId!==bp.id)return;const g=bp;bp=null;mA.visible=mB.visible=false;showGhost([]);showFloorGhost([]);hideFurnGhost();
  if(g.mv){g.mv.group.visible=true;const sp=g.spot;if(e.type!=='pointercancel'&&sp&&sp.ok&&(sp.x0!==g.from[0]||sp.z0!==g.from[1]||sp.r!==g.from[2])){g.mv.x0=sp.x0;g.mv.z0=sp.z0;g.mv.rot=sp.r;placeModel(g.mv);build.undo.push({furnSet:[[g.mv.uid,g.from]]});saveBuild();sound()}else if(sp&&!sp.ok&&e.type!=='pointercancel')toast('No room there');return}
- if(g.fp){if(e.type==='pointercancel')return;const sp=g.spot;if(sp&&sp.ok&&g.ex&&furn.has(g.ex.uid)){const o=g.ex,from=[o.x0,o.z0,o.rot];o.x0=sp.x0;o.z0=sp.z0;o.rot=sp.r;placeModel(o);build.undo.push({furnSet:[[o.uid,from]]});saveBuild();sound();toast('Moved your '+FURN[g.fp].n.toLowerCase())}else if(sp&&sp.ok){const pr=FURN[g.fp].price||0;if(pr>coins()){noCoins(pr);return}const it=addFurn(g.fp,sp.x0,sp.z0,sp.r);build.undo.push({furnAdd:[it.uid]});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}else toast('No room there');return}
- if(e.type==='pointercancel')return;if(g.floor){paintCells(cellsRect(g.a,g.b));return}
+ if(g.fp){if(e.type==='pointercancel')return;const sp=g.spot;if(sp&&sp.ok&&g.ex&&furn.has(g.ex.uid)){const o=g.ex,from=[o.x0,o.z0,o.rot];o.x0=sp.x0;o.z0=sp.z0;o.rot=sp.r;placeModel(o);build.undo.push({furnSet:[[o.uid,from]]});saveBuild();sound();toast('Moved your '+FURN[g.fp].n.toLowerCase())}else if(sp&&sp.ok){if(GT&&GT.denyFurn(g.fp,sp)){toast('Place it on the glowing floor ✨');return}const pr=FURN[g.fp].price||0;if(pr>coins()){noCoins(pr);return}const it=addFurn(g.fp,sp.x0,sp.z0,sp.r);build.undo.push({furnAdd:[it.uid]});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}else toast('No room there');return}
+ if(e.type==='pointercancel')return;if(g.floor){const cl=cellsRect(g.a,g.b);paintCells(GT?GT.cells(cl):cl);return}
  if(build.tool==='erase'){if(g.removed.length||g.removedF.length||g.removedFu.length){build.undo.push({remove:g.removed,floor:g.removedF,furnRemove:g.removedFu});saveBuild()}return}
- const added=[],styled=[];let broke=0;for(const [x,z,o] of pathEdges(g.a,g.b)){const ex=edges.get(ekey(x,z,o));if(!ex){const c=WALLP[build.wall]||10;if(coins()<c){broke=c;break}if(addEdge(x,z,o,'wall',build.wall))added.push([x,z,o])}else if(ex.style!==build.wall){const dl=edgeVal(ex.type,build.wall)-edgeVal(ex.type,ex.style);if(dl>0&&coins()<dl){broke=dl;break}styled.push([x,z,o,ex.style,build.wall]);const t=ex.type;removeEdge(ekey(x,z,o));addEdge(x,z,o,t,build.wall)}}if(broke)noCoins(broke);
+ const added=[],styled=[];let broke=0,denied=0;for(const [x,z,o] of pathEdges(g.a,g.b)){if(GT&&GT.deny('wall',x,z,o)){denied++;continue}const ex=edges.get(ekey(x,z,o));if(!ex){const c=WALLP[build.wall]||10;if(coins()<c){broke=c;break}if(addEdge(x,z,o,'wall',build.wall))added.push([x,z,o])}else if(ex.style!==build.wall){const dl=edgeVal(ex.type,build.wall)-edgeVal(ex.type,ex.style);if(dl>0&&coins()<dl){broke=dl;break}styled.push([x,z,o,ex.style,build.wall]);const t=ex.type;removeEdge(ekey(x,z,o));addEdge(x,z,o,t,build.wall)}}if(broke)noCoins(broke);if(denied)toast('Follow the glowing line ✨');
  if(added.length||styled.length){build.undo.push({add:added,style:styled});if(build.undo.length>60)build.undo.shift();saveBuild();sound();qev('build')}}
 cv.addEventListener('pointerup',endDraw);cv.addEventListener('pointercancel',endDraw);
 // ===== Audio + haptics =====
@@ -2185,10 +2202,11 @@ var AU=(function(){
   const row=(k,l)=>'<label style="display:flex;align-items:center;gap:8px;margin:8px 0">'+l+'<input data-k="'+k+'" type="range" min="0" max="1" step=".05" value="'+S[k]+'" style="flex:1"></label>';
   p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">⚙️ Menu</b><button id="audX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div>'+row('music','🎵 Music')+row('sfx','🔔 Effects')+row('amb','🌿 Nature')+
    '<label style="display:flex;align-items:center;gap:8px;margin:8px 0"><input id="audV" type="checkbox" '+(S.vib?'checked':'')+'> 📳 Vibration</label><label style="display:flex;align-items:center;gap:8px;margin:8px 0"><input id="audM" type="checkbox" '+(S.mute?'checked':'')+'> 🔇 Mute everything</label>'+
-   '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><button id="audSave" style="flex:1;border:0;border-radius:12px;padding:10px;background:#2e7658;color:#fff;font-weight:800">💾 Save now</button><button id="audBk" style="border:0;border-radius:12px;padding:10px;background:#fff;font-weight:800">📤 Back up</button><button id="audRs" style="border:0;border-radius:12px;padding:10px;background:#fff;font-weight:800">📥 Restore</button></div><div id="audSaved" style="font-size:11px;opacity:.7;margin-top:8px;line-height:1.4">Your game saves by itself every few seconds and whenever you leave the app. Use Back up to keep a copy or move to a new phone.</div>';
+   '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px"><button id="audSave" style="flex:1;border:0;border-radius:12px;padding:10px;background:#2e7658;color:#fff;font-weight:800">💾 Save now</button><button id="audBk" style="border:0;border-radius:12px;padding:10px;background:#fff;font-weight:800">📤 Back up</button><button id="audRs" style="border:0;border-radius:12px;padding:10px;background:#fff;font-weight:800">📥 Restore</button></div><button id="audNew" style="width:100%;margin-top:8px;border:0;border-radius:12px;padding:9px;background:#fff;font-weight:800;font-size:12px;color:#a2452f">🔄 Start a new game</button><div id="audSaved" style="font-size:11px;opacity:.7;margin-top:8px;line-height:1.4">Your game saves by itself every few seconds and whenever you leave the app. Use Back up to keep a copy or move to a new phone.</div>';
   document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#audX').onclick=()=>p.remove();
   p.querySelector('#audSave').onclick=()=>{saveAll();const t=new Date();p.querySelector('#audSaved').textContent='✅ Saved at '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0')+'. Your house, Kitty, coins and goals are stored on this phone.';sound('good')};
   p.querySelector('#audBk').onclick=()=>{saveAll();try{window.purrBackup()}catch(e){}};p.querySelector('#audRs').onclick=()=>{try{window.purrRestore()}catch(e){}};
+  {const nb=p.querySelector('#audNew');let arm=0;nb.onclick=()=>{if(!arm){arm=1;nb.textContent='⚠️ Tap again to erase this game for good';setTimeout(()=>{arm=0;nb.textContent='🔄 Start a new game'},3500);return}try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('purrfect')===0&&k!=='purrfect-audio')ks.push(k)}ks.forEach(k=>localStorage.removeItem(k))}catch(e){}location.reload()}}
   p.querySelectorAll('input[type=range]').forEach(r=>r.oninput=()=>{S[r.dataset.k]=+r.value;apply();save();if(r.dataset.k==='sfx')sfx('coin')});
   p.querySelector('#audV').onchange=e=>{S.vib=e.target.checked;save();if(S.vib)hap([20,40,20])};p.querySelector('#audM').onchange=e=>{S.mute=e.target.checked;save();apply();if(ctx){if(S.mute)ctx.suspend();else ctx.resume()}icon()}}
  function icon(){const b=document.getElementById('audBtn');if(b)b.textContent=S.mute?'🔇':'⚙️'}
@@ -2209,17 +2227,54 @@ var QM=(function(){
  function dayEnd(){try{const a=(stats.hunger+stats.thirst+stats.litter+stats.love+stats.health+stats.clean)/6;if(a>=50&&started){const c=Math.round((a-40)*1.2);WALLET.base+=c;saveBuild();toast('☀️ New day! Kitty was '+(a>=85?'spoiled':a>=70?'happy':'okay')+' · +'+c+' 🪙');sound('coin')}}catch(e){}}
  const nF=t=>{let c=0;for(const it of furn.values())if(it.type===t)c++;return c};
  // guided steps: poll = checked automatically from the state of the house, ev = happens when the player does it
+ // ---------- guided first day: spotlight + tap-locking, like a modern builder ----------
+ const HX={x0:-3,x1:3,z0:-2,z1:2};
+ const PER=[];for(let x=HX.x0;x<HX.x1;x++)PER.push([x,HX.z0,'h'],[x,HX.z1,'h']);for(let z=HX.z0;z<HX.z1;z++)PER.push([HX.x0,z,'v'],[HX.x1,z,'v']);
+ const DOORE=[[-1,HX.z1,'h'],[0,HX.z1,'h']];
+ const inHouse=(cx,cz)=>cx>=HX.x0&&cx<HX.x1&&cz>=HX.z0&&cz<HX.z1;
+ const perDone=()=>PER.every(([x,z,o])=>edges.has(ekey(x,z,o)));
+ const hasDoor=()=>DOORE.some(([x,z,o])=>{const e=edges.get(ekey(x,z,o));return e&&e.type==='door'});
+ const floorN=()=>{let n=0;for(const f of floors.values())if(inHouse(f.cx,f.cz))n++;return n};
+ const nameT=t=>String(t).replace(/\{n\}/g,PNAME||'friend').replace(/\{c\}/g,CNAME||'Kitty');
+ const NEAR=(t,r)=>{for(const it of furn.values())if(it.type===t)return Math.hypot(player.position.x-(it.x0+it.fw/2),player.position.z-(it.z0+it.fd/2))<r;return false};
+ const BM=['canvas','#bUndo','#bL','#bR'],CARE=['canvas','#pad','#feedMenu','#litMenu','#ctxBtn','#petGame','#servedPop'];
+ const sel=(q)=>({allow:[q],spot:q,click:q}),opt=o=>sel('#subBar [data-o="'+o+'"]'),grp=g=>sel('#grpBar [data-g="'+g+'"]');
+ const T=(t,h,o)=>Object.assign({t,h,r:0},o);
  const TUT=[
-  {t:'Build your walls',h:'Tap 🔨 Build, pick Wall, then drag along the grid to draw a room.',poll:()=>edges.size>=4,r:100,pulse:'buildBtn'},
-  {t:'Lay a floor',h:'In Build, open the Floor tab and drag over the inside of your room.',poll:()=>floors.size>=4,r:100,pulse:'buildBtn'},
-  {t:"Set up Kitty's corner",h:'Build → Furniture → 🐾 Cat: place a food bowl, a water bowl and a litter tray.',poll:()=>nF('foodbowl')>0&&nF('waterbowl')>0&&nF('litter')>0,r:150,pulse:'buildBtn'},
-  {t:'Feed Kitty',h:'Tap ✔ Done, walk to the food bowl and tap Feed.',ev:'feed',r:100,pulse:'careBtn'},
-  {t:'Fill the water bowl',h:'Stand by the water bowl and tap Water.',ev:'water',r:80,pulse:'careBtn'},
-  {t:'Pet Kitty',h:'Walk up to Kitty and tap Pet, then tap in the green zone.',ev:'pet',r:120,pulse:'careBtn'},
-  {t:'Buy food at Fresh Grocery',h:'Walk out of the garden to Fresh Grocery, pick a drink or ready meal and pay at the checkout.',ev:'groc',r:100},
-  {t:'Add a fridge',h:'Build → Furniture → Kitchen → Fridge. Your groceries are kept inside it.',poll:()=>nF('fridge')>0,r:80,pulse:'buildBtn'},
-  {t:'Have a meal',h:'Open the fridge, take your food and eat it. Add a dining set (level 3) for a proper table!',ev:'eat',r:120},
-  {t:'Take a photo',h:'Tap the 📷 camera and capture a memory.',ev:'photo',r:100}];
+  T('Welcome','Hi {n}! I will show you how to build a cosy home for {c}. Follow the glowing hints. Only the highlighted button works, so you cannot get lost.',{allow:['#tutOk'],ok:'Let’s go!',done:'ok'}),
+  T('Start building','Tap the 🔨 Build button to open the builder.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>build.on}),
+  T('Walls','Tap the Wall tab.',sel('#bCatWall')),
+  T('Walls','Choose Normal walls.',opt('normal')),
+  T('Walls','Drag along the glowing line to draw {c}’s walls. One drag per side. Close the loop so the room is sealed!',{allow:BM,guide:'walls',poll:perDone,r:100}),
+  T('A door','Every home needs a door, or you and {c} could never get in or out. Tap the Doors tab.',sel('#bCatAcc')),
+  T('A door','Choose Door.',opt('door')),
+  T('A door','Tap the glowing spot on the front wall to place the door.',{allow:BM,guide:'door',poll:hasDoor,r:60}),
+  T('Floor','Now a cosy floor. Tap the Floor tab.',sel('#bCatFloor')),
+  T('Floor','Choose Wood.',opt('wood')),
+  T('Floor','Drag across the whole room to lay the floor.',{allow:BM,guide:'floor',poll:()=>floorN()>=20,r:80}),
+  T('{c}’s corner','{c} needs a few essentials. Tap the Furniture tab.',sel('#bCatFurn')),
+  T('{c}’s corner','Open the 🐾 Cat section.',grp('cat')),
+  T('{c}’s corner','Pick the Food bowl.',opt('foodbowl')),
+  T('{c}’s corner','Touch the glowing floor, slide the bowl where you like, then lift your finger.',{allow:BM,guide:'furn',fp:'foodbowl',poll:()=>nF('foodbowl')>0,r:40}),
+  T('{c}’s corner','Now pick the Water bowl.',opt('waterbowl')),
+  T('{c}’s corner','Put the water bowl down next to it the same way.',{allow:BM,guide:'furn',fp:'waterbowl',poll:()=>nF('waterbowl')>0,r:40}),
+  T('{c}’s corner','Last one: pick the Litter tray.',opt('litter')),
+  T('{c}’s corner','Place the litter tray somewhere out of the way, on the glowing floor.',{allow:BM,guide:'furn',fp:'litter',poll:()=>nF('litter')>0,r:60}),
+  T('Step inside','Looking good! Tap ✔ Done to step into your new home.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>!build.on}),
+  T('Feed {c}','Walk to the food bowl. Drag the round pad, and use the door!',{allow:['#pad','canvas'],spot:'#pad',guide:'at:foodbowl',poll:()=>NEAR('foodbowl',2.6)}),
+  T('Feed {c}','Tap the food bowl, then choose some food for {c}.',{allow:CARE,guide:'at:foodbowl',ev:'feed',r:100}),
+  T('Fresh water','Now the water bowl. Walk over and tap it.',{allow:CARE,guide:'at:waterbowl',ev:'water',r:80}),
+  T('Cuddle time','{c} would love a cuddle. Walk up to {c} and tap them, then tap in the green zone.',{allow:CARE,guide:'at:cat',ev:'pet',r:120}),
+  T('Groceries','Time to shop! Walk out of the garden to Fresh Grocery, pick a drink or ready meal and pay at the checkout.',{allow:'*',ev:'groc',r:100}),
+  T('A kitchen','Your food needs a home. Tap 🔨 Build.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>build.on}),
+  T('A kitchen','Open the Furniture tab.',sel('#bCatFurn')),
+  T('A kitchen','Open the 🍳 Kitchen section.',grp('kitchen')),
+  T('A kitchen','Pick the Fridge.',opt('fridge')),
+  T('A kitchen','Slide the fridge onto the glowing floor, then lift your finger.',{allow:BM,guide:'furn',fp:'fridge',poll:()=>nF('fridge')>0,r:80}),
+  T('A kitchen','Tap ✔ Done.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>!build.on}),
+  T('Mealtime','Open the fridge, take your food and eat it. Add a dining set (level 3) for a proper table!',{allow:'*',ev:'eat',r:120}),
+  T('Say cheese','Capture a memory! Tap the 📷 camera.',{allow:'*',spot:'#phBtn',ev:'photo',r:100}),
+  T('All set','You did it, {n}! Your home is ready. Every day you will get little goals. Keep {c} happy and keep decorating!',{allow:['#tutOk'],ok:'Start playing!',done:'ok',r:150})];
  const POOL=[
   {k:'feed',n:2,r:50,t:'Feed Kitty',i:'🍗',c:0},{k:'water',n:1,r:30,t:'Fill the water bowl',i:'💧',c:0},{k:'litter',n:1,r:50,t:'Clean the litter tray',i:'🧹',c:0},{k:'pet',n:2,r:60,t:'Pet Kitty',i:'💗',c:0},{k:'play',n:2,r:60,t:'Let Kitty play',i:'🧶',c:0},
   {k:'eat',n:1,r:50,t:'Eat a meal',i:'🍽️',c:1},{k:'cook',n:1,r:70,t:'Cook something new',i:'🍳',c:1},{k:'sit',n:1,r:30,t:'Sit down and relax',i:'🛋️',c:1},{k:'cafe',n:1,r:80,t:'Eat at the café',i:'☕',c:1},
@@ -2232,29 +2287,71 @@ var QM=(function(){
   if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g.k);reward(p.r,p.i+' Goal done!');xp(15,'goal')}}
    if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=120+20*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
    save()}refresh()}catch(e){}}
- function adv(){const s=TUT[Q.tut];Q.tut++;reward(s.r,'✅ '+s.t);xp(25,'tut');if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
+ function adv(){const s=TUT[Q.tut];Q.tut++;if(s.r){reward(s.r,'✅ '+nameT(s.t));xp(25,'tut')}else{try{sound('good')}catch(e){}}if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
  function poll(){if(Q.tut==='done'){newDay();return}const s=TUT[Q.tut];
   // never let a step be blocked: if the bowl is already full, empty it so Feed / Water can be done
   if(s&&s.ev==='feed'&&bowl.food>=99.5){bowl.food=0;try{updateBowlVisuals();saveCat()}catch(e){}}
   if(s&&s.ev==='water'&&bowl.water>=99.5){bowl.water=0;try{updateBowlVisuals();saveCat()}catch(e){}}
   if(s&&s.poll&&s.poll())adv()}
  // ---- UI ----
- function mk(){if(ui.b)return;const st=document.createElement('style');st.textContent='@keyframes qpulse{0%,100%{box-shadow:0 0 0 0 #f3bd56aa}50%{box-shadow:0 0 0 10px #f3bd5600}}.qpulse{animation:qpulse 1.3s infinite}#qBanner{position:fixed;left:max(12px,env(safe-area-inset-left));top:calc(max(10px,env(safe-area-inset-top)) + 150px);z-index:6;width:min(calc(100vw - 140px),340px);background:#fff8e9ee;border-radius:16px;padding:9px 14px;font:700 12.5px/1.35 system-ui;color:#24332e;box-shadow:0 6px 20px #0003;display:none;pointer-events:auto}#qBanner b{font-size:13.5px}#qBanner small{display:block;font-weight:600;opacity:.8}#qBanner .qd{height:5px;border-radius:3px;background:#e6dcc0;margin-top:6px;overflow:hidden}#qBanner .qd i{display:block;height:100%;background:#2e7658}';document.head.appendChild(st);
-  ui.b=document.createElement('div');ui.b.id='qBanner';document.body.appendChild(ui.b);ui.b.addEventListener('pointerdown',e=>e.stopPropagation());ui.b.addEventListener('click',()=>panel());
+ function mk(){if(ui.b)return;const st=document.createElement('style');st.textContent='@keyframes qpulse{0%,100%{box-shadow:0 0 0 0 #f3bd56aa}50%{box-shadow:0 0 0 10px #f3bd5600}}.qpulse{animation:qpulse 1.3s infinite}@keyframes qglow{0%,100%{box-shadow:0 0 0 100vmax #121c18a6,0 0 10px 2px #f3bd56aa}50%{box-shadow:0 0 0 100vmax #121c18a6,0 0 24px 8px #f3bd56}}@keyframes qhand{from{transform:translateY(0)}to{transform:translateY(-12px)}}#qBanner{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 292px);z-index:95;width:min(calc(100vw - 24px),380px);background:#fff8e9;border:2px solid #f3bd56;border-radius:20px;padding:11px 14px;font:700 13px/1.4 Nunito,system-ui;color:#24332e;box-shadow:0 8px 26px #0005;display:none;pointer-events:auto}.building #qBanner{top:calc(max(10px,env(safe-area-inset-top)) + 70px)}#qBanner b{font-size:14.5px}#qBanner small{display:block;font:700 13px/1.4 Nunito,system-ui;opacity:.85;margin-top:2px}#qBanner .tgr{display:flex;gap:10px;align-items:center}#qBanner .tga{font-size:34px;line-height:1}#qBanner .qd{height:5px;border-radius:3px;background:#e6dcc0;margin-top:8px;overflow:hidden}#qBanner .qd i{display:block;height:100%;background:#2e7658}#qBanner button{display:block;width:100%;margin-top:9px;border:0;border-radius:14px;padding:12px;background:#2e7658;color:#fff;font:900 15px Nunito,system-ui}#qBanner a{display:block;text-align:right;font-size:11px;opacity:.55;margin-top:5px;text-decoration:underline}#tutSpot{position:fixed;z-index:60;display:none;border:3px solid #f3bd56;border-radius:18px;pointer-events:none;animation:qglow 1.3s infinite}#tutHand{position:fixed;z-index:61;display:none;font-size:36px;line-height:1;pointer-events:none;animation:qhand .7s infinite alternate;filter:drop-shadow(0 3px 4px #0006)}.toast{z-index:96!important}';document.head.appendChild(st);
+  ui.b=document.createElement('div');ui.b.id='qBanner';document.body.appendChild(ui.b);ui.b.addEventListener('pointerdown',e=>e.stopPropagation());
+  ui.b.addEventListener('click',e=>{if(!e.target.closest('#tutSkip'))return;if(!ui.skipArm){ui.skipArm=1;ui.key='';refresh();setTimeout(()=>{ui.skipArm=0;ui.key='';refresh()},3000);return}ui.skipArm=0;Q.tut='done';save();clearGuides();ui.key='';newDay();refresh()});
+  ui.sp=document.createElement('div');ui.sp.id='tutSpot';document.body.appendChild(ui.sp);ui.hd=document.createElement('div');ui.hd.id='tutHand';ui.hd.textContent='👆';document.body.appendChild(ui.hd);
   ui.btn=document.getElementById('qBtn');if(ui.btn)ui.btn.addEventListener('click',e=>{e.stopPropagation();panel()})}
- function refresh(){mk();const tut=Q.tut!=='done',s=tut?TUT[Q.tut]:null,shown=started&&document.getElementById('welcome').style.display==='none';
-  if(ui.b){if(tut&&s&&shown&&!Q.hide){ui.b.style.display='block';ui.b.innerHTML='<b>🎯 First day · step '+(Q.tut+1)+' of '+TUT.length+': '+s.t+'</b><small>'+s.h+'</small><div class="qd"><i style="width:'+(Q.tut/TUT.length*100)+'%"></i></div>'}else ui.b.style.display='none'}
-  for(const id of ['buildBtn','careBtn']){const e=document.getElementById(id);if(e)e.classList.toggle('qpulse',!!(tut&&s&&s.pulse===id&&shown))}
+ function refresh(){mk();const tut=Q.tut!=='done',s=tut?TUT[Q.tut]:null,shown=started&&!OB.on&&document.getElementById('welcome').style.display==='none';
+  if(ui.b){if(tut&&s&&shown&&!Q.hide){const key=Q.tut+'|'+(ui.skipArm?1:0)+'|'+PNAME+CNAME;if(ui.key!==key){ui.key=key;ui.b.style.display='block';ui.b.innerHTML='<div class="tgr"><div class="tga">🐱</div><div><b>'+escH(nameT(s.t))+'</b><small>'+escH(nameT(s.h))+'</small></div></div>'+(s.ok?'<button id="tutOk" type="button">'+escH(s.ok)+'</button>':'')+'<div class="qd"><i style="width:'+(Q.tut/TUT.length*100)+'%"></i></div><a id="tutSkip">'+(ui.skipArm?'Tap again to skip the tutorial':'Skip tutorial')+'</a>'}else ui.b.style.display='block'}else{ui.b.style.display='none';ui.key=''}}
   if(ui.btn){const dn=Q.g.filter(g=>g.d).length;ui.btn.textContent=tut?'🎯 '+Q.tut+'/'+TUT.length:'🎯 '+dn+'/'+Q.g.length}}
+ // ---- tap-locking: only the highlighted thing works ----
+ const curStep=()=>Q.tut!=='done'?TUT[Q.tut]:null;
+ const locked=()=>{const s=curStep();return !!(s&&s.allow&&s.allow!=='*'&&started&&!OB.on)};
+ const okTarget=(t,s)=>{if(!t||!t.closest)return false;if(t.closest('#qBanner,#audBtn,#audPanel,#toast'))return true;for(const q of s.allow){if(q==='canvas'){if(t===cv)return true}else if(t.closest(q))return true}return false};
+ for(const n of ['pointerdown','pointerup','mousedown','mouseup','click','touchstart','touchend','dblclick','contextmenu'])window.addEventListener(n,e=>{if(!locked())return;const s=curStep();
+  if(okTarget(e.target,s)){if(n==='click'){if(s.click&&e.target.closest(s.click)){setTimeout(()=>{if(curStep()===s)adv()},90)}else if(s.done==='ok'&&e.target.closest('#tutOk'))setTimeout(()=>{if(curStep()===s)adv()},0)}return}
+  e.stopImmediatePropagation();e.preventDefault()},{capture:true,passive:false});
+ window.addEventListener('keydown',e=>{if(!locked())return;const s=curStep();if(s.allow.includes('#pad'))return;if(/^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright| |e)$/i.test(e.key)){e.stopImmediatePropagation();e.preventDefault()}},true);
+ // ---- spotlight + pointing hand ----
+ function spotTick(){if(!ui.sp)return;const s=curStep();let el=null,r=null;
+  if(s&&s.spot&&started&&!OB.on){el=document.querySelector(s.spot);if(el){r=el.getBoundingClientRect();if(r.width<2||r.height<2)el=null}}
+  if(!el){ui.sp.style.display='none';ui.hd.style.display='none';return}
+  if((r.left<4||r.right>innerWidth-4)&&el.scrollIntoView){try{el.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}r=el.getBoundingClientRect()}
+  const pd=6;ui.sp.style.display='block';ui.sp.style.left=(r.left-pd)+'px';ui.sp.style.top=(r.top-pd)+'px';ui.sp.style.width=(r.width+2*pd)+'px';ui.sp.style.height=(r.height+2*pd)+'px';
+  const up=r.top>110;ui.hd.style.display='block';ui.hd.textContent=up?'👇':'👆';ui.hd.style.left=Math.max(4,Math.min(innerWidth-44,r.left+r.width/2-18))+'px';ui.hd.style.top=(up?r.top-pd-46:r.bottom+pd+4)+'px'}
+ // ---- glowing guides in the 3D world ----
+ const GG=new THREE.Group();GG.visible=false;scene.add(GG);let gKey='',gMats=[];
+ const gm=(c,o)=>{const m=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,side:THREE.DoubleSide});m.userData.o=o;gMats.push(m);return m};
+ function clearGuides(){while(GG.children.length)GG.remove(GG.children[0]);gKey='';gMats=[];GG.visible=false}
+ function gAdd(geo,mat,x,y,z,ry){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);if(ry)m.rotation.y=ry;m.renderOrder=5;GG.add(m);return m}
+ const g1=new THREE.BoxGeometry(1.12,.14,.16),g2=new THREE.PlaneGeometry(1,2.3),g3=new THREE.BoxGeometry(.9,.03,.9),g4=new THREE.BoxGeometry(1.0,2.15,.34),g5=new THREE.RingGeometry(.62,.86,36);
+ function gUpdate(){const s=curStep(),k=s&&s.guide&&started&&!OB.on&&(s.guide.indexOf('at:')===0||build.on)?s.guide:'';
+  if(!k){if(gKey)clearGuides();return}
+  if(k.indexOf('at:')===0){if(gKey!==k){clearGuides();gKey=k;const m=gm('#f3bd56',.9);gAdd(g5,m,0,.09,0).rotation.x=-Math.PI/2;GG.visible=true}
+   const t=k.slice(3);let x=null,z=null;if(t==='cat'){x=cat.position.x;z=cat.position.z}else for(const it of furn.values())if(it.type===t){x=it.x0+it.fw/2;z=it.z0+it.fd/2}
+   if(x===null)GG.visible=false;else{GG.visible=true;GG.children[0].position.set(x,.09,z)}return}
+  const sig=k+'|'+edges.size+'|'+floors.size+'|'+furn.size+'|'+[...edges.values()].filter(e=>e.type==='door').length;if(gKey===sig)return;clearGuides();gKey=sig;GG.visible=true;
+  if(k==='walls'){const m=gm('#ffcf4d',.85),m2=gm('#ffe9a8',.18);for(const [x,z,o] of PER){if(edges.has(ekey(x,z,o)))continue;const cx=o==='h'?x+.5:x,cz=o==='h'?z:z+.5;gAdd(g1,m,cx,.12,cz,o==='v'?Math.PI/2:0);gAdd(g2,m2,cx,1.15,cz,o==='v'?Math.PI/2:0)}}
+  else if(k==='door'){const m=gm('#5fd38d',.55);for(const [x,z,o] of DOORE){const e=edges.get(ekey(x,z,o));if(e&&e.type==='wall')gAdd(g4,m,x+.5,1.08,z)}}
+  else if(k==='floor'){const m=gm('#ffcf4d',.5);for(let x=HX.x0;x<HX.x1;x++)for(let z=HX.z0;z<HX.z1;z++)if(!floors.has(fkey(x,z)))gAdd(g3,m,x+.5,.1,z+.5)}
+  else if(k==='furn'){const m=gm('#5fd38d',.4);for(let x=HX.x0;x<HX.x1;x++)for(let z=HX.z0;z<HX.z1;z++)gAdd(g3,m,x+.5,.1,z+.5)}}
+ function gAnim(t){if(!GG.visible)return;const o=.55+.45*Math.sin(t*4.2);for(const m of gMats)m.opacity=m.userData.o*o;if(GG.children.length===1&&GG.children[0].geometry===g5){const q=1+.12*Math.sin(t*5);GG.children[0].scale.set(q,q,1)}}
+ // ---- hooks used by the builder: reject anything that is not the guided action ----
+ GT={anim:gAnim,
+  deny(kind,x,z,o){const s=curStep();if(!locked()||!s)return false;if(kind==='wall')return !(s.guide==='walls'&&PER.some(a=>a[0]===x&&a[1]===z&&a[2]===o));return false},
+  noLift(){const s=curStep();return !!(locked()&&s&&s.guide==='furn')},
+  denyFix(e,type){const s=curStep();if(!locked()||!s)return false;return !(s.guide==='door'&&type==='door'&&e.o==='h'&&e.z===HX.z1&&(e.x===-1||e.x===0))},
+  cells(list){const s=curStep();if(!locked()||!s)return list;if(s.guide!=='floor'){toast('Not yet ✨');return []}const out=list.filter(c=>inHouse(c[0],c[1]));if(out.length<list.length)toast('Stay inside the glowing area ✨');return out},
+  denyFurn(t,sp){const s=curStep();if(!locked()||!s)return false;return !(s.guide==='furn'&&s.fp===t&&inHouse(Math.floor(sp.x0+.01),Math.floor(sp.z0+.01)))}};
+ setInterval(()=>{try{if(started&&!OB.on){if(Q.tut!=='done')poll();refresh();spotTick();gUpdate()}}catch(e){}},140);
  function panel(){let p=document.getElementById('qPanel');if(p){p.remove();return}p=document.createElement('div');p.id='qPanel';
   p.style.cssText='position:fixed;z-index:50;right:max(12px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 60px);width:min(330px,92vw);max-height:70vh;overflow:auto;background:#fff8e9;border-radius:18px;padding:14px;box-shadow:0 10px 34px #0004;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:13px';
   let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Today’s goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
   if(Q.tut==='done'){h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak':'Finish all three to start a streak')+'</div>';
    for(const g of Q.g){const p=info(g.k);h+='<div style="margin:9px 0;'+(g.d?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+p.i+' '+p.t+(g.d?' ✅':'')+'</span><span>'+g.h+'/'+g.n+' · 🪙'+p.r+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+g.h/g.n*100+'%;background:#2e7658"></i></div></div>'}
    h+='<div style="font-size:11px;opacity:.7;margin-top:6px">New goals appear every game day. Finish all three for a bonus.</div>'}
-  else{TUT.forEach((s,i)=>{const d=i<Q.tut,c=i===Q.tut;h+='<div style="margin:7px 0;'+(d?'opacity:.55':'')+'"><b>'+(d?'✅':c?'👉':'⬜')+' '+s.t+'</b> <span style="opacity:.7">· 🪙'+s.r+'</span>'+(c?'<div style="font-weight:600;opacity:.85;margin-left:22px">'+s.h+'</div>':'')+'</div>'});h+='<button id="qSkip" style="margin-top:8px;border:0;background:#fff;border-radius:12px;padding:8px 12px;font-weight:700;font-size:12px">Skip the guide</button>'}
+  else{const secs=[];TUT.forEach((s,i)=>{const t=nameT(s.t),L=secs[secs.length-1];if(L&&L.t===t){L.b=i}else secs.push({t,a:i,b:i})});secs.forEach(S=>{const d=S.b<Q.tut,c=Q.tut>=S.a&&Q.tut<=S.b;h+='<div style="margin:7px 0;'+(d?'opacity:.55':'')+'"><b>'+(d?'✅':c?'👉':'⬜')+' '+escH(S.t)+'</b>'+(c?'<div style="font-weight:600;opacity:.85;margin-left:22px">'+escH(nameT(TUT[Q.tut].h))+'</div>':'')+'</div>'});h+='<button id="qSkip" style="margin-top:8px;border:0;background:#fff;border-radius:12px;padding:8px 12px;font-weight:700;font-size:12px">Skip the guide</button>'}
   p.innerHTML=h;document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#qX').onclick=()=>p.remove();const sk=p.querySelector('#qSkip');if(sk)sk.onclick=()=>{Q.tut='done';save();p.remove();newDay();refresh()}}
- function init(){if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
+ function init(){if(Q.tv!==2){Q.tv=2;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
+ setTimeout(()=>{try{init();refresh()}catch(e){}},0);
  function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();refresh()}
  return {ev,tick,panel,refresh,dayEnd,need,xp,save,get Q(){return Q},TUT,POOL}
 })();
@@ -3521,6 +3618,7 @@ function animateInner(now){const dt=Math.min((now-prev)/1000,.05);prev=now;elaps
  else{near=getNear();if(near){prompt.style.display='block';prompt.textContent='✨ '+near.label+' · tap it'}else if(!edges.size&&!furn.size&&onLot){prompt.style.display='block';prompt.textContent='🏗️ Empty lot · tap 🔨 Build to start your house'}else prompt.style.display='none'}
  for(const e of edges.values()){if(!e.info.pivot)continue;const dd=Math.hypot(px-e.pcx,pz-e.pcz),sg=(e.o==='h'?pz-e.cz:px-e.cx)>=0?1:-1;if(dd<e.reach)e.sg=sg;const tgt=(!build.on&&dd<e.reach)?1.5:0;e.info.ang+=(tgt-e.info.ang)*Math.min(1,dt*6);e.info.pivot.rotation.y=e.info.ang*(e.sg||1)*(-e.info.s)}
  visualUpdate(elapsed,mins);applyAge();stinkTick(elapsed);if(fountainF.visible)fountainF.userData.pose(elapsed);
+ if(GT&&GT.anim)GT.anim(elapsed);
  if(OC.hid.length){for(const g of OC.hid)g.visible=true;OC.hid.length=0}
  if(build.on){cameraYaw+=(build.yawT-cameraYaw)*Math.min(1,dt*6);const r=build.vr/build.zoom,p=1.05;scene.fog.near=Math.max(fogN,r+30);scene.fog.far=Math.max(fogF,r+110);camTarget.set(build.panX,0,build.panZ);camDesired.set(build.panX+Math.sin(cameraYaw)*r*Math.cos(p),Math.sin(p)*r,build.panZ+Math.cos(cameraYaw)*r*Math.cos(p))}
  else if(PG.on){scene.fog.near=fogN;scene.fog.far=fogF;
@@ -3539,7 +3637,8 @@ function animateInner(now){const dt=Math.min((now-prev)/1000,.05);prev=now;elaps
 window.__cfErr=0;window.purrDebug=()=>({bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{mins=v},getDay:()=>day,setDay:v=>{day=v},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));layoutView()});window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
 requestAnimationFrame(animate);
-document.getElementById('start').addEventListener('click',()=>{started=true;document.getElementById('welcome').style.display='none';toast(furn.size||edges.size?'Welcome back! Kitty is waiting 🐱':'Tap 🔨 Build to start your house')});
+document.getElementById('start').addEventListener('click',()=>{started=true;document.getElementById('welcome').style.display='none';toast(furn.size||edges.size?'Welcome back, '+(PNAME||'friend')+'! '+CNAME+' is waiting 🐱':'Welcome, '+(PNAME||'friend')+'! 🏡')});
+try{if(OBSKIP)setTimeout(()=>document.getElementById('start').click(),40);else obRun()}catch(e){console.warn('onboarding',e)}
 })();
 }
 (function loadThree(){
