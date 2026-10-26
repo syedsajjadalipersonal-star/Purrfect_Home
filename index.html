@@ -229,19 +229,23 @@ const wallGroup=group(scene,0,0,0),ghostGroup=group(scene,0,0,0);
 const edges=new Map(); // "x,z,o" -> {mesh,rect,x,z,o}; o 'h' = (x,z)->(x+1,z), 'v' = (x,z)->(x,z+1)
 const ekey=(x,z,o)=>x+','+z+','+o;
 const inLot=(x,z,o)=>o==='h'?(x>=LOT.x0&&x<LOT.x1&&z>=LOT.z0&&z<=LOT.z1):(x>=LOT.x0&&x<=LOT.x1&&z>=LOT.z0&&z<LOT.z1);
-const DOOR_H=2.2,SILL=.9,WIN_TOP=2.0,doorMat=mat('#8a5b3c',.7);doorMat.map=surfaceTexture('#8a5b3c','#d1a070',900);doorMat.bumpMap=doorMat.map;
+const DOOR_H=2.2,SILL=.9,WIN_TOP=2.0,doorMat=mat('#8a5b3c',.7),doorPanelMat=mat('#6d4529',.78),brassMat=mat('#d8c27a',.3);doorMat.map=surfaceTexture('#8a5b3c','#d1a070',900);doorMat.bumpMap=doorMat.map;
 // Each wall piece is built in a local frame (length along x, thickness along z) then placed/rotated onto its grid edge.
 function buildEdge(parent,x,z,o,type,style){const L=1+WT,T2=WT+.05,g=group(parent,o==='h'?x+.5:x,0,o==='h'?z:z+.5);if(o==='v')g.rotation.y=Math.PI/2;const info={g,pivot:null,s:-1},WM=(WALL_STYLES[style]||WALL_STYLES.normal).mat,idx=o==='h'?x:z,wb=(px,py,pz,w,h,d)=>wbox(g,px,py,pz,w,h,d,WM,true,idx);
- const hinge=(px,len,dir)=>{const pv=group(g,px,0,0);box(pv,dir*len/2,DOOR_H/2-.02,0,len,DOOR_H-.04,.05,doorMat);box(pv,dir*len/2,DOOR_H/2-.02,0,len-.26,DOOR_H-.5,.06,doorMat,false);sphere(pv,dir*(len-.1),1.0,.05,.035,.035,.035,mat('#d8c27a',.3));sphere(pv,dir*(len-.1),1.0,-.05,.035,.035,.035,mat('#d8c27a',.3));return pv};
+ const hinge=(px,len,dir)=>{const pv=group(g,px,0,0),w=len-.3;box(pv,dir*len/2,DOOR_H/2-.02,0,len,DOOR_H-.04,.05,doorMat);
+  for(const [y,h] of [[.62,.78],[1.6,.82]])box(pv,dir*len/2,y,0,w,h,.078,doorPanelMat,false);
+  box(pv,dir*len/2,1.12,0,len-.1,.05,.062,doorPanelMat,false);
+  for(const f of [-1,1]){box(pv,dir*(len-.1),1.0,f*.052,.05,.15,.012,brassMat,false);box(pv,dir*(len-.2),1.0,f*.075,.17,.026,.026,brassMat,false);sphere(pv,dir*(len-.29),1.0,f*.075,.02,.02,.02,brassMat)}return pv};
+ const casing=(px,hw)=>{for(const s of [-1,1])box(g,s*(hw+.025),DOOR_H/2,0,.06,DOOR_H,WT+.08,M.white,false);box(g,0,DOOR_H+.01,0,hw*2+.1,.08,WT+.08,M.white,false);box(g,0,.012,0,hw*2,.025,WT+.1,M.wood,false)};
  if(type==='door'){
-  wb(0,(DOOR_H+WH)/2,0,L,WH-DOOR_H,WT);for(const s of [-1,1])wb(s*.53,DOOR_H/2,0,.16,DOOR_H,WT);
-  for(const s of [-1,1])box(g,s*.455,DOOR_H/2,0,.05,DOOR_H,T2,M.white,false);box(g,0,DOOR_H-.02,0,.96,.05,T2,M.white,false);
-  info.pivot=hinge(-.43,.86,1);info.ang=0;info.s=-1}
+  wb(0,(DOOR_H+WH)/2,0,L,WH-DOOR_H,WT);for(const s of [-1,1])wb(s*.56,DOOR_H/2,0,.1,DOOR_H,WT);
+  casing(0,.51);
+  info.pivot=hinge(-.5,1.0,1);info.ang=0;info.s=-1}
  else if(type==='dbl_a'||type==='dbl_b'){
   // double door: two neighbouring edges, outer jamb on the far end of each, open in the middle. 'a' = lower-coordinate edge.
   const low=type==='dbl_a',s=o==='h'?(low?-1:1):(low?1:-1);
-  wb(0,(DOOR_H+WH)/2,0,L,WH-DOOR_H,WT);wb(s*.53,DOOR_H/2,0,.16,DOOR_H,WT);
-  box(g,s*.455,DOOR_H/2,0,.05,DOOR_H,T2,M.white,false);box(g,0,DOOR_H-.02,0,.96,.05,T2,M.white,false);
+  wb(0,(DOOR_H+WH)/2,0,L,WH-DOOR_H,WT);wb(s*.56,DOOR_H/2,0,.1,DOOR_H,WT);
+  box(g,s*.535,DOOR_H/2,0,.06,DOOR_H,WT+.08,M.white,false);box(g,0,DOOR_H+.01,0,L,.08,WT+.08,M.white,false);box(g,0,.012,0,L-.1,.025,WT+.1,M.wood,false);
   info.pivot=hinge(s*.45,.95,-s);info.ang=0;info.s=s}
  else if(type==='window'){
   wb(0,SILL/2,0,L,SILL,WT);wb(0,(WIN_TOP+WH)/2,0,L,WH-WIN_TOP,WT);for(const s of [-1,1])wb(s*.53,(SILL+WIN_TOP)/2,0,.16,WIN_TOP-SILL,WT);
