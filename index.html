@@ -2084,12 +2084,12 @@ function startTask(name){const U=cat.userData,T=U.target;if(U.task==='climb'&&U.
   case 'play-mouse':case 'play-ball':case 'play-feather':{const its=[...furn.values()].filter(o=>o.type===name.slice(5));U.item=its[Math.floor(Math.random()*its.length)];if(!U.item)T.set(cat.position.x,0,cat.position.z);else at(U.item.group,.1+.4*(cat.scale.x/CAT_SCALE));break}
   case 'climb':{const its=[...furn.values()].filter(o=>o.type==='tree'||o.type==='tower');U.item=its[Math.floor(Math.random()*its.length)];if(!U.item)T.set(cat.position.x,0,cat.position.z);else at(U.item.group,.85);break}
   case 'nap':{const nbd=napTarget();if(nbd){T.set(nbd.position.x,0,nbd.position.z);U.face=nbd.rotation.y+2.2}else T.set(cat.position.x,0,cat.position.z);break}
-  case 'window':{const w=windowSpot();if(!w){T.set(cat.position.x,0,cat.position.z);U.winKey=null;break}T.set(w.x,0,w.z);U.face=w.face;U.winKey=w.key;U.speed=.8;break}
+  case 'window':{const w=windowSpot();if(!w){T.set(cat.position.x,0,cat.position.z);U.winKey=null;break}T.set(w.x,0,w.z);U.face=w.face;U.winKey=w.key;U.base=[w.x,w.z];U.sill=[w.sx,w.sz];U.speed=.8;break}
   case 'sulk':case 'relax':T.set(cat.position.x,0,cat.position.z);break;
   case 'sleep':{const nbd=napTarget();if(nbd){T.set(nbd.position.x,0,nbd.position.z);U.face=nbd.rotation.y+2.2}else T.set(cat.position.x,0,cat.position.z);U.speed=.8;break}
   default:{const p=freeSpot(0,null);T.set(p.x,0,p.z)}}
  U.path=(Math.hypot(T.x-cat.position.x,T.z-cat.position.z)>.4)?navPath(cat.position.x,cat.position.z,T.x,T.z):null;U.pathVer=navVer}
-function endTask(){const U=cat.userData;if(/^play/.test(U.task||''))qev('play');if(/^play/.test(U.task||'')&&Math.random()<.3&&!(U.potty>0))U.potty=12+Math.random()*20;if(U.item&&furn.has(U.item.uid)&&/^(play-|climb)/.test(U.task||''))placeModel(U.item);U.lift=0;U.leap=false;U.rest=false;U.o0=null;U.task='';U.stage='';U.wait=(stats.love<=0?2.5:.6)+Math.random()*2.2}
+function endTask(){const U=cat.userData;if(U.task==='window'&&U.base&&U.lift>.05){cat.position.x=U.base[0];cat.position.z=U.base[1]}U.j1=0;if(/^play/.test(U.task||''))qev('play');if(/^play/.test(U.task||'')&&Math.random()<.3&&!(U.potty>0))U.potty=12+Math.random()*20;if(U.item&&furn.has(U.item.uid)&&/^(play-|climb)/.test(U.task||''))placeModel(U.item);U.lift=0;U.leap=false;U.rest=false;U.o0=null;U.task='';U.stage='';U.wait=(stats.love<=0?2.5:.6)+Math.random()*2.2}
 function pickIdle(){const r=Math.random();if(stats.love<=0)return r<.55?'sulk':r<.8?'wander':'relax';if(SICK.t>0&&r<.75)return 'relax';
  const pw=(1+1.2*(1-ageF())/.48)*PM.play*(1+homeScore().fun/150),opts=[['wander',4*PM.wander]];for(const ty of ['mouse','ball','feather'])if(placedN(ty)>0)opts.push(['play-'+ty,2*pw]);if(placedN('tree')||placedN('tower'))opts.push(['climb',2.6]);if(isPlaced(scratchPost))opts.push(['scratch',2.6]);if(isPlaced(yarn))opts.push(['play',2.2*pw]);if(edges.size&&[...edges.values()].some(e=>e.type==='window'))opts.push(['window',2.4]);opts.push(['relax',((isPlaced(catBed)?2.4:1.6)+(RECOVER.t>0?8:0))*PM.relax]);
  let tot=0;for(const o of opts)tot+=o[1];let x=Math.random()*tot;for(const o of opts){if((x-=o[1])<=0)return o[0]}return 'wander'}
@@ -2100,7 +2100,7 @@ function enterDo(){const U=cat.userData;U.stage='do';U.t=0;U.cn=0;
  switch(U.task){
   case 'eat':U.f0=bowl.food;U.kind=bowl.kind||'basic';U.dur=6.5;break;case 'drink':U.w0=bowl.water;U.dur=4.5;break;
   case 'litter':U.dur=2.2+(U.doPoop?6:4)+2.2;break;
-  case 'scratch':U.dur=8;break;case 'window':U.dur=14+Math.random()*10;U.wc=0;break;case 'nap':U.dur=11;break;case 'relax':U.dur=9+Math.random()*6;break;case 'sleep':U.dur=1e9;if(U.sleepKind==='night')bedtimePenalty();break;case 'sulk':U.dur=7;break;case 'play':U.dur=7;break;case 'play-mouse':case 'play-ball':case 'play-feather':U.dur=8;U.o0=null;break;case 'climb':U.dur=1e9;U.rest=false;U.leap=false;U.o0=null;break;
+  case 'scratch':U.dur=8;break;case 'window':U.dur=16+Math.random()*10;U.wc=0;break;case 'nap':U.dur=11;break;case 'relax':U.dur=9+Math.random()*6;break;case 'sleep':U.dur=1e9;if(U.sleepKind==='night')bedtimePenalty();break;case 'sulk':U.dur=7;break;case 'play':U.dur=7;break;case 'play-mouse':case 'play-ball':case 'play-feather':U.dur=8;U.o0=null;break;case 'climb':U.dur=1e9;U.rest=false;U.leap=false;U.o0=null;break;
   case 'beg-food':U.dur=1e9;U.meow=0;toast('Kitty is hungry, but the food bowl is empty! 🍗 Tap Feed.');break;
   case 'beg-water':U.dur=1e9;U.meow=0;toast('Kitty is thirsty, but the water bowl is empty! 💧');break;
   case 'refuse':U.dur=3;U.refuseCD=45;toast('The litter tray is too dirty. Kitty refuses to use it! 🧹');catSound('meow');break;
@@ -2150,7 +2150,7 @@ function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.payT=(LIFE.payT||30)-d
 function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;const bill=sickPay(Math.max(12,Math.min(60,Math.round(coins()*.08))));catSound('sad');toast('🤒 Kitty is unwell'+(bill?' · medicine −'+bill+' 🪙':'')+'. Medicine keeps costing coins until she recovers. A vet visit cures her fast');return true}
 function windowSpot(){const ws=[...edges.values()].filter(e=>e.type==='window');if(!ws.length)return null;const e=ws[Math.floor(Math.random()*ws.length)],o=[[0,.55],[0,-.55]],q=e.o==='h'?[[0,.55],[0,-.55]]:[[.55,0],[-.55,0]];
  let best=q[0],bs=-1;for(const [dx,dz] of q){const x=e.cx+dx,z=e.cz+dz,sc=(floorAt(x,z)?2:0)+(blockedPoint(x,z,.25)?-3:0)+Math.random();if(sc>bs){bs=sc;best=[dx,dz]}}
- return {e,x:e.cx+best[0],z:e.cz+best[1],face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
+ return {e,x:e.cx+best[0],z:e.cz+best[1],sx:e.cx+best[0]*.3,sz:e.cz+best[1]*.3,face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
 
 // ===== Cinematic camera moments + depth of field =====
 const CINE={k:0,t:0,cool:12,kind:'',side:1,yaw:0,menu:0,mt:0,on:true,fov:49};
@@ -2217,7 +2217,13 @@ function updateCat(dt){const U=cat.userData,sad=stats.love<=0;lifeSick(dt);
    else if(U.t<tD){const q=wp(n-1);x=q[0];z=q[1];y=q[2];rest=true;if(tick(.3))catSound('purr')}
    else{const q=wp(n-1),u=(U.t-tD)/.9,e=sm(u);x=q[0]+(B[0]-q[0])*e;z=q[1]+(B[1]-q[1])*e;y=q[2]*(1-e)+Math.sin(Math.PI*Math.min(1,u))*.3;leap=u<1;U.face=Math.atan2(B[0]-q[0],B[1]-q[1]);if(u>=1){endTask();break}}
    cat.position.x=x;cat.position.z=z;U.lift=y;U.leap=leap;U.rest=rest;break}
-  case 'window':{if(!U.cn&&U.t>1.5){U.cn=1;cineGo('look',6)}U.wc+=dt;if(U.wc>6){U.wc=0;if(Math.random()<.5)catSound('meow')}if(U.t>=U.dur){stats.love=Math.min(100,stats.love+2);if(!LIFE.winSeen){LIFE.winSeen=true;toast('🪟 Kitty enjoyed watching the world go by · bond +2')}endTask()}break}
+  case 'window':{if(!U.cn&&U.t>2.4){U.cn=1;cineGo('look',6)}U.wc+=dt;if(U.wc>6){U.wc=0;if(Math.random()<.5)catSound('meow')}
+   if(U.base&&U.sill){const B=U.base,S=U.sill,TI=.9,TO=.9,H=SILL-.08,sm=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};let u,e,y,leap=false,x,z;
+    if(U.t<TI){u=U.t/TI;e=sm(u);x=B[0]+(S[0]-B[0])*e;z=B[1]+(S[1]-B[1])*e;y=H*e+Math.sin(Math.PI*u)*.22;leap=true;if(!U.j1){U.j1=1;catSound('scratch')}}
+    else if(U.t<U.dur-TO){x=S[0];z=S[1];y=H}
+    else{u=(U.t-(U.dur-TO))/TO;e=sm(u);x=S[0]+(B[0]-S[0])*e;z=S[1]+(B[1]-S[1])*e;y=H*(1-e)+Math.sin(Math.PI*Math.min(1,u))*.22;leap=u<1}
+    cat.position.x=x;cat.position.z=z;U.lift=y;U.leap=leap;U.j1=U.j1||0}
+   if(U.t>=U.dur){stats.love=Math.min(100,stats.love+2);if(!LIFE.winSeen){LIFE.winSeen=true;toast('🪟 Kitty enjoyed watching the world go by · bond +2')}endTask()}break}
   case 'sleep':break;
   case 'beg-food':case 'beg-water':U.meow-=dt;if(U.meow<=0){U.meow=5;catSound('meow')}break;
   case 'accident':{const aq=1.2+(U.doPoop?6:4);if(U.t<1.2&&tick(6))catSound('scratch');if(U.t>=aq&&!U.done){U.done=true;const fx=Math.sin(cat.rotation.y),fz=Math.cos(cat.rotation.y),mx=cat.position.x-fx*.4,mz=cat.position.z-fz*.4;if(U.doPee){clocks.pee=0;addFloorMess('pee',mx,mz)}if(U.doPoop){clocks.poop=0;addFloorMess('poop',mx-fz*.1,mz+fx*.1)}toast('Oh no! The tray was too dirty, so Kitty went on the floor 😿 Tap 🧽 Clean mess.');catSound('sad')}if(U.t>=U.dur)endTask();break}
@@ -2226,7 +2232,7 @@ function catStateText(){const U=cat.userData,tk=U.stage==='do'?U.task:U.task?'wa
  if(stats.love<=0)return 'Sad 😿';return {eat:'Eating 😋',drink:'Drinking 💧',litter:'Using the tray 🚽',scratch:'Scratching 🐾',play:'Playing 🧶','play-mouse':'Chasing the mouse 🐭','play-ball':'Batting the ball 🔴','play-feather':'Chasing feathers 🪶',climb:'Climbing 🌳',nap:'Napping 💤',sleep:'Sleeping 💤',relax:'Relaxing 😌',refuse:'Dirty tray! 🧹',accident:'Having an accident 😿',sulk:'Sulking',window:'Watching outside 🪟',wander:'Roaming'}[tk]||(tk==='walk'?'Walking':'Relaxing')}
 function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THREE.MathUtils.lerp;
  const sad=stats.love<=0,tk=U.stage==='do'?U.task:'',sqEnd=2.2+(U.doPoop?6:4),ph=tk==='litter'?(U.t<2.2?'dig':U.t<sqEnd?'sq':'cv'):tk==='accident'?(U.t<1.2?'dig':U.t<1.2+(U.doPoop?6:4)?'sq':''):'';
- const tg={sc:tk==='scratch',nb:tk==='nap'||tk==='sleep'||(tk==='climb'&&!!U.rest),rl:tk==='relax'||tk==='window',wn:tk==='window',lp:tk==='climb'&&!!U.leap,hd:tk==='eat'||tk==='drink',chew:tk==='eat',lap:tk==='drink',dg:ph==='dig'||tk.startsWith('play'),sq:ph==='sq',cv:ph==='cv',sd:sad||tk==='sulk',beg:tk==='beg-food'||tk==='beg-water',pur:U.happy>0,lt:tk==='litter'};
+ const tg={sc:tk==='scratch',nb:tk==='nap'||tk==='sleep'||(tk==='climb'&&!!U.rest),rl:tk==='relax'||tk==='window',wn:tk==='window',lp:(tk==='climb'||tk==='window')&&!!U.leap,hd:tk==='eat'||tk==='drink',chew:tk==='eat',lap:tk==='drink',dg:ph==='dig'||tk.startsWith('play'),sq:ph==='sq',cv:ph==='cv',sd:sad||tk==='sulk',beg:tk==='beg-food'||tk==='beg-water',pur:U.happy>0,lt:tk==='litter'};
  for(const k in tg)P[k]=L(P[k]||0,tg[k]?1:0,Math.min(1,dt*(k==='sq'?3:5)));
  const sc=P.sc,nb=P.nb,hd=P.hd,sd=P.sd;let by=0;
  if(U.moving){const ph=U.gait||0,A=sad?.28:.5,ph4=[0,Math.PI,Math.PI,0];legs.forEach((l,i)=>{const q=ph+ph4[i];l.rotation.x=Math.sin(q)*A*(i<2?1:.9);l.position.y=.34+Math.max(0,Math.cos(q))*.035});by=Math.abs(Math.sin(ph))*.03;U.roll=Math.sin(ph)*.035;U.nod=Math.sin(ph*2)*.04}else{legs.forEach(l=>{l.rotation.x=0;l.position.y=.34});by=Math.sin(t*2.5)*.018;U.roll=0;U.nod=0}
