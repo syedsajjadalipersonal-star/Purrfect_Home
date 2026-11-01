@@ -477,7 +477,7 @@ function rotateFurn(it){const cx=it.x0+it.fw/2,cz=it.z0+it.fd/2,nr=frot(it.rot+1
  toast('No room to turn it here');return false}
 // cat with tail, ears, face and articulated legs
 const CAT_SCALE=.7;const cat=group(scene,1.2,0,5.2);cat.scale.setScalar(CAT_SCALE);const catBody=group(cat);
-var catHead=group(catBody,0,.74,.52),catEars=[],catLids=[],catTears=[],catJaw=null,catTongue=null;
+var catPupils=[],catPd=0,catHead=group(catBody,0,.74,.52),catEars=[],catLids=[],catTears=[],catJaw=null,catTongue=null;
 var legs=[0,1,2,3].map(()=>group(catBody,0,.34,0));var tail=group(catBody,0,.5,-.42);
 let catMount=group(catBody,0,0,0);catMount.add(catHead);const catNew=[],catMats=[];
 // ===== Cat creator data: 5 famous breeds x coat patterns x colours =====
@@ -642,7 +642,7 @@ function catBuild(rig,spec,track,mats,seedBase){
  const jawM=mat('#b84b5a',.5),tongM=mat('#f08a9a',.5);mats.push(jawM,tongM);
  const jaw=S(0,-.118,.258+mz,.045,.004,.03,jawM),tongue=S(0,-.125,.268+mz,.02,.012,.03,tongM);tongue.visible=false;
  const tears=[];for(const s of[-1,1]){const tm=mat('#9fd6ff',.2);mats.push(tm);const tr=S(s*.1,-.02,.245,.012,.018,.01,tm);tr.visible=false;tears.push(tr)}
- const lids=[],ears=[];
+ const lids=[],ears=[],pupils=[];
  const ex=earT==='L'?1.15:1,eyeK=spec.eye==='odd'?['#4f8fd8','#d08a2c']:[(CEYE[spec.eye]||CEYE.amber)[0],(CEYE[spec.eye]||CEYE.amber)[0]];
  const almond=BR[2]==='slim'||BR[2]==='lean'?.88:1,headC=coat('head',0,.05,.05),lidM=new THREE.MeshStandardMaterial({color:new THREE.Color(headC[0],headC[1],headC[2]),roughness:.95});mats.push(lidM);
  if(!CAT_EAR_G)CAT_EAR_G=catEarGeo();
@@ -650,7 +650,7 @@ function catBuild(rig,spec,track,mats,seedBase){
  for(const s of[-1,1]){
   S(s*.1,.045,.188,.056*ex*.95,.06*almond,.03,darkM);
   const em=mat(eyeK[s<0?0:1],.3);mats.push(em);S(s*.1,.045,.191,.054*ex*.95,.057*almond,.03,em);
-  S(s*.1,.045,.208,.018,.04*almond,.01,M.black);const hi=mat('#ffffff',.1);mats.push(hi);S(s*.1+.012,.06,.216,.008,.008,.006,hi);
+  {const pm=mat('#070606',.35);mats.push(pm);const pp=S(s*.1,.045,.2175,.009,.044*almond,.011,pm);pp.userData.pa=.044*almond;pupils.push(pp)}const hi=mat('#ffffff',.1);mats.push(hi);S(s*.1+.012,.06,.216,.008,.008,.006,hi);
   const lid=S(s*.1,.115,.19,.06,.0015,.034,lidM);lid.rotation.z=-s*.1;lids.push(lid);
   // ear
   const es=earT==='L'?1.4:earT==='S'?.95:earT==='T'?1.25:1.1,ew=.15*es,eh=.26*es,ex0=s*.14,ey=.16,ez=-.01;
@@ -698,14 +698,14 @@ function catBuild(rig,spec,track,mats,seedBase){
   rig.legs.forEach((l,i)=>{const lf=furBlades(l.children[0].geometry,(x,y,z,nx,ny,nz)=>y>-.3*LL&&y<-.04*LL,Math.round(50*dens),{flow:()=>[0,-1,-.25],len:[.1,.2],w:[.05,.08],droop:.5,g:.5,fw:1,nw:.12,sway:.08},(x,y,z)=>coat('leg',x,y/LL,z),rnd);if(lf)add(l,lf,'fur',false,true)});
  }
  rig.head.position.set(0,.74,.52);
- return {ears,lids,jaw,tongue,tears,hd:BD.hd.map(v=>v*.86),oy,mz:oy,Z,tail:rig.tail,body:bodyM}
+ return {pupils,ears,lids,jaw,tongue,tears,hd:BD.hd.map(v=>v*.86),oy,mz:oy,Z,tail:rig.tail,body:bodyM}
 }
 
 function catRebuild(spec,silent){
  spec=catNorm(Object.assign(catDefaults(spec&&spec.breed),spec||{}));catSpec=spec;
  for(const m of catNew){if(m.parent)m.parent.remove(m);if(m.geometry&&m.geometry!==CAT_EAR_G&&m.geometry.dispose)m.geometry.dispose()}for(const mm of catMats){if(mm.map)mm.map.dispose();mm.dispose()}catMats.length=0;catNew.length=0;
  const R=catBuild({body:catBody,head:catHead,legs,tail},spec,catNew,catMats,0);
- catEars=R.ears;catLids=R.lids;catJaw=R.jaw;catTongue=R.tongue;catTears=R.tears;catHeadK=R.hd;
+ catEars=R.ears;catPupils=R.pupils;catLids=R.lids;catJaw=R.jaw;catTongue=R.tongue;catTears=R.tears;catHeadK=R.hd;
  catMount.position.set(0,R.oy,.52*(R.Z-1));
  catRefit();
  try{localStorage.setItem('purrfect-cat',JSON.stringify(spec))}catch(e){}
@@ -2400,6 +2400,7 @@ function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THRE
  if(U.held>.001){const k=U.held;legs[0].rotation.x=L(legs[0].rotation.x,.35,k);legs[1].rotation.x=L(legs[1].rotation.x,.3,k);legs[2].rotation.x=L(legs[2].rotation.x,-.5,k);legs[3].rotation.x=L(legs[3].rotation.x,-.45,k);legs.forEach(l=>l.scale.y=1-.5*k);tail.rotation.x=L(tail.rotation.x,-2.4,k);tail.rotation.z=L(tail.rotation.z,0,k);catHead.position.y-=.2*k;catHead.position.z+=.04*k;catHead.rotation.x+=.35*k;by=L(by,0,k)}
  catBody.position.y=by;
  for(const [ear,inner,s] of catEars){const r=L(-s*.4,-s*1.3,sd);ear.rotation.z=r;inner.rotation.z=r}
+ {const dk=mins<330||mins>1290?.45:0,tg=Math.max(U.zoom>0?1:0,dk,U.task==='chase'||U.task==='bug'?.8:0);catPd+=(tg-catPd)*Math.min(1,dt*6);for(const pp of catPupils){const a=pp.userData.pa||.044;pp.scale.set(.009+.03*catPd,a*(1-.1*catPd),.011)}}
  const cl=Math.max(sd*.65,nb,P.sq*.5);for(const lid of catLids){lid.scale.set(.06+.01*cl,.0015+.062*cl,.034+.03*cl);lid.position.y=.115-.075*cl;lid.position.z=.2+.035*cl}
  const open=P.chew*(Math.sin(t*14)*.5+.5)+P.beg*Math.max(0,Math.sin(t*3));catJaw.scale.y=.004+.03*open;
  catTongue.visible=P.lap>.3;if(catTongue.visible){catTongue.position.z=.268+.035*Math.max(0,Math.sin(t*10));catTongue.position.y=-.125-.01*Math.max(0,Math.sin(t*10))}
