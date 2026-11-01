@@ -2628,47 +2628,50 @@ var QM=(function(){
  const perDone=()=>PER.every(([x,z,o])=>edges.has(ekey(x,z,o)));
  const hasDoor=()=>DOORE.some(([x,z,o])=>{const e=edges.get(ekey(x,z,o));return e&&e.type==='door'});
  const floorN=()=>{let n=0;for(const f of floors.values())if(inHouse(f.cx,f.cz))n++;return n};
- const nameT=t=>String(t).replace(/\{n\}/g,PNAME||'friend').replace(/\{c\}/g,CNAME||'Kitty');
+ const nameT=t=>String(typeof t==='function'?t():t).replace(/\{n\}/g,PNAME||'friend').replace(/\{c\}/g,CNAME||'Kitty');
  const NEAR=(t,r)=>{for(const it of furn.values())if(it.type===t)return Math.hypot(player.position.x-(it.x0+it.fw/2),player.position.z-(it.z0+it.fd/2))<r;return false};
  const BM=['canvas','#bUndo','#bL','#bR'],CARE=['canvas','#pad','#feedMenu','#litMenu','#ctxBtn','#petGame','#servedPop'];
  const sel=(q)=>({allow:[q],spot:q,click:q}),opt=o=>sel('#subBar [data-o="'+o+'"]'),grp=g=>sel('#grpBar [data-g="'+g+'"]');
  const T=(t,h,o)=>Object.assign({t,h,r:0},o);
+ const BRT={persian:'Persians are calm, sweet and fluffy, with a long silky coat that loves brushing.',siamese:'Siamese cats are clever, chatty and very social, with striking blue eyes.',mainecoon:'Maine Coons are the gentle giants: big, shaggy and friendly.',british:'British Shorthairs are sturdy and easy-going, with a plush round face.',bengal:'Bengals are sleek, energetic and playful, with a wild-looking spotted coat.'};
+ const brName=()=>{const b=CB_BY[(catSpec&&catSpec.breed)||'persian'];return b?b[1]:'Persian'},brInfo=()=>BRT[(catSpec&&catSpec.breed)||'persian']||'';
+ const catCam=()=>[cat.position.x,cat.position.z,3.4,.8,.7];
+ const OKB=o=>Object.assign({allow:['#tutOk'],ok:'Next',done:'ok'},o);
+ const mt=n=>'.meters .meter:nth-of-type('+n+')';
+ const shopCam=x=>({cam:[x,19,10,3.2,0]});
  const TUT=[
-  T('Welcome','Hi {n}! I will show you how to build a cosy home for {c}. Follow the glowing hints. Only the highlighted button works, so you cannot get lost.',{allow:['#tutOk'],ok:'Let’s go!',done:'ok'}),
-  T('Start building','Tap the 🔨 Build button to open the builder.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>build.on}),
-  T('Walls','Tap the Wall tab.',sel('#bCatWall')),
-  T('Walls','Choose Normal walls.',opt('normal')),
-  T('Walls','Drag along the glowing line to draw {c}’s walls. One drag per side. Close the loop so the room is sealed!',{allow:BM,guide:'walls',poll:perDone,r:100}),
-  T('A door','Every home needs a door, or you and {c} could never get in or out. Tap the Doors tab.',sel('#bCatAcc')),
-  T('A door','Choose Door.',opt('door')),
-  T('A door','Tap the glowing spot on the front wall to place the door.',{allow:BM,guide:'door',poll:hasDoor,r:60}),
-  T('Floor','Now a cosy floor. Tap the Floor tab.',sel('#bCatFloor')),
-  T('Floor','Choose Wood.',opt('wood')),
-  T('Floor','Drag across the whole room to lay the floor.',{allow:BM,guide:'floor',poll:()=>floorN()>=20,r:80}),
-  T('{c}’s corner','{c} needs a few essentials. Tap the Furniture tab.',sel('#bCatFurn')),
-  T('{c}’s corner','Open the 🐾 Cat section.',grp('cat')),
-  T('{c}’s corner','Pick the Food bowl.',opt('foodbowl')),
-  T('{c}’s corner','Touch the glowing floor, slide the bowl where you like, then lift your finger.',{allow:BM,guide:'furn',fp:'foodbowl',poll:()=>nF('foodbowl')>0,r:40}),
-  T('{c}’s corner','Now pick the Water bowl.',opt('waterbowl')),
-  T('{c}’s corner','Put the water bowl down next to it the same way.',{allow:BM,guide:'furn',fp:'waterbowl',poll:()=>nF('waterbowl')>0,r:40}),
-  T('{c}’s corner','Last one: pick the Litter tray.',opt('litter')),
-  T('{c}’s corner','Place the litter tray somewhere out of the way, on the glowing floor.',{allow:BM,guide:'furn',fp:'litter',poll:()=>nF('litter')>0,r:60}),
-  T('Step inside','Looking good! Tap ✔ Done to step into your new home.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>!build.on}),
-  T('Feed {c}','Walk to the food bowl. Drag the round pad, and use the door!',{allow:['#pad','canvas'],spot:'#pad',guide:'at:foodbowl',poll:()=>NEAR('foodbowl',2.6)}),
-  T('Feed {c}','Tap the food bowl, then choose some food for {c}.',{allow:CARE,guide:'at:foodbowl',ev:'feed',r:100}),
-  T('Fresh water','Now the water bowl. Walk over and tap it.',{allow:CARE,guide:'at:waterbowl',ev:'water',r:80}),
-  T('Cuddle time','{c} would love a cuddle. Walk up to {c} and tap them, then tap in the green zone.',{allow:CARE,guide:'at:cat',ev:'pet',r:120}),
-  T('Groceries','Time to shop! Walk out of the garden to Fresh Grocery, pick a drink or ready meal and pay at the checkout.',{allow:'*',ev:'groc',r:100}),
-  T('Head home','Leave the shop and walk back to your garden. Your home is waiting!',{allow:'*',poll:()=>!SH.on&&!SH.tr&&player.position.x>LOT.x0&&player.position.x<LOT.x1&&player.position.z>LOT.z0&&player.position.z<LOT.z1}),
-  T('A kitchen','Your food needs a home. Tap 🔨 Build.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>build.on}),
-  T('A kitchen','Open the Furniture tab.',sel('#bCatFurn')),
-  T('A kitchen','Open the 🍳 Kitchen section.',grp('kitchen')),
-  T('A kitchen','Pick the Fridge.',opt('fridge')),
-  T('A kitchen','Slide the fridge onto the glowing floor, then lift your finger.',{allow:BM,guide:'furn',fp:'fridge',poll:()=>nF('fridge')>0,r:80}),
-  T('A kitchen','Tap ✔ Done.',{allow:['#buildBtn'],spot:'#buildBtn',poll:()=>!build.on}),
-  T('Mealtime','Open the fridge, take your food and eat it. Add a dining set (level 3) for a proper table!',{allow:'*',ev:'eat',r:120}),
-  T('Say cheese','Capture a memory! Tap the 📷 camera.',{allow:'*',spot:'#phBtn',ev:'photo',r:100}),
-  T('All set','You did it, {n}! Your home is ready. Every day you will get little goals. Keep {c} happy and keep decorating!',{allow:['#tutOk'],ok:'Start playing!',done:'ok',r:150})];
+  T('Welcome','Hi {n}! Here is a quick tour of {c}’s world. Tap Next to move along.',OKB({ok:'Start the tour',cam:catCam})),
+  T('Meet {c}',()=>'{c} is a '+brName()+' kitten. '+brInfo()+' Look after {c} and {c} will grow into a happy adult.',OKB({cam:catCam,guide:'at:cat'})),
+  T('Age','Here you can see {c}’s age. Kittens grow up as the days go by.',OKB({spot:'#agePill'})),
+  T('Time','The clock shows the day and time. One game minute passes every real second, and {c} naps, wakes and gets hungry as the day goes on.',OKB({spot:'#clock'})),
+  T('Care bars','These six bars show how {c} is feeling. Keep them topped up and {c} stays happy and healthy.',OKB({spot:'.meters'})),
+  T('🍗 Hunger','Hunger drops over time. Fill the food bowl, or tap the bowl to give {c} a meal. If it hits zero, {c}’s health suffers.',OKB({spot:mt(1)})),
+  T('💧 Thirst','Thirst drops too. Keep the water bowl full. A thirsty cat gets unwell quickly.',OKB({spot:mt(2)})),
+  T('🧹 Litter clean','This is how clean the litter tray is. Scoop it regularly. A dirty tray makes {c} unhappy.',OKB({spot:mt(3)})),
+  T('💗 Bond','Bond is how much {c} loves you. Pet, play and spend time with {c} to raise it.',OKB({spot:mt(4)})),
+  T('🩺 Health','Health falls when {c} is hungry, thirsty or sick. A visit to the Animal Hospital helps {c} recover.',OKB({spot:mt(5)})),
+  T('🛁 Cleanliness','How clean {c} is. A dirty coat lowers happiness, so keep the bathroom and baths handy.',OKB({spot:mt(6)})),
+  T('Daily goals','Your daily goals will appear here after the tour. Each game day brings three small goals for coins, and finishing all three builds a streak bonus.',OKB({spot:'#qBtn'})),
+  T('Walking','Drag the round pad to walk around. Drag the open screen to look around.',OKB({spot:'#pad'})),
+  T('Build','Tap Build to design your home. Let me show you the build menu.',OKB({spot:'#buildBtn'})),
+  T('🧱 Walls','Draw walls to shape your rooms. Pick the wall style from the strip below.',OKB({bld:true,spot:'#bCatWall'})),
+  T('🟫 Floors','Paint floors such as wood, tile and carpet. Drag across a room to cover it.',OKB({bld:true,spot:'#bCatFloor'})),
+  T('🚪 Doors and windows','Place doors and windows on your walls, so you and {c} can get in and out and let the light in.',OKB({bld:true,spot:'#bCatAcc'})),
+  T('🛋️ Furniture','Furniture comes in sections: living room, kitchen, bedroom, bathroom and 🐾 Cat items like bowls, litter trays, beds and toys. More unlock as your Home Level rises.',OKB({bld:true,spot:'#bCatFurn'})),
+  T('🧽 Erase','Use Erase to remove walls, floors or furniture you no longer want.',OKB({bld:true,spot:'#bErase'})),
+  T('Undo and turn','Undo takes back your last change. The arrows turn your view around the house.',OKB({bld:true,spot:'#bUndo'})),
+  T('Done','Tap ✔ Done when you finish building to step back into your home.',OKB({bld:true,spot:'#buildBtn'})),
+  T('Your lot','This is your lot. Everything you build goes here.',OKB({bld:false,cam:[0,0,15,9,.6]})),
+  T('The garden','Past your lot is the garden, and then the road to the shops.',OKB({cam:[0,8,16,9,Math.PI]})),
+  T('The shops','The shops line the road. Walk up to a shop door to go inside.',OKB({cam:[0,18,24,10,0]})),
+  T('🐾 Paws & Pets','The pet shop. Buy food, treats, toys and supplies for {c}.',OKB(Object.assign({guide:'at:@-9,20.3'},shopCam(-9)))),
+  T('🛒 Fresh Grocery','Buy drinks and ready meals for yourself here, then stock your fridge. Open 6 am to 11 pm.',OKB(Object.assign({guide:'at:@-3.5,20.3'},shopCam(-3.5)))),
+  T('🏥 Animal Hospital','The vet. Bring {c} here for check-ups and treatment when {c} is ill.',OKB(Object.assign({guide:'at:@3.5,20.3'},shopCam(3.5)))),
+  T('☕ Purrfect Café','A cosy café full of friendly cats to pet, feed and play with. Open 7 am to 9 pm.',OKB(Object.assign({guide:'at:@9,20.3'},shopCam(9)))),
+  T('Photos','Tap the camera to take a photo of {c} and your home.',OKB({spot:'#phBtn'})),
+  T('Gallery','Your photos are saved in the gallery.',OKB({spot:'#gaBtn'})),
+  T('Settings','Sound, vibration, saving and backups, and the cinematic camera live in Settings.',OKB({spot:'#audBtn'})),
+  T('All set','You are ready, {n}! Look after {c}, build your dream home and enjoy.',{allow:['#tutOk'],ok:'Start playing!',done:'ok',r:150})];
  const POOL=[
   {k:'feed',n:2,r:50,t:'Feed Kitty',i:'🍗',c:0},{k:'water',n:1,r:30,t:'Fill the water bowl',i:'💧',c:0},{k:'litter',n:1,r:50,t:'Clean the litter tray',i:'🧹',c:0},{k:'pet',n:2,r:60,t:'Pet Kitty',i:'💗',c:0},{k:'play',n:2,r:60,t:'Let Kitty play',i:'🧶',c:0},
   {k:'eat',n:1,r:50,t:'Eat a meal',i:'🍽️',c:1},{k:'cook',n:1,r:70,t:'Cook something new',i:'🍳',c:1},{k:'sit',n:1,r:30,t:'Sit down and relax',i:'🛋️',c:1},{k:'cafe',n:1,r:80,t:'Eat at the café',i:'☕',c:1},
@@ -2687,16 +2690,18 @@ var QM=(function(){
   // never let a step be blocked: if the bowl is already full, empty it so Feed / Water can be done
   if(s&&s.ev==='feed'&&bowl.food>=99.5){bowl.food=0;try{updateBowlVisuals();saveCat()}catch(e){}}
   if(s&&s.ev==='water'&&bowl.water>=99.5){bowl.water=0;try{updateBowlVisuals();saveCat()}catch(e){}}
+  if(s&&started&&!OB.on){const wb=s.bld===undefined?false:s.bld;if(build.on!==wb)buildToggle(wb)}
   if(s&&s.poll&&s.poll())adv()}
  // ---- UI ----
- function mk(){if(ui.b)return;const st=document.createElement('style');st.textContent='@keyframes qpulse{0%,100%{box-shadow:0 0 0 0 #f3bd56aa}50%{box-shadow:0 0 0 10px #f3bd5600}}.qpulse{animation:qpulse 1.3s infinite}@keyframes qglow{0%,100%{box-shadow:0 0 0 100vmax #121c18a6,0 0 10px 2px #f3bd56aa}50%{box-shadow:0 0 0 100vmax #121c18a6,0 0 24px 8px #f3bd56}}@keyframes qhand{from{transform:translateY(0)}to{transform:translateY(-12px)}}#qBanner{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 292px);z-index:95;width:min(calc(100vw - 24px),380px);background:#fff8e9;border:2px solid #f3bd56;border-radius:20px;padding:11px 14px;font:700 13px/1.4 Nunito,system-ui;color:#24332e;box-shadow:0 8px 26px #0005;display:none;pointer-events:auto}.building #qBanner{top:calc(max(10px,env(safe-area-inset-top)) + 70px)}#qBanner b{font-size:14.5px}#qBanner small{display:block;font:700 13px/1.4 Nunito,system-ui;opacity:.85;margin-top:2px}#qBanner .tgr{display:flex;gap:10px;align-items:center}#qBanner .tga{font-size:34px;line-height:1}#qBanner .qd{height:5px;border-radius:3px;background:#e6dcc0;margin-top:8px;overflow:hidden}#qBanner .qd i{display:block;height:100%;background:#2e7658}#qBanner button{display:block;width:100%;margin-top:9px;border:0;border-radius:14px;padding:12px;background:#2e7658;color:#fff;font:900 15px Nunito,system-ui}#qBanner a{display:block;text-align:right;font-size:11px;opacity:.55;margin-top:5px;text-decoration:underline}#tutSpot{position:fixed;z-index:60;display:none;border:3px solid #f3bd56;border-radius:18px;pointer-events:none;animation:qglow 1.3s infinite}#tutHand{position:fixed;z-index:61;display:none;font-size:36px;line-height:1;pointer-events:none;animation:qhand .7s infinite alternate;filter:drop-shadow(0 3px 4px #0006)}.toast{z-index:96!important}';document.head.appendChild(st);
+ function mk(){if(ui.b)return;const st=document.createElement('style');st.textContent='@keyframes qpulse{0%,100%{box-shadow:0 0 0 0 #f3bd56aa}50%{box-shadow:0 0 0 10px #f3bd5600}}.qpulse{animation:qpulse 1.3s infinite}@keyframes qglow{0%,100%{box-shadow:0 0 0 100vmax #121c18a6,0 0 10px 2px #f3bd56aa}50%{box-shadow:0 0 0 100vmax #121c18a6,0 0 24px 8px #f3bd56}}@keyframes qhand{from{transform:translateY(0)}to{transform:translateY(-12px)}}#qBanner{position:fixed;left:50%;transform:translateX(-50%);top:calc(max(10px,env(safe-area-inset-top)) + 292px);z-index:95;width:min(calc(100vw - 24px),380px);background:#fff8e9;border:2px solid #f3bd56;border-radius:20px;padding:11px 14px;font:700 13px/1.4 Nunito,system-ui;color:#24332e;box-shadow:0 8px 26px #0005;display:none;pointer-events:auto}.building #qBanner{top:calc(max(10px,env(safe-area-inset-top)) + 70px)}body.tut #qBanner{top:calc(max(10px,env(safe-area-inset-top)) + 8px)!important;width:min(calc(100vw - 20px),440px);padding:8px 10px;border-radius:16px;box-shadow:0 6px 18px #0005}body.tut #qBanner .tgr{gap:8px}body.tut #qBanner .tga{font-size:24px}body.tut #qBanner .tt{flex:1;min-width:0}body.tut #qBanner b{font-size:13.5px}body.tut #qBanner small{font-size:12px;line-height:1.3;margin-top:1px}body.tut #qBanner #tutOk{width:auto;flex:none;margin:0;padding:9px 14px;font-size:13px;border-radius:12px}body.tut #qBanner .qd{margin-top:6px;height:3px}body.tut #qBanner a{margin-top:3px;font-size:10px}body.tut .hud{top:var(--tb,100px)!important}body.tut #bowls,body.tut .hud>.panel:first-child,body.tut #coinPill,body.tut #zone,body.tut #qBtn:not([data-tshow]),body.tut #agePill:not([data-tshow]){display:none!important}#qBanner b{font-size:14.5px}#qBanner small{display:block;font:700 13px/1.4 Nunito,system-ui;opacity:.85;margin-top:2px}#qBanner .tgr{display:flex;gap:10px;align-items:center}#qBanner .tga{font-size:34px;line-height:1}#qBanner .qd{height:5px;border-radius:3px;background:#e6dcc0;margin-top:8px;overflow:hidden}#qBanner .qd i{display:block;height:100%;background:#2e7658}#qBanner button{display:block;width:100%;margin-top:9px;border:0;border-radius:14px;padding:12px;background:#2e7658;color:#fff;font:900 15px Nunito,system-ui}#qBanner a{display:block;text-align:right;font-size:11px;opacity:.55;margin-top:5px;text-decoration:underline}#tutSpot{position:fixed;z-index:60;display:none;border:3px solid #f3bd56;border-radius:18px;pointer-events:none;animation:qglow 1.3s infinite}#tutHand{position:fixed;z-index:61;display:none;font-size:36px;line-height:1;pointer-events:none;animation:qhand .7s infinite alternate;filter:drop-shadow(0 3px 4px #0006)}.toast{z-index:96!important}';document.head.appendChild(st);
   ui.b=document.createElement('div');ui.b.id='qBanner';document.body.appendChild(ui.b);ui.b.addEventListener('pointerdown',e=>e.stopPropagation());
   ui.b.addEventListener('click',e=>{if(!e.target.closest('#tutSkip'))return;if(!ui.skipArm){ui.skipArm=1;ui.key='';refresh();setTimeout(()=>{ui.skipArm=0;ui.key='';refresh()},3000);return}ui.skipArm=0;Q.tut='done';save();clearGuides();ui.key='';newDay();refresh()});
   ui.sp=document.createElement('div');ui.sp.id='tutSpot';document.body.appendChild(ui.sp);ui.hd=document.createElement('div');ui.hd.id='tutHand';ui.hd.textContent='👆';document.body.appendChild(ui.hd);
   ui.btn=document.getElementById('qBtn');if(ui.btn)ui.btn.addEventListener('click',e=>{e.stopPropagation();panel()})}
  function refresh(){mk();const tut=Q.tut!=='done',s=tut?TUT[Q.tut]:null,shown=started&&!OB.on&&document.getElementById('welcome').style.display==='none';
-  if(ui.b){if(tut&&s&&shown&&!Q.hide){const key=Q.tut+'|'+(ui.skipArm?1:0)+'|'+PNAME+CNAME;if(ui.key!==key){ui.key=key;ui.b.style.display='block';ui.b.innerHTML='<div class="tgr"><div class="tga">🐱</div><div><b>'+escH(nameT(s.t))+'</b><small>'+escH(nameT(s.h))+'</small></div></div>'+(s.ok?'<button id="tutOk" type="button">'+escH(s.ok)+'</button>':'')+'<div class="qd"><i style="width:'+(Q.tut/TUT.length*100)+'%"></i></div><a id="tutSkip">'+(ui.skipArm?'Tap again to skip the tutorial':'Skip tutorial')+'</a>'}else ui.b.style.display='block'}else{ui.b.style.display='none';ui.key=''}}
-  if(ui.btn){const dn=Q.g.filter(g=>g.d).length;ui.btn.textContent=tut?'🎯 '+Q.tut+'/'+TUT.length:'🎯 '+dn+'/'+Q.g.length}}
+  document.body.classList.toggle('tut',!!(tut&&s&&shown));
+  if(ui.b){if(tut&&s&&shown&&!Q.hide){const hh=nameT(s.h),key=Q.tut+'|'+(ui.skipArm?1:0)+'|'+PNAME+CNAME+hh;if(ui.key!==key){ui.key=key;ui.b.style.display='block';ui.b.innerHTML='<div class="tgr"><div class="tga">🐱</div><div class="tt"><b>'+escH(nameT(s.t))+'</b><small>'+escH(hh)+'</small></div>'+(s.ok?'<button id="tutOk" type="button">'+escH(s.ok)+'</button>':'')+'</div><div class="qd"><i style="width:'+(Q.tut/TUT.length*100)+'%"></i></div><a id="tutSkip">'+(ui.skipArm?'Tap again to skip the tutorial':'Skip tutorial')+'</a>'}else ui.b.style.display='block'}else{ui.b.style.display='none';ui.key=''}}
+  if(ui.btn){const dn=Q.g.filter(g=>g.d).length;ui.btn.textContent=tut?'🎯':'🎯 '+dn+'/'+Q.g.length}}
  // ---- tap-locking: only the highlighted thing works ----
  const curStep=()=>Q.tut!=='done'?TUT[Q.tut]:null;
  const locked=()=>{const s=curStep();return !!(s&&s.allow&&s.allow!=='*'&&started&&!OB.on)};
@@ -2706,8 +2711,8 @@ var QM=(function(){
   e.stopImmediatePropagation();e.preventDefault()},{capture:true,passive:false});
  window.addEventListener('keydown',e=>{if(!locked())return;const s=curStep();if(s.allow.includes('#pad'))return;if(/^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright| |e)$/i.test(e.key)){e.stopImmediatePropagation();e.preventDefault()}},true);
  // ---- spotlight + pointing hand ----
- function spotTick(){if(!ui.sp)return;if(ui.b&&ui.btn){const qr=ui.btn.getBoundingClientRect();if(qr.height>0)ui.b.style.top=Math.max(56,Math.round(qr.bottom+8))+'px'}const s=curStep();let el=null,r=null;
-  if(s&&s.spot&&started&&!OB.on){el=document.querySelector(s.spot);if(el){r=el.getBoundingClientRect();if(r.width<2||r.height<2)el=null}}
+ function spotTick(){if(!ui.sp)return;if(ui.b&&Q.tut!=='done'){const br=ui.b.getBoundingClientRect();if(br.height>0)document.body.style.setProperty('--tb',Math.round(br.bottom+6)+'px')}const s=curStep();let el=null,r=null;
+  if(s&&s.spot&&started&&!OB.on){el=document.querySelector(s.spot);if(el){for(const o of document.querySelectorAll('[data-tshow]'))if(o!==el)o.removeAttribute('data-tshow');el.setAttribute('data-tshow','1');r=el.getBoundingClientRect();if(r.width<2||r.height<2)el=null}}else for(const o of document.querySelectorAll('[data-tshow]'))o.removeAttribute('data-tshow');
   if(!el){ui.sp.style.display='none';ui.hd.style.display='none';return}
   if((r.left<4||r.right>innerWidth-4)&&el.scrollIntoView){try{el.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}r=el.getBoundingClientRect()}
   const pd=6;ui.sp.style.display='block';ui.sp.style.left=(r.left-pd)+'px';ui.sp.style.top=(r.top-pd)+'px';ui.sp.style.width=(r.width+2*pd)+'px';ui.sp.style.height=(r.height+2*pd)+'px';
@@ -2721,7 +2726,7 @@ var QM=(function(){
  function gUpdate(){const s=curStep(),k=s&&s.guide&&started&&!OB.on&&(s.guide.indexOf('at:')===0||build.on)?s.guide:'';
   if(!k){if(gKey)clearGuides();return}
   if(k.indexOf('at:')===0){if(gKey!==k){clearGuides();gKey=k;const m=gm('#f3bd56',.9);gAdd(g5,m,0,.09,0).rotation.x=-Math.PI/2;GG.visible=true}
-   const t=k.slice(3);let x=null,z=null;if(t==='cat'){x=cat.position.x;z=cat.position.z}else for(const it of furn.values())if(it.type===t){x=it.x0+it.fw/2;z=it.z0+it.fd/2}
+   const t=k.slice(3);let x=null,z=null;if(t[0]==='@'){const q=t.slice(1).split(',');x=+q[0];z=+q[1]}else if(t==='cat'){x=cat.position.x;z=cat.position.z}else for(const it of furn.values())if(it.type===t){x=it.x0+it.fw/2;z=it.z0+it.fd/2}
    if(x===null)GG.visible=false;else{GG.visible=true;GG.children[0].position.set(x,.09,z)}return}
   const sig=k+'|'+edges.size+'|'+floors.size+'|'+furn.size+'|'+[...edges.values()].filter(e=>e.type==='door').length;if(gKey===sig)return;clearGuides();gKey=sig;GG.visible=true;
   if(k==='walls'){const m=gm('#ffcf4d',.85),m2=gm('#ffe9a8',.18);for(const [x,z,o] of PER){if(edges.has(ekey(x,z,o)))continue;const cx=o==='h'?x+.5:x,cz=o==='h'?z:z+.5;gAdd(g1,m,cx,.12,cz,o==='v'?Math.PI/2:0);gAdd(g2,m2,cx,1.15,cz,o==='v'?Math.PI/2:0)}}
@@ -2747,10 +2752,10 @@ var QM=(function(){
    h+='<div style="font-size:11px;opacity:.7;margin-top:6px">New goals appear every game day. Finish all three for a bonus.</div>'}
   else{const secs=[];TUT.forEach((s,i)=>{const t=nameT(s.t),L=secs[secs.length-1];if(L&&L.t===t){L.b=i}else secs.push({t,a:i,b:i})});secs.forEach(S=>{const d=S.b<Q.tut,c=Q.tut>=S.a&&Q.tut<=S.b;h+='<div style="margin:7px 0;'+(d?'opacity:.55':'')+'"><b>'+(d?'✅':c?'👉':'⬜')+' '+escH(S.t)+'</b>'+(c?'<div style="font-weight:600;opacity:.85;margin-left:22px">'+escH(nameT(TUT[Q.tut].h))+'</div>':'')+'</div>'});h+='<button id="qSkip" style="margin-top:8px;border:0;background:#fff;border-radius:12px;padding:8px 12px;font-weight:700;font-size:12px">Skip the guide</button>'}
   p.innerHTML=h;document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#qX').onclick=()=>p.remove();const sk=p.querySelector('#qSkip');if(sk)sk.onclick=()=>{Q.tut='done';save();p.remove();newDay();refresh()}}
- function init(){if(Q.tv!==2){Q.tv=2;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
+ function init(){if(Q.tv!==3){Q.tv=3;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
  setTimeout(()=>{try{init();refresh()}catch(e){}},0);
  function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();refresh()}
- return {ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,get Q(){return Q},TUT,POOL}
+ return {ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
 })();
 function qev(n,c){try{QM.ev(n,c)}catch(e){}}
 // ===== Kitty's personality and little random events =====
@@ -3980,11 +3985,12 @@ try{const sv=JSON.parse(localStorage.getItem('purrfect-cat')||'null');if(sv&&sv.
 // ===== Main loop =====
 const OC={hid:[]},OC_TALL={wardrobe:1,fridge:1,shelf:1,shower:1,hood:1,wallcab:1};
 function ocBlocks(cx,cz,ax,az,bx,bz,r){const dx=bx-ax,dz=bz-az,L2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((cx-ax)*dx+(cz-az)*dz)/L2));if(t>.9)return false;const qx=ax+dx*t-cx,qz=az+dz*t-cz;return qx*qx+qz*qz<r*r}
-function ocClear(ax,az,bx,bz){for(const e of edges.values()){const g=e.info&&e.info.g;if(!g||!g.visible)continue;let hit=false;for(let i=0;i<=4&&!hit;i++){const u=i/4,wx=e.o==='h'?e.x+u:e.x,wz=e.o==='h'?e.z:e.z+u;hit=ocBlocks(wx,wz,ax,az,bx,bz,.8)}if(hit){g.visible=false;OC.hid.push(g)}}
+function ocClear(ax,az,bx,bz){return;for(const e of edges.values()){const g=e.info&&e.info.g;if(!g||!g.visible)continue;let hit=false;for(let i=0;i<=4&&!hit;i++){const u=i/4,wx=e.o==='h'?e.x+u:e.x,wz=e.o==='h'?e.z:e.z+u;hit=ocBlocks(wx,wz,ax,az,bx,bz,.8)}if(hit){g.visible=false;OC.hid.push(g)}}
  for(const it of furn.values()){const g=it.group;if(!g||!g.visible||!OC_TALL[it.type])continue;if(ocBlocks(it.x0+it.fw/2,it.z0+it.fd/2,ax,az,bx,bz,.9)){g.visible=false;OC.hid.push(g)}}}
 let prev=performance.now(),elapsed=0,uiT=0,saveT=0;const camTarget=new THREE.Vector3(),camDesired=new THREE.Vector3(),camTargetWant=new THREE.Vector3();
 window.addEventListener('error',ev=>{try{toast('⚠️ '+(ev.message||'error'))}catch(_){}});window.addEventListener('unhandledrejection',ev=>{try{toast('⚠️ '+(ev.reason&&ev.reason.message||'error'))}catch(_){}});
 let animErr=0;function animate(now){requestAnimationFrame(animate);try{animateInner(now)}catch(e){if(animErr++<3){try{console.error(e);toast('⚠️ '+(e&&e.message||e))}catch(_){}}try{renderer.render(scene,camera)}catch(_){}}}
+let TC=null;
 function animateInner(now){const dt=Math.min((now-prev)/1000,.05);prev=now;elapsed+=dt;
  if(document.body.classList.contains('petting')&&!PG.on&&!SG.on&&shopEl.style.display!=='block'&&feedEl.style.display!=='block')document.body.classList.remove('petting');
  {const pm=mins;mins+=dt*(seat&&seat.stage==='lying'&&!seat.leaving?20:1);if(mins>=1440){mins-=1440;day++;try{QM.dayEnd()}catch(e){}}invTick();if((dishT-=dt)<0){dishT=.6;dishSync()}if(seat&&seat.kind==='sleep'&&!seat.leaving&&seat.t>1.5&&(pm<420&&mins>=420))standUp()}if(build.clearArm>0)build.clearArm=Math.max(0,build.clearArm-dt);
@@ -4037,6 +4043,7 @@ function animateInner(now){const dt=Math.min((now-prev)/1000,.05);prev=now;elaps
   camTarget.lerp(camTargetWant,1-Math.pow(.02,dt))}
  else if(SG.on){scene.fog.near=fogN;scene.fog.far=fogF;camTarget.copy(SG.ct);camDesired.copy(SG.cd);cameraYaw=SG.phi}
  else if(STU.on){stuCam(dt)}
+ else if((TC=QM.cam())){scene.fog.near=fogN;scene.fog.far=fogF;const d=TC[2],yw=TC[4];camTarget.set(TC[0],1.2,TC[1]);camDesired.set(TC[0]+Math.sin(yw)*d,TC[3],TC[1]+Math.cos(yw)*d);cameraYaw=yw}
  else{scene.fog.near=fogN;scene.fog.far=fogF;camTarget.set(px,player.position.y+1.7,pz);if(!SH.on)ocClear(camera.position.x,camera.position.z,px,pz);camDesired.set(px+Math.sin(cameraYaw)*(SH.on?5.2:7),player.position.y+1.9+cameraPitch*4.5,pz+Math.cos(cameraYaw)*(SH.on?5.2:7))}
  cineCam(dt);camera.position.lerp(camDesired,1-Math.pow(.001,dt));camera.lookAt(camTarget);renderer.render(scene,camera);if(PHO.snap)photoGrab()}
 window.__cfErr=0;window.purrDebug=()=>({KP,startKneelPet,petChoose,stuOpen,stuClose,STU,openWardrobe,catHeadRef:()=>catHead,CINE,cineGo,LIFE,SICK,startTask,setMins:v=>{mins=v},accGroups,applyWorn,toggleWear,addFurn,napTarget,deskWork,coffeeBrew,openFridge,openFeedMenu,openLitterMenu,openShopMenu,openHospMenu,FURN,makeFurnModel,homeScore,furn,FGROUPS,BEN,TIP,build,tptsN:()=>tpts.size,bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{mins=v},getDay:()=>day,setDay:v=>{day=v},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
