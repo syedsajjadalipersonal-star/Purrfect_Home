@@ -1474,10 +1474,10 @@ const pgMark=document.getElementById('pgMark'),pgZone=document.getElementById('p
 function pgPos(){const u=(PG.t*PG.speed)%2;return u<1?u:2-u}
 function pgNewZone(){const h=PG.zw/2;let c;do{c=h+.04+Math.random()*(.92-PG.zw)}while(Math.abs(c-PG.zc)<.15);PG.zc=c;pgZone.style.left=((c-h)*100)+'%';pgZone.style.width=(PG.zw*100)+'%'}
 function pgDraw(){document.getElementById('pgOk').textContent='💗'.repeat(PG.hits)+'🤍'.repeat(3-PG.hits);document.getElementById('pgBad').textContent='😾'.repeat(PG.miss)+'😺'.repeat(3-PG.miss)}
-function startPetGame(){if(PG.on)return;PG.on=true;PG.cd=null;PG.camA=null;PG.hid=[];PG.phase='lift';PG.h=0;PG.res=null;PG.t=0;PG.hits=0;PG.miss=0;PG.zw=PG_ZW[0];PG.speed=PG_SP[0];PG.lock=9;PG.age=0;PG.endT=0;PG.zoneT=0;PG.zc=.5;
- PG.sx=cat.position.x;PG.sz=cat.position.z;PG.sy=cat.rotation.y;pgNewZone();pgDraw();pgBar.className='pgBar';document.body.classList.add('petting');pgEl.style.display='block';toast('Kitty is picked up 💗 Tap when the line is in the green zone')}
+function startPetGame(kneel){if(PG.on)return;PG.kneel=!!kneel;PG.on=true;PG.cd=null;PG.camA=null;PG.hid=[];PG.phase='lift';PG.h=0;PG.res=null;PG.t=0;PG.hits=0;PG.miss=0;PG.zw=PG_ZW[0];PG.speed=PG_SP[0];PG.lock=9;PG.age=0;PG.endT=0;PG.zoneT=0;PG.zc=.5;
+ PG.sx=cat.position.x;PG.sz=cat.position.z;PG.sy=cat.rotation.y;pgNewZone();pgDraw();pgBar.className='pgBar';document.body.classList.add('petting');pgEl.style.display='block';toast(kneel?'Kneeling beside Kitty 💗 Tap when the line is in the green zone':'Kitty is picked up 💗 Tap when the line is in the green zone')}
 function endPetGame(res){if(!PG.on||PG.phase==='drop')return;PG.phase='drop';PG.res=res;pgEl.style.display='none'}
-function finishPetGame(){const res=PG.res;for(const g of PG.hid||[])g.visible=true;PG.hid=[];PG.on=false;PG.phase='';document.body.classList.remove('petting');body.rotation.x=0;cat.rotation.x=0;cat.rotation.z=0;const U=cat.userData;U.held=0;armL.rotation.set(0,0,0);armR.rotation.set(0,0,0);for(const eb of elbows)eb.rotation.x=0;
+function finishPetGame(){const res=PG.res;for(const g of PG.hid||[])g.visible=true;PG.hid=[];PG.on=false;PG.kneel=false;PG.phase='';document.body.classList.remove('petting');resetBody();body.rotation.x=0;cat.rotation.x=0;cat.rotation.z=0;const U=cat.userData;U.held=0;armL.rotation.set(0,0,0);armR.rotation.set(0,0,0);for(const eb of elbows)eb.rotation.x=0;
  if(res==='win'){qev('pet');try{PERS.petBonus()}catch(e){}stats.love=100;U.happy=3.5;U.follow=8;U.task='';U.stage='';U.wait=0;catSound('purr');toast('Purr purr! Bond is 100% 💗');actionAnim=0}
  else if(res==='fail'){U.annoyed=25;U.happy=0;U.follow=0;U.task='wander';U.stage='goto';U.t=0;U.speed=1.1;U.pathVer=-1;let p=null;for(let k=0;k<30;k++){const q=freeSpot(3,null);if(Math.hypot(q.x-player.position.x,q.z-player.position.z)>4){p=q;break}p=q}U.target.set(p.x,0,p.z);U.face=null;catSound('meow');toast('Kitty got annoyed, wriggled free and ran off 😾');actionAnim=0}
  else{U.happy=0;actionAnim=0}
@@ -1503,6 +1503,7 @@ function petGameTick(dt){if(!PG.on)return;
  else{PG.t+=dt}
  const h=PG.h,e=h*h*(3-2*h),U=cat.userData,pp=pgPos();pgMark.style.left=(pp*100)+'%';
  if(PG.phase==='hold'){if(PG.endT>0){PG.endT-=dt;if(PG.endT<=0){PG.endT=0;endPetGame(PG.endRes);return}}if(PG.zoneT>0){PG.zoneT-=dt;if(PG.zoneT<=0){PG.zoneT=0;pgBar.className='pgBar';pgNewZone()}}PG.age+=dt;if(PG.lock>0&&PG.lock<9)PG.lock=Math.max(0,PG.lock-dt)}
+ if(PG.kneel){actionType='pet';actionAnim=0;pgKneelPose(dt,e,U);return}
  U.happy=Math.max(U.happy||0,2);U.held=e;U.task='';actionType='pet';actionAnim=0;
  if(PG.phase==='lift'&&PG.h<.05){const dx=PG.sx-player.position.x,dz=PG.sz-player.position.z;player.rotation.y=Math.atan2(dx,dz)}
  const yaw=player.rotation.y,fx=Math.sin(yaw),fz=Math.cos(yaw),rx_=Math.cos(yaw),rz_=-Math.sin(yaw);
@@ -1523,12 +1524,18 @@ function petGameTick(dt){if(!PG.on)return;
 // ---- Second petting style: kneel beside the cat and stroke it from head to tail (like the Purrfect Café)
 const KP={on:false,t:0,kn:0,q:[-1.2,-.3,-1.0],end:false,hb:0,sx:0,sz:0,yw:0};
 {const st=document.createElement('style');st.textContent='#petPick{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100vw,520px);z-index:9;display:none;background:rgba(255,248,233,.98);border-radius:24px 24px 0 0;padding:12px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 28px rgba(36,51,46,.28);font:800 15px system-ui,-apple-system,sans-serif;color:#24332e;text-align:center}#petPick .pk{display:flex;gap:10px;margin-top:10px}#petPick button{flex:1;border:2px solid #eadfc4;background:#fff;border-radius:18px;padding:12px 6px;font:800 14px system-ui;color:#24332e;touch-action:manipulation}#petPick button small{display:block;font-weight:600;opacity:.65;margin-top:3px;font-size:11px}#petPick .x{flex:0 0 auto;padding:12px 14px}';document.head.appendChild(st)}
-const ppEl=document.createElement('div');ppEl.id='petPick';ppEl.innerHTML='<div>How would you like to pet Kitty? 💗</div><div class="pk"><button type="button" data-m="lift">🤲 Pick up<small>Cuddle in your arms · timing game</small></button><button type="button" data-m="kneel">🐾 Kneel &amp; stroke<small>Sit beside and pet gently</small></button><button type="button" class="x" data-m="no" aria-label="Cancel">✕</button></div>';document.body.appendChild(ppEl);
+const ppEl=document.createElement('div');ppEl.id='petPick';ppEl.innerHTML='<div>How would you like to pet Kitty? 💗</div><div class="pk"><button type="button" data-m="lift">🤲 Pick up<small>Hold her in your arms · timing game</small></button><button type="button" data-m="kneel">🐾 Pet<small>Kneel beside her · timing game</small></button><button type="button" class="x" data-m="no" aria-label="Cancel">✕</button></div>';document.body.appendChild(ppEl);
 function petChoose(){ppEl.style.display='block';document.body.classList.add('petting')}
 ppEl.addEventListener('pointerdown',e=>e.stopPropagation());
-ppEl.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;ppEl.style.display='none';document.body.classList.remove('petting');if(b.dataset.m==='lift')startPetGame();else if(b.dataset.m==='kneel')startKneelPet()});
+ppEl.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;ppEl.style.display='none';document.body.classList.remove('petting');if(b.dataset.m==='lift')startPetGame(false);else if(b.dataset.m==='kneel')startKneelPet()});
 function startKneelPet(){if(KP.on||PG.on)return;const P=player.position,c=cat.position,yaw=cat.rotation.y,fx=Math.sin(yaw),fz=Math.cos(yaw),n1=[fz,-fx],n2=[-fz,fx],d1=(c.x+n1[0]-P.x)**2+(c.z+n1[1]-P.z)**2,d2=(c.x+n2[0]-P.x)**2+(c.z+n2[1]-P.z)**2,n=d1<d2?n1:n2,L=cat.scale.x/.7,d=.62*Math.max(.7,L);
- KP.sx=c.x+n[0]*d+n[1]*.3;KP.sz=c.z+n[1]*d-n[0]*.3;KP.yw=Math.atan2(-n[0],-n[1]);Object.assign(KP,{on:true,t:0,kn:0,end:false,hb:0});KP.q=[-1.2,-.3,-1.0];toast('Kneeling beside Kitty 🐾 Stay still… or move to stop')}
+ KP.sx=c.x+n[0]*d+n[1]*.3;KP.sz=c.z+n[1]*d-n[0]*.3;KP.yw=Math.atan2(-n[0],-n[1]);KP.q=[-1.2,-.3,-1.0];startPetGame(true)}
+function pgKneelPose(dt,e,U){const P=player.position;U.task='';U.stage='';U.wait=2;U.happy=Math.max(U.happy||0,2);U.moving=false;U.held=0;
+ const g=Math.min(1,dt*5);P.x+=(KP.sx-P.x)*g;P.z+=(KP.sz-P.z)*g;P.y+=(groundY(P.x,P.z)+.05-P.y)*Math.min(1,dt*15);player.rotation.y=turnTo(player.rotation.y,KP.yw,Math.min(1,dt*10));
+ ciCrouch(e,0);const L=cat.scale.x,yaw=cat.rotation.y,fx=Math.sin(yaw),fz=Math.cos(yaw),u=.5-.5*Math.cos(Math.max(0,PG.t)*2.3);
+ const T=ciRigTarget(cat.position.x+fx*L*(.5-.95*u),cat.position.y+L*.88+.04,cat.position.z+fz*L*(.5-.95*u));ikSolve(KP.q,T,.45,-1.3,.8);const k=Math.min(1,e*1.2);
+ armR.rotation.set(KP.q[0]*k,0,KP.q[1]*k);elbows[1].rotation.x=KP.q[2]*k;armL.rotation.set(-.7*e,0,.12*e);elbows[0].rotation.x=-.8*e;legL.rotation.z=legR.rotation.z=0;
+ if(PG.phase==='hold'&&PG.age>.6&&(Math.hypot(moveX,moveY)>.35||keys.w||keys.a||keys.s||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright))endPetGame('cancel')}
 function kpTick(dt){const U=cat.userData,P=player.position;KP.t+=dt;U.task='';U.stage='';U.wait=2;U.happy=Math.max(U.happy||0,2);U.moving=false;U.held=0;
  const e=Math.min(1,dt*5);if(!KP.end){P.x+=(KP.sx-P.x)*e;P.z+=(KP.sz-P.z)*e}P.y+=(groundY(P.x,P.z)+.05-P.y)*Math.min(1,dt*15);player.rotation.y=turnTo(player.rotation.y,KP.yw,Math.min(1,dt*10));
  KP.kn=KP.end?Math.max(0,KP.kn-dt*2.6):Math.min(1,KP.kn+dt*2.2);ciCrouch(KP.kn,0);
