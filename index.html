@@ -217,9 +217,13 @@ const CL_DAY=new THREE.Color('#ffffff'),CL_DUSK=new THREE.Color('#ffc3a0'),tmpA=
 // Rim light (lifts characters off the background) + warm indoor fill
 const rim=new THREE.DirectionalLight('#cfe2ff',.4);rim.castShadow=false;scene.add(rim);scene.add(rim.target);
 const roomL=new THREE.PointLight('#ffd7a0',0,10,2);scene.add(roomL);let roomK=0;
+const lampPool=[0,1,2,3].map(()=>{const l=new THREE.PointLight('#ffd7a0',0,9,2);l.intensity=0;scene.add(l);return l});let lampPoolT=0;
 let litT=0,litN=0,_nk=0;function dayNightK(){return _nk}
-function lightTick(dt,ind,night){const k=ind&&!SH.on?1:0;roomK+=(k-roomK)*Math.min(1,dt*3);litT-=dt;if(litT<=0){litT=.5;litN=0;for(const it of furn.values())if(LAMPS.has(it.type)&&it.lampOn!==false&&Math.hypot((it.x0||0)-player.position.x,(it.z0||0)-player.position.z)<8)litN++}roomL.intensity=roomK*(5*(1-night)+night*(1.2+9*Math.min(1,litN/2)));roomL.position.set(player.position.x,2.6,player.position.z);
- rim.target.position.copy(camTarget);rim.position.set(camTarget.x*2-camera.position.x,camTarget.y+6,camTarget.z*2-camera.position.z);rim.intensity=(.12+.38*(1-night))*(SH.on?.5:1)}
+function lightTick(dt,ind,night){const k=ind&&!SH.on?1:0;roomK+=(k-roomK)*Math.min(1,dt*3);litT-=dt;if(litT<=0){litT=.5;litN=0;for(const it of furn.values())if(LAMPS.has(it.type)&&it.lampOn!==false&&Math.hypot((it.x0||0)-player.position.x,(it.z0||0)-player.position.z)<8)litN++}roomL.intensity=0;
+ // true lighting: real point lights sit on the nearest switched-on lamps, nothing follows the player
+ lampPoolT-=dt;if(lampPoolT<=0){lampPoolT=.4;const P=player.position,L=[];for(const it of furn.values()){if(!LAMPS.has(it.type)||it.lampOn===false)continue;const x=it.x0+(it.fw||1)/2,z=it.z0+(it.fd||1)/2,d=Math.hypot(x-P.x,z-P.z);if(d<26)L.push({x,z,d,y:{walllight:1.9,desklamp:.95,side:1.05,lantern:1.0,fireplace:.7}[it.type]||1.5,fire:it.type==='fireplace'})}L.sort((a,b)=>a.d-b.d);lampPool.forEach((l,i)=>{l.tgt=L[i]||null})}
+ for(const l of lampPool){const t=l.tgt;if(t){l.position.set(t.x,t.y,t.z);l.color.set(t.fire?'#ff9a50':'#ffd7a0')}const want=t&&!SH.on?(.8+8*night):0;l.intensity+=(want-l.intensity)*Math.min(1,dt*4)}
+ rim.target.position.copy(camTarget);rim.position.set(camTarget.x*2-camera.position.x,camTarget.y+6,camTarget.z*2-camera.position.z);rim.intensity=(.38*(1-night))*(SH.on?.5:1)}
 let sssT=0;function sssTick(dt){sssT-=dt;if(sssT>0)return;sssT=2;for(const root of [player,cat])root.traverse(o=>{const m=o.material;if(m&&m.isMeshStandardMaterial&&m.emissive&&!m.userData.sss&&!m.transparent){m.userData.sss=1;m.emissive.copy(m.color).multiplyScalar(.1)}})}
 function visualUpdate(t,minutes){const h=minutes/60;const ang=(h-6)/12*Math.PI;const sunH=Math.sin(ang);const inStore=typeof SH!=='undefined'&&SH.on;const day=inStore?0:THREE.MathUtils.clamp(sunH*3+.2,0,1);const dusk=inStore?0:THREE.MathUtils.clamp(1-Math.abs(sunH)*3.2,0,1)*(sunH>-.25?1:0);
 sun.position.set(Math.cos(ang)*-24,Math.max(Math.abs(sunH),.15)*26+2,10);sun.intensity=.15+2.3*day;tmpA.copy(sunDay).lerp(sunDusk,dusk);if(day<.1)tmpA.copy(moon);sun.color.copy(tmpA);
