@@ -222,8 +222,8 @@ function lightTick(dt,ind,night){const k=ind&&!SH.on?1:0;roomK+=(k-roomK)*Math.m
  rim.target.position.copy(camTarget);rim.position.set(camTarget.x*2-camera.position.x,camTarget.y+6,camTarget.z*2-camera.position.z);rim.intensity=(.12+.38*(1-night))*(SH.on?.5:1)}
 let sssT=0;function sssTick(dt){sssT-=dt;if(sssT>0)return;sssT=2;for(const root of [player,cat])root.traverse(o=>{const m=o.material;if(m&&m.isMeshStandardMaterial&&m.emissive&&!m.userData.sss&&!m.transparent){m.userData.sss=1;m.emissive.copy(m.color).multiplyScalar(.1)}})}
 function visualUpdate(t,minutes){const h=minutes/60;const ang=(h-6)/12*Math.PI;const sunH=Math.sin(ang);const inStore=typeof SH!=='undefined'&&SH.on;const day=inStore?0:THREE.MathUtils.clamp(sunH*3+.2,0,1);const dusk=inStore?0:THREE.MathUtils.clamp(1-Math.abs(sunH)*3.2,0,1)*(sunH>-.25?1:0);
-sun.position.set(Math.cos(ang)*-24,Math.max(Math.abs(sunH),.15)*26+2,10);sun.intensity=.15+2.8*day;tmpA.copy(sunDay).lerp(sunDusk,dusk);if(day<.1)tmpA.copy(moon);sun.color.copy(tmpA);
-{const vs=document.getElementById('vig');if(vs){vs.style.setProperty('--vg',(.2+.22*(1-day)).toFixed(3));vs.style.setProperty('--wm',(dusk*.16).toFixed(3));vs.style.setProperty('--cl',((1-day)*(1-dusk*.6)*.18).toFixed(3))}}hemi.intensity=.42+1.48*day;ambient.intensity=.2+.24*day;renderer.toneMappingExposure=.72+.33*day;
+sun.position.set(Math.cos(ang)*-24,Math.max(Math.abs(sunH),.15)*26+2,10);sun.intensity=.15+2.3*day;tmpA.copy(sunDay).lerp(sunDusk,dusk);if(day<.1)tmpA.copy(moon);sun.color.copy(tmpA);
+{const vs=document.getElementById('vig');if(vs){vs.style.setProperty('--vg',(.2+.22*(1-day)).toFixed(3));vs.style.setProperty('--wm',(dusk*.16).toFixed(3));vs.style.setProperty('--cl',((1-day)*(1-dusk*.6)*.18).toFixed(3))}}hemi.intensity=.4+1.15*day;ambient.intensity=.2+.24*day;renderer.toneMappingExposure=.58+.18*day;
 for(const k of ['top','mid','bot']){skyMat.uniforms[k].value.copy(nightCols[k]).lerp(dayCols[k],day).lerp(duskCols[k],dusk*.65)}skyMat.uniforms.sunDir.value.copy(sun.position).normalize();skyMat.uniforms.glow.value.copy(sun.color);skyMat.uniforms.sunAmt.value=inStore?0:THREE.MathUtils.clamp(day+dusk*.8,0,1)*(sunH>-.12?1:0);skyMat.uniforms.starAmt.value=inStore?0:THREE.MathUtils.clamp(1-day*1.6-dusk*.3,0,1);cloudMat.color.set('#6c759b').lerp(CL_DAY,day).lerp(CL_DUSK,dusk*.8);cloudMat.emissive.copy(cloudMat.color);
 scene.background.copy(skyMat.uniforms.mid.value);scene.fog.color.copy(skyMat.uniforms.mid.value);
 const night=1-day;_nk=night;if(typeof updateFurnGlow==='function')updateFurnGlow(night);for(const l of lampLights){l.L.intensity=night*14;l.bulb.material.emissiveIntensity=night*2.2}
@@ -481,7 +481,7 @@ var catHead=group(catBody,0,.74,.52),catEars=[],catLids=[],catTears=[],catJaw=nu
 var legs=[0,1,2,3].map(()=>group(catBody,0,.34,0));var tail=group(catBody,0,.5,-.42);
 let catMount=group(catBody,0,0,0);catMount.add(catHead);const catNew=[],catMats=[];
 // ===== Cat creator data: 5 famous breeds x coat patterns x colours =====
-const CCOL={black:['#2d2d33','#17171b','Black'],white:['#f4f0e8','#cfc6b6','White'],cream:['#e2cfa0','#b9a06c','Cream'],blue:['#79818f','#4f5764','Blue (grey)'],cinnamon:['#a9672c','#7d4f28','Cinnamon'],red:['#d8873f','#9c5420','Red (ginger)'],brown:['#5c4535','#3a2d22','Brown'],silver:['#aeb2b9','#6f737c','Silver']};
+const CCOL={black:['#2a2630','#17171b','Black'],white:['#f7f3ea','#cfc6b6','White'],cream:['#f2c46f','#b9a06c','Cream'],blue:['#6a86ad','#4f5764','Blue (grey)'],cinnamon:['#b8651f','#7d4f28','Cinnamon'],red:['#f0771a','#9c5420','Red (ginger)'],brown:['#6e3d1f','#3a2d22','Brown'],silver:['#9db0c8','#6f737c','Silver']};
 const CPAT=[['solid','Solid'],['mackerel','Tabby'],['spotted','Spotted'],['point','Colour point'],['tuxedo','Tuxedo'],['calico','Calico']];
 const CEYE={amber:['#d08a2c','Amber'],green:['#5fae4f','Green'],blue:['#4f8fd8','Blue'],copper:['#b5651d','Copper'],gold:['#e0b030','Gold'],odd:['#4f8fd8','Odd-eyed']};
 // build: bl length, bw width, bh height, hd head scale, muz muzzle push
@@ -547,7 +547,7 @@ function furBlades(srcGeo,filter,n,o,colorOf,rnd){
   let sx=dy*nz-dz*ny,sy=dz*nx-dx*nz,sz=dx*ny-dy*nx;const sl=Math.hypot(sx,sy,sz)||1;sx/=sl;sy/=sl;sz/=sl;
   const col=colorOf(rx,ry,rz),base=P.length/3,sw=(o.sway||0)*L,ph=rnd()*6.28;
   for(let s=0;s<=SEG;s++){const t=s/SEG,w=W*Math.pow(1-t,.75)*.5,wv=sw*Math.sin(t*3.4+ph)*t,px=rx-nx*.012+dx*L*t+sx*wv,py=ry-ny*.012+dy*L*t-dr*L*t*t*(o.g===undefined?.55:o.g)+sy*wv,pz=rz-nz*.012+dz*L*t+sz*wv;
-   const shade=.86+.2*t;for(const sg of [-1,1]){P.push(px+sx*w*sg,py+sy*w*sg,pz+sz*w*sg);N.push(nx,ny,nz);C.push(Math.min(1,col[0]*shade),Math.min(1,col[1]*shade),Math.min(1,col[2]*shade))}}
+   const shade=.84+.1*t;for(const sg of [-1,1]){P.push(px+sx*w*sg,py+sy*w*sg,pz+sz*w*sg);N.push(nx,ny,nz);C.push(Math.min(1,col[0]*shade),Math.min(1,col[1]*shade),Math.min(1,col[2]*shade))}}
   for(let s=0;s<SEG;s++){const a=base+s*2;I.push(a,a+1,a+2,a+1,a+3,a+2)}}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(N,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.setIndex(I);return g}
 function mergeGeos(list){list=list.filter(Boolean);if(!list.length)return null;let tp=[],tn=[],tc=[],ti=[],off=0;for(const g of list){const p=g.attributes.position,n=g.attributes.normal,c=g.attributes.color;for(let i=0;i<p.count;i++){tp.push(p.getX(i),p.getY(i),p.getZ(i));tn.push(n.getX(i),n.getY(i),n.getZ(i));tc.push(c.getX(i),c.getY(i),c.getZ(i))}const ix=g.index.array;for(let i=0;i<ix.length;i++)ti.push(ix[i]+off);off+=p.count;g.dispose()}
@@ -561,7 +561,7 @@ function rosette(B,x,y,z,sd,k){ // Bengal rosettes: scattered spots, each a dark
  const ring=sstep(.5,.66,best)*(1-sstep(.84,1,best)),core=1-sstep(.4,.58,best);
  let c=mixC(B,mulC(B,1.18),core*.7);return mixC(c,mulC(B,.2),ring*.96)}
 function catCoat(spec,seed){
- const cc=CCOL[spec.c]||CCOL.brown,B=hexC(cc[0]),DK=mulC(B,.5),WH=hexC('#f6f2ea'),p=spec.p,sd=seed*13.7;
+ const cc=CCOL[spec.c]||CCOL.brown,B=hexC(cc[0]),DK=mulC(B,.36),WH=hexC('#f6f2ea'),p=spec.p,sd=seed*13.7;
  const bright=['white','cream','silver'].includes(spec.c);
  const pale=mixC(B,hexC('#f3e6cb'),spec.c==='brown'||spec.c==='black'?.86:.62),pts=spec.c==='cream'||spec.c==='white'?hexC('#7a6a5c'):mulC(B,.58);
  const cols=spec.cols||(bright?[WH,hexC('#e08c3c'),hexC('#2f2f35')]:[WH,B,hexC('#2f2f35')]);
@@ -572,7 +572,7 @@ function catCoat(spec,seed){
   let c=B;
   if(reg==='body'){
    if(p==='point')c=mixC(pale,pts,sstep(.52,.62,y)*.18);
-   else if(p==='mackerel'){const st=Math.sin(z*15+vnoise(x*4+sd,y*4,z*4)*2.2),on=sstep(.18,.5,st)*sstep(.3,.5,y);c=mixC(B,DK,on*.85);if(Math.abs(x)<.045&&y>.56)c=mixC(c,DK,.9)}
+   else if(p==='mackerel'){const st=Math.sin(z*44+vnoise(x*4+sd,y*4,z*4)*2.6),on=sstep(.05,.3,st)*sstep(.3,.5,y);c=mixC(B,DK,on*.85);if(Math.abs(x)<.045&&y>.56)c=mixC(c,DK,.9)}
    else if(p==='spotted'){c=rosette(B,x,y,z,sd,1);c=mixC(c,mixC(B,WH,.55),sstep(.36,.2,y)*.85)}
    else if(p==='tuxedo'){const w=Math.max(sstep(.36,.3,y),sstep(.3,.36,z)*sstep(.6,.4,y));c=mixC(B,WH,Math.max(w,sstep(.28,.2,y)))}
    else if(p==='calico'){const n=vnoise(x*3.6+sd,y*3.6,z*3.6),bw=Math.max(sstep(.38,.3,y),0);c=n<.42?cols[0]:n<.62?cols[1]:cols[2];c=mixC(c,cols[0],bw*.9)}
@@ -692,7 +692,7 @@ function catBuild(rig,spec,track,mats,seedBase){
   hf.push(furBlades(hg,(x,y,z,nx,ny,nz)=>y>.1&&z<.05,Math.round(70*dens),{flow:()=>[0,-.2,-1],len:[.1,.2],w:[.05,.08],droop:.7,g:.7,fw:1,nw:.12,jit:.15},(x,y,z)=>coat('head',x,y,z),rnd));
   const hfg=mergeGeos(hf);if(hfg)add(rig.head,hfg,'fur',false,true);
   // tail plume: feathered strands along the whole tail
-  const tg=rig.tail.userData.geo;const tf=furBlades(tg,(x,y,z)=>y>.05,Math.round(280*dens),{flow:(x,y,z,nx,ny,nz)=>[nx*.15,.95,nz*.15],len:[.16,.3],w:[.05,.08],droop:.9,g:.85,fw:1,nw:.05,seg:6,jit:.15,sway:.12},(x,y,z)=>coat('tail',x,y,z),rnd);
+  const tg=rig.tail.userData.geo;const tf=furBlades(tg,(x,y,z)=>y>.05,Math.round(200*dens),{flow:(x,y,z,nx,ny,nz)=>[nx*.1,.95,nz*.1],len:[.2,.34],w:[.05,.08],droop:.35,g:.3,fw:1,nw:.03,seg:6,jit:.1,sway:.1},(x,y,z)=>coat('tail',x,y,z),rnd);
   if(tf)add(rig.tail,tf,'fur',false,true);
   // leg feathers
   rig.legs.forEach((l,i)=>{const lf=furBlades(l.children[0].geometry,(x,y,z,nx,ny,nz)=>y>-.3*LL&&y<-.04*LL,Math.round(50*dens),{flow:()=>[0,-1,-.25],len:[.1,.2],w:[.05,.08],droop:.5,g:.5,fw:1,nw:.12,sway:.08},(x,y,z)=>coat('leg',x,y/LL,z),rnd);if(lf)add(l,lf,'fur',false,true)});
