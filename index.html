@@ -67,7 +67,123 @@ body.building #vig{opacity:.45}
 #fxBar small{font-size:10.5px;opacity:.78;font-weight:700}#fxBar .fxp{background:var(--green);color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;white-space:nowrap}
 
 @media (orientation:landscape) and (max-height:520px){body #wdMenu .gd{grid-template-columns:repeat(5,1fr)!important;gap:6px!important;max-height:52vh!important}body #wdMenu .gd>*{padding:5px 3px!important;font-size:11px!important}}
-.oc .pr{display:block;font-style:normal;font-size:11px;font-weight:700;color:#b7791f;margin-top:2px}#dof{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}#dof.cine{-webkit-mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%);mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%)}#dof.menu{-webkit-backdrop-filter:blur(4px) brightness(.92);backdrop-filter:blur(4px) brightness(.92)}@media (prefers-reduced-motion:reduce){#dof{transition:none}}</style></head><body><div id="game"></div>
+.oc .pr{display:block;font-style:normal;font-size:11px;font-weight:700;color:#b7791f;margin-top:2px}#dof{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}#dof.cine{-webkit-mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%);mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%)}#dof.menu{-webkit-backdrop-filter:blur(4px) brightness(.92);backdrop-filter:blur(4px) brightness(.92)}@media (prefers-reduced-motion:reduce){#dof{transition:none}}
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(22px,env(safe-area-inset-top)) 16px max(26px,env(safe-area-inset-bottom));background:radial-gradient(120% 70% at 50% 0%,#fff6dc 0%,#ffe9c4 38%,#f6d3b0 100%);font-family:Nunito,ui-rounded,system-ui,sans-serif;color:#24332e;transition:opacity .55s ease;overflow:hidden}
+#splash.out{opacity:0;pointer-events:none}
+#splash .sppw{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 20px 26px,#8a5a3c 0 7px,transparent 8px),radial-gradient(circle at 8px 12px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 20px 8px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 32px 12px,#8a5a3c 0 3.4px,transparent 4.4px);background-size:92px 92px;pointer-events:none}
+#splash .splogo{position:relative;width:min(80vw,360px);margin-top:2vh;animation:spLogo .9s cubic-bezier(.2,1.3,.4,1) both}
+#splash .splogo svg{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 10px #8a5a3c33)}
+#splash .spstage{position:relative;width:min(92vw,400px);aspect-ratio:36/25;border-radius:28px;overflow:hidden;box-shadow:0 14px 34px #8a5a3c40,0 0 0 4px #fff8e9;background:#fdf1d6}
+#splash .spstage svg{position:absolute;inset:0;width:100%;height:100%}
+#splash .spscene{opacity:0;transition:opacity .4s}
+#splash .spscene.on{opacity:1}
+#splash .spcap{margin-top:12px;font-weight:800;font-size:15px;letter-spacing:.02em;color:#7a4c2e;min-height:20px;text-align:center}
+#splash .spld{width:min(82vw,340px);text-align:center}
+#splash .spbar{position:relative;height:16px;border-radius:10px;background:#fff8e9;box-shadow:inset 0 2px 4px #8a5a3c33,0 0 0 3px #fff8e9aa}
+#splash .spfill2{position:absolute;left:3px;right:3px;top:3px;bottom:3px;border-radius:8px;overflow:hidden}
+#splash .spfill2 i{position:absolute;inset:0;border-radius:8px;transform-origin:0 50%;transform:scaleX(.04);transition:transform .5s ease-out;background:linear-gradient(90deg,#f3bd56,#ef8f66 60%,#e46c7a)}
+#splash .spfill2 i:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,#ffffff30 0 8px,transparent 8px 16px);animation:spStripe 1s linear infinite}
+#splash .sppct2{display:flex;justify-content:space-between;margin-top:7px;font-weight:800;font-size:13px;color:#7a4c2e}
+@keyframes spStripe{to{background-position:16px 0}}
+@keyframes spLogo{from{transform:translateY(-24px) scale(.88);opacity:0}to{transform:none;opacity:1}}
+#splash .spk{transform-box:fill-box;transform-origin:50% 50%}
+@media (prefers-reduced-motion:reduce){#splash *{animation:none!important}}
+/* ---- scene animation (each scene restarts when it gets .on) ---- */
+.sp-a{transform-origin:0 0}
+.sc1.on .s1root{animation:s1root 3.3s ease-in-out both}.sc1.on .s1head{animation:s1head 3.3s ease-in-out both}.sc1.on .s1leg{animation:s1leg 3.3s ease-in-out both}.sc1.on .s1bug{animation:s1bug 3.3s linear both}
+.sc1.on .wing{animation:flap .16s ease-in-out infinite alternate}.sc1.on .tail{animation:tailS 1.4s ease-in-out infinite alternate}.sc1.on .s1pop{animation:pop 3.3s ease-out both}
+@keyframes s1bug{0%{transform:translate(340px,60px)}22%{transform:translate(285px,98px)}42%{transform:translate(236px,64px)}60%{transform:translate(188px,104px)}68%{transform:translate(190px,104px)}72%{transform:translate(198px,92px)}88%{transform:translate(268px,40px)}100%{transform:translate(350px,22px)}}
+@keyframes s1root{0%,48%{transform:translate(104px,205px)}57%{transform:translate(104px,208px) rotate(3deg)}66%{transform:translate(150px,170px) rotate(-16deg)}76%{transform:translate(168px,205px)}100%{transform:translate(168px,205px)}}
+@keyframes s1head{0%{transform:translate(26px,-80px) rotate(0)}24%{transform:translate(26px,-80px) rotate(-10deg)}44%{transform:translate(26px,-80px) rotate(-16deg)}60%{transform:translate(26px,-80px) rotate(-8deg)}100%{transform:translate(26px,-80px) rotate(6deg)}}
+@keyframes s1leg{0%,54%{transform:translate(22px,-36px) rotate(0)}64%{transform:translate(22px,-36px) rotate(-75deg)}76%{transform:translate(22px,-36px) rotate(-20deg)}100%{transform:translate(22px,-36px) rotate(0)}}
+@keyframes flap{from{transform:scaleX(1)}to{transform:scaleX(.25)}}
+@keyframes tailS{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+@keyframes pop{0%,60%{transform:scale(0)}68%{transform:scale(1.25)}76%,100%{transform:scale(1)}}
+.sc2.on .s2root{animation:s2root 3.3s ease-in-out both}.sc2.on .lg{animation:lgw .26s ease-in-out infinite alternate}.sc2.on .lg2{animation:lgw .26s ease-in-out infinite alternate-reverse}.sc2.on .tail{animation:tailS .9s ease-in-out infinite alternate}.sc2.on .s2zz{animation:pop 3.3s ease-out both}
+@keyframes lgw{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
+@keyframes s2root{0%{transform:translate(70px,205px) rotate(0)}34%{transform:translate(254px,205px) rotate(0)}42%{transform:translate(268px,205px) rotate(-82deg)}76%{transform:translate(268px,100px) rotate(-82deg)}86%{transform:translate(262px,70px) rotate(-26deg)}94%,100%{transform:translate(248px,62px) rotate(0)}}
+.sc3.on .s3root{animation:s3cat 3.3s ease-in both}.sc3.on .s3mouse{animation:s3mouse 3.3s ease-in both}.sc3.on .lg{animation:lgr .2s ease-in-out infinite alternate}.sc3.on .lg2{animation:lgr .2s ease-in-out infinite alternate-reverse}.sc3.on .bob{animation:bob .2s ease-in-out infinite alternate}.sc3.on .tail{animation:tailS .5s ease-in-out infinite alternate}.sc3.on .mleg{animation:bob .1s linear infinite alternate}
+@keyframes lgr{from{transform:rotate(-38deg)}to{transform:rotate(38deg)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+@keyframes s3cat{0%{transform:translate(-90px,205px)}78%{transform:translate(236px,205px)}86%{transform:translate(264px,176px) rotate(-14deg)}100%{transform:translate(290px,205px)}}
+@keyframes s3mouse{0%{transform:translate(8px,205px)}20%{transform:translate(78px,205px)}35%{transform:translate(120px,205px)}55%{transform:translate(206px,205px)}80%{transform:translate(300px,205px)}100%{transform:translate(430px,205px)}}
+.sc4.on .s4leg{animation:s4leg 3.3s ease-in-out both}.sc4.on .s4head{animation:s4head 3.3s ease-in-out both}.sc4.on .s4tg{animation:s4tg .5s ease-in-out infinite alternate}.sc4.on .tail{animation:tailS 1.6s ease-in-out infinite alternate}.sc4.on .spk{animation:spk 1.2s ease-in-out infinite}
+@keyframes s4leg{0%{transform:translate(22px,-36px) rotate(0)}18%{transform:translate(22px,-36px) rotate(-150deg)}30%{transform:translate(22px,-36px) rotate(-168deg)}42%{transform:translate(22px,-36px) rotate(-148deg)}54%{transform:translate(22px,-36px) rotate(-168deg)}66%{transform:translate(22px,-36px) rotate(-148deg)}78%{transform:translate(22px,-36px) rotate(-168deg)}92%,100%{transform:translate(22px,-36px) rotate(-150deg)}}
+@keyframes s4head{0%{transform:translate(26px,-80px) rotate(0)}20%,90%{transform:translate(26px,-80px) rotate(14deg)}100%{transform:translate(26px,-80px) rotate(8deg)}}
+@keyframes s4tg{from{opacity:.2}to{opacity:1}}
+@keyframes spk{0%,100%{transform:scale(.4);opacity:0}50%{transform:scale(1);opacity:1}}
+.sc2 .zzx,.sc4 .zzx{display:none}
+</style></head><body>
+<div id="splash" aria-label="Purrfect Home is loading"><div class="sppw"></div>
+<div class="splogo"><svg viewBox="0 0 360 214" role="img" aria-label="Purrfect Home">
+<defs><linearGradient id="lgRoof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4896f"/><stop offset="1" stop-color="#e2625f"/></linearGradient><linearGradient id="lgWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9b8"/><stop offset="1" stop-color="#f9cf8c"/></linearGradient></defs>
+<g transform="translate(120,0)">
+<path d="M24 92 L24 128 Q24 138 34 138 L86 138 Q96 138 96 128 L96 92 Z" fill="url(#lgWall)"/>
+<rect x="55" y="12" width="16" height="36" rx="3" fill="#b8574f"/><rect x="52" y="8" width="22" height="8" rx="4" fill="#9c433f"/><path d="M10 78 L14 22 L40 44 Q60 36 80 44 L106 22 L110 78 Q108 92 100 88 Q92 97 84 90 Q76 99 68 91 Q60 100 52 91 Q44 99 36 90 Q28 97 20 88 Q12 92 10 78 Z" fill="url(#lgRoof)"/><path d="M18 60 Q60 70 102 60 M16 72 Q60 82 104 72" stroke="#ffffff38" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<path d="M21 40 L23 29 L33 38 Z" fill="#ffc2c6"/><path d="M99 40 L97 29 L87 38 Z" fill="#ffc2c6"/>
+
+<ellipse cx="44" cy="106" rx="10" ry="11" fill="#ffd45e"/><ellipse cx="76" cy="106" rx="10" ry="11" fill="#ffd45e"/>
+<ellipse cx="44" cy="106" rx="3.2" ry="8.5" fill="#3a2a22"/><ellipse cx="76" cy="106" rx="3.2" ry="8.5" fill="#3a2a22"/>
+<circle cx="46" cy="101" r="2.4" fill="#fff"/><circle cx="78" cy="101" r="2.4" fill="#fff"/>
+<path d="M54 118 L66 118 L60 126 Z" fill="#ef7f95"/><path d="M60 126 Q56 132 51 129 M60 126 Q64 132 69 129" stroke="#8a4b3a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+<g stroke="#fff6de" stroke-width="2.6" stroke-linecap="round"><path d="M22 112 L2 106"/><path d="M22 120 L2 124"/><path d="M98 112 L118 106"/><path d="M98 120 L118 124"/></g>
+
+</g>
+<g font-family="Nunito,ui-rounded,system-ui,sans-serif" font-weight="900" text-anchor="middle" paint-order="stroke" stroke-linejoin="round">
+<text x="180" y="172" font-size="56" fill="#e2625f" stroke="#fff8e9" stroke-width="10" letter-spacing="-.5">Purrfect</text>
+<text x="180" y="208" font-size="30" fill="#2e7658" stroke="#fff8e9" stroke-width="7" letter-spacing="9">HOME</text>
+</g></svg></div>
+<div class="spstage"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3d2"/><stop offset="1" stop-color="#ffe2b4"/></linearGradient><linearGradient id="spFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a06a"/><stop offset="1" stop-color="#c58953"/></linearGradient></defs>
+<rect width="360" height="250" fill="url(#spWall)"/><rect y="205" width="360" height="45" fill="url(#spFloor)"/><path d="M0 205 H360" stroke="#b9794a" stroke-width="3"/><g stroke="#b9794a44" stroke-width="2"><path d="M60 205 V250"/><path d="M150 205 V250"/><path d="M240 205 V250"/><path d="M330 205 V250"/></g>
+<g><rect x="22" y="38" width="64" height="76" rx="30" fill="#bfe3f2"/><path d="M54 38 V114 M22 76 H86" stroke="#fff8e9" stroke-width="5"/><rect x="22" y="38" width="64" height="76" rx="30" fill="none" stroke="#fff8e9" stroke-width="6"/><path d="M30 106 L60 46" stroke="#ffffff66" stroke-width="7" stroke-linecap="round"/></g>
+<g id="spScenes"></g></svg></div>
+<div class="spcap" id="spCap"></div>
+<div class="spld"><div class="spbar"><div class="spfill2"><i id="spFill"></i></div></div><div class="sppct2"><span id="spMsg">Loading your home…</span><span id="spPct">0%</span></div></div></div>
+<script>
+(function(){try{
+const OR='#f3a65a',DK='#d9803a',CR='#ffe2b8',PK='#f5a3a8',INK='#2a1f1a',LG='#e69043';
+const eye=(x,y)=>'<ellipse cx="'+x+'" cy="'+y+'" rx="4.6" ry="5.4" fill="'+INK+'"/><circle cx="'+(x+1.6)+'" cy="'+(y-1.8)+'" r="1.7" fill="#fff"/>';
+const head=cls=>'<g class="sp-a '+cls+'"><path d="M-19 -12 L-21 -38 L-3 -22 Z" fill="'+OR+'"/><path d="M5 -22 L22 -38 L20 -10 Z" fill="'+OR+'"/><path d="M-17 -16 L-18 -31 L-7 -21 Z" fill="'+PK+'"/><path d="M8 -21 L18 -31 L17 -15 Z" fill="'+PK+'"/><circle r="25" fill="'+OR+'"/><path d="M-4 -24 V-14 M-11 -23 L-10 -15 M3 -23 L2 -15" stroke="'+DK+'" stroke-width="3" stroke-linecap="round"/><ellipse cx="1" cy="9" rx="13" ry="9.5" fill="'+CR+'"/>'+eye(-9,-1)+eye(11,-1)+'<path d="M-3 5 L5 5 L1 10 Z" fill="#e8798a"/><path d="M1 10 Q-3 15 -7 12 M1 10 Q5 15 9 12" stroke="#8a4b3a" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="-17" cy="8" r="4.4" fill="#f7a99d" opacity=".55"/><circle cx="19" cy="8" r="4.4" fill="#f7a99d" opacity=".55"/><g stroke="#fff8e9" stroke-width="1.5" stroke-linecap="round" opacity=".9"><path d="M-14 9 L-30 5"/><path d="M-14 13 L-29 16"/><path d="M16 9 L32 5"/><path d="M16 13 L31 16"/></g><ellipse class="s4tg" cx="1" cy="17" rx="3.2" ry="2.6" fill="#ef7f95" opacity="0"/></g>';
+const tail=(px,py,d)=>'<g transform="translate('+px+','+py+')"><g class="sp-a tail"><path d="'+d+'" stroke="'+OR+'" stroke-width="12" fill="none" stroke-linecap="round"/><path d="'+d+'" stroke="'+DK+'" stroke-width="12" fill="none" stroke-dasharray="5 11" stroke-dashoffset="2"/></g></g>';
+const leg=(px,py,len,cls,col)=>'<g transform="translate('+px+','+py+')"><g class="sp-a '+cls+'"><rect x="-6" y="0" width="12" height="'+len+'" rx="6" fill="'+col+'"/><ellipse cx="1" cy="'+len+'" rx="8.5" ry="5" fill="'+CR+'"/></g></g>';
+// a sitting cat (used for watching a butterfly and for washing)
+function sit(k,tr){return '<g class="sp-a s'+k+'root"'+(tr?' transform="'+tr+'"':'')+'>'+tail(-34,-12,'M0 0 C-34 4 -52 -14 -40 -34')+
+ '<ellipse cx="-6" cy="-24" rx="27" ry="24" fill="'+OR+'"/><ellipse cx="12" cy="-46" rx="20" ry="32" transform="rotate(-8 12 -46)" fill="'+OR+'"/><ellipse cx="17" cy="-42" rx="12" ry="25" transform="rotate(-8 17 -42)" fill="'+CR+'"/><path d="M-26 -30 q-6 -6 0 -12 M-18 -42 q-6 -6 0 -12" stroke="'+DK+'" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse cx="-12" cy="-6" rx="19" ry="7" fill="'+CR+'"/>'+
+ '<g transform="translate(14,-36)"><rect x="-6" y="0" width="12" height="36" rx="6" fill="'+LG+'"/><ellipse cx="1" cy="36" rx="8.5" ry="5" fill="'+CR+'"/></g>'+
+ '<g class="sp-a s'+k+'leg"><rect x="-6" y="0" width="12" height="36" rx="6" fill="'+OR+'"/><ellipse cx="1" cy="36" rx="8.5" ry="5" fill="'+CR+'"/></g>'+
+ head('s'+k+'head')+'</g>'}
+// a standing cat (used for climbing and for chasing)
+function stand(k){return '<g class="sp-a s'+k+'root"><g class="sp-a bob">'+tail(-42,-48,'M0 0 C-24 -4 -36 -26 -24 -48')+
+ leg(-18,-34,34,'lg2',LG)+leg(18,-34,34,'lg',LG)+
+ '<ellipse cx="0" cy="-42" rx="44" ry="22" fill="'+OR+'"/><ellipse cx="4" cy="-33" rx="32" ry="11" fill="'+CR+'"/><path d="M-20 -60 q-4 8 0 14 M-6 -63 q-4 8 0 15 M8 -63 q-4 8 0 15" stroke="'+DK+'" stroke-width="3.5" fill="none" stroke-linecap="round"/>'+
+ leg(-26,-34,34,'lg',OR)+leg(26,-34,34,'lg2',OR)+
+ '<g transform="translate(52,-58)">'+head('')+'</g></g></g>'}
+const wing=s=>'<g class="sp-a"><g class="wing"><path d="M0 0 Q'+(-16*s)+' -18 '+(-22*s)+' -4 Q'+(-20*s)+' 8 0 2 Z" fill="#b99af0"/><path d="M0 0 Q'+(-14*s)+' 12 '+(-10*s)+' 20 Q0 18 0 2 Z" fill="#f09ac4"/></g></g>';
+const bug='<g class="sp-a s1bug">'+wing(1)+wing(-1)+'<ellipse cx="0" cy="6" rx="2.6" ry="9" fill="#5a3b52"/></g>';
+const tree='<g><ellipse cx="292" cy="206" rx="46" ry="6" fill="#00000018"/><rect x="258" y="196" width="76" height="10" rx="5" fill="#7ec3a0"/><rect x="272" y="62" width="30" height="136" rx="6" fill="#e9c58b"/><g stroke="#c79a5c" stroke-width="3"><path d="M272 78h30M272 94h30M272 110h30M272 126h30M272 142h30M272 158h30M272 174h30M272 190h30"/></g><rect x="244" y="136" width="94" height="10" rx="5" fill="#7ec3a0"/><rect x="236" y="62" width="102" height="10" rx="5" fill="#7ec3a0"/><rect x="306" y="34" width="30" height="28" rx="8" fill="#ef8f66"/><path d="M314 62 v-10 a7 7 0 0 1 14 0 v10 Z" fill="#fff0d2"/></g>';
+const mouse='<g class="sp-a s3mouse"><path d="M-18 -8 C-34 -6 -38 -22 -30 -24" stroke="#c9c4d0" stroke-width="3.2" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-12" rx="19" ry="11" fill="#cfcad8"/><ellipse cx="6" cy="-6" rx="12" ry="5" fill="#e9e5ee"/><circle cx="14" cy="-20" r="6" fill="#f0a5b5"/><circle cx="14" cy="-20" r="3.4" fill="#ffd0da"/><circle cx="18" cy="-13" r="2" fill="#2a1f1a"/><circle cx="25" cy="-10" r="2.4" fill="#ef7f95"/><g transform="translate(-8,-2)"><circle class="sp-a mleg" r="3.4" fill="#aaa5b6"/></g><g transform="translate(8,-2)"><circle class="sp-a mleg" r="3.4" fill="#aaa5b6"/></g></g>';
+const S=document.getElementById('spScenes');if(!S)return;
+const spk='<g fill="#ffd45e"><path class="spk" d="M262 110 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3Z"/><path class="spk" style="animation-delay:.4s" d="M120 96 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2Z"/></g>';
+const sc=[
+ ['sc1','Catching a butterfly','<ellipse cx="170" cy="207" rx="70" ry="6" fill="#00000014"/>'+sit(1)+bug],
+ ['sc2','Climbing the cat tree',tree+stand(2)],
+ ['sc3','Chasing a toy mouse','<ellipse cx="180" cy="208" rx="170" ry="5" fill="#00000010"/>'+mouse+stand(3)],
+ ['sc4','Washing up','<ellipse cx="190" cy="207" rx="52" ry="6" fill="#00000014"/><g transform="translate(190,205)">'+sit(4).replace('class="sp-a s4root"','')+'</g>'+spk]];
+S.innerHTML=sc.map(s=>'<g class="spscene '+s[0]+'" id="'+s[0]+'">'+s[2]+'</g>').join('');
+const cap=document.getElementById('spCap');let i=0;
+function show(n){sc.forEach((s,k)=>{const g=document.getElementById(s[0]);if(g)g.classList.toggle('on',k===n)});if(cap)cap.textContent=sc[n][1]+'…'}
+show(0);window.__spTimer=setInterval(()=>{i=(i+1)%sc.length;show(i)},3300);
+}catch(e){console.warn('splash',e)}})();
+(function(){const sp=document.getElementById('splash');if(!sp){window.__splash={set(){},done(){},hide(){}};return}
+ const t0=performance.now(),fill=document.getElementById('spFill'),pct=document.getElementById('spPct'),msg=document.getElementById('spMsg');let p=0,fin=false,gone=false;
+ const auto=!!(navigator&&navigator.webdriver);
+ function set(v,ms){p=Math.max(p,v);if(fill){fill.style.transitionDuration=(ms||500)+'ms';fill.style.transform='scaleX('+Math.max(.04,p)+')'}if(pct)pct.textContent=Math.round(p*100)+'%'}
+ function hide(now){if(gone)return;gone=true;clearInterval(window.__spTimer);sp.classList.add('out');setTimeout(()=>{sp.style.display='none'},now?0:650)}
+ function done(){if(fin)return;fin=true;set(1,300);if(msg)msg.textContent='Ready!';const wait=auto?0:Math.max(0,3600-(performance.now()-t0));setTimeout(()=>hide(),wait+250)}
+ window.__splash={set,done,hide};set(.12,400);
+ let c=.12;const cr=setInterval(()=>{if(fin||gone){clearInterval(cr);return}c+=(.46-c)*.05;set(c,400)},200);
+})();
+</script><div id="game"></div>
 <div class="hud"><div class="panel"><div class="brand">🏡 PURRFECT HOME</div><div class="sub">Build your home, then make it yours.</div></div><div class="panel meters"><div class="meter">🍗 HUNGER<div class="track"><div id="hunger" class="fill hunger"></div></div></div><div class="meter">💧 THIRST<div class="track"><div id="thirst" class="fill"></div></div></div><div class="meter">🧹 LITTER CLEAN<div class="track"><div id="litter" class="fill litter"></div></div></div><div class="meter">💗 BOND<div class="track"><div id="love" class="fill love"></div></div></div><div class="meter">🩺 HEALTH<div class="track"><div id="health" class="fill health"></div></div></div><div class="meter">🛁 CLEAN<div class="track"><div id="clean" class="fill clean"></div></div></div><div class="meter" id="bowls" style="grid-column:1/-1;font-size:10px;font-weight:700;opacity:.85;line-height:1.35"></div></div><div class="topright"><div class="pill" id="agePill">🐱 Kitten · 2 mo</div><div class="pill" id="clock">☀️ Day 1 · 08:00</div><div class="pill" id="coinPill">🪙 10,000</div><div class="pill" id="zone">🏗️ Your lot</div><div style="display:flex;gap:6px;justify-content:flex-end"><button class="pill" id="infoBtn" type="button" aria-label="Cat info">🐾</button><button class="pill" id="qBtn" type="button" aria-label="Goals">🎯</button><button class="pill" id="audBtn" type="button" aria-label="Menu">⚙️</button></div><button class="pill" id="buildBtn" type="button">🔨 Build</button></div></div>
 <div id="prompt" class="prompt">Press interact</div><div id="toast" class="toast"></div>
 <div id="dof"></div><div id="vig"></div><div class="bottom"><div class="controls" id="controls"><div id="pad" class="pad" aria-label="Movement joystick"><div id="stick" class="stick"></div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px"><div class="hint" id="hint">Drag the pad to walk · Drag open screen to look around<br>Tap 🔨 Build to build your house · PC: WASD / arrows</div><div id="buildMenu" style="display:none"><div class="row util"><button class="bt" id="bUndo" type="button"><span class="i">↶</span><span class="lbl">Undo</span></button><button class="bt" id="bClear" type="button"><span class="i">🗑</span><span class="lbl">Clear</span></button><button class="bt" id="bL" type="button"><span class="i">⟲</span></button><button class="bt" id="bR" type="button"><span class="i">⟳</span></button><button class="bt" id="bHalf" type="button">Full</button><button class="bt" id="bDock" type="button"><span class="i">⌄</span></button></div><div class="row tabs" id="catBar"><button class="bt sel" id="bCatWall" type="button"><span class="i">🧱</span>Wall</button><button class="bt" id="bCatFloor" type="button"><span class="i">🟫</span>Floor</button><button class="bt" id="bCatAcc" type="button"><span class="i">🚪</span>Doors</button><button class="bt" id="bCatFurn" type="button"><span class="i">🛋️</span>Furniture</button><button class="bt" id="bErase" type="button"><span class="i">🧽</span>Erase</button></div><div class="row chips" id="grpBar" style="display:none"></div><div id="fxBar" style="display:none"></div><div class="row opts" id="subBar"></div></div></div></div>
@@ -4201,8 +4317,8 @@ try{if(OBSKIP)setTimeout(()=>document.getElementById('start').click(),40);else o
 }
 (function loadThree(){
  const urls=['vendor/three.min.js','https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js','https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js','https://unpkg.com/three@0.128.0/build/three.min.js'];let index=0;
- function fail(msg){const el=document.getElementById('load-error');el.style.display='block';if(msg)el.textContent=msg}
- function attempt(){if(window.THREE){try{bootGame()}catch(err){console.error(err);fail('The 3D world could not start: '+(err&&err.message?err.message:'unknown error')+'. Reload the page and try again.')}return}
+ function fail(msg){try{window.__splash.hide(true)}catch(e){}const el=document.getElementById('load-error');el.style.display='block';if(msg)el.textContent=msg}
+ function attempt(){if(window.THREE){try{window.__splash.set(.62,2600)}catch(e){}setTimeout(()=>{try{bootGame();try{window.__splash.done()}catch(e){}}catch(err){console.error(err);fail('The 3D world could not start: '+(err&&err.message?err.message:'unknown error')+'. Reload the page and try again.')}},80);return}
   if(index>=urls.length){fail();return}
   const s=document.createElement('script');s.src=urls[index++];s.onload=attempt;s.onerror=()=>{s.remove();attempt()};document.head.appendChild(s)}
  attempt()})();
