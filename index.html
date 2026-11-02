@@ -80,6 +80,22 @@ body.building #vig{opacity:.45}
   walk(this,[],0);d.set.call(this,v);
   for(const [p,t,l] of sv){let el=this;for(const i of p)el=el&&el.children[i];if(el){if(t)el.scrollTop=t;if(l)el.scrollLeft=l}}}})}catch(e){}})();
 function bootGame(){
+// ---- save safety: version stamp, rolling backups of the last good save, and automatic recovery from a damaged save ----
+const SAVE_V=2,SB_JSON=['purrfect-home-build1','purrfect-home-cat1','purrfect-quests','purrfect-cat','purrfect-look'],SB_SKIP=/^purrfect-(bak\d|tutsnap|seen)$/;
+const sbOk=(k,v)=>{if(v===null||v===undefined)return true;try{const o=JSON.parse(v);if(!o||typeof o!=='object')return false;
+  if(k==='purrfect-home-build1'&&(!Array.isArray(o.walls)||!Array.isArray(o.floors)||!Array.isArray(o.furniture)))return false;
+  if(k==='purrfect-home-cat1'&&(!o.stats||typeof o.stats!=='object'))return false;
+  if(k==='purrfect-cat'&&!o.breed)return false;return true}catch(e){return false}};
+const sbBundle=()=>{try{const keys={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||k.indexOf('purrfect')!==0||SB_SKIP.test(k))continue;const v=localStorage.getItem(k);if(v&&v.length<300000)keys[k]=v}return {t:Date.now(),v:SAVE_V,keys}}catch(e){return null}};
+function sbBackup(force){try{for(const k of SB_JSON)if(!sbOk(k,localStorage.getItem(k)))return;const b1=JSON.parse(localStorage.getItem('purrfect-bak1')||'null');
+  if(!force&&b1&&Date.now()-b1.t<10*60*1000)return;const nb=sbBundle();if(!nb||!nb.keys['purrfect-home-build1'])return;
+  if(b1)localStorage.setItem('purrfect-bak2',JSON.stringify(b1));localStorage.setItem('purrfect-bak1',JSON.stringify(nb))}catch(e){}}
+window.__sbBackup=sbBackup;
+(function sbBoot(){try{const bad=SB_JSON.filter(k=>!sbOk(k,localStorage.getItem(k)));
+  if(bad.length){let got=null;for(const slot of ['purrfect-bak1','purrfect-bak2']){let b=null;try{b=JSON.parse(localStorage.getItem(slot)||'null')}catch(e){}if(!b||!b.keys)continue;
+    const rest=bad.filter(k=>b.keys[k]!==undefined&&sbOk(k,b.keys[k]));if(rest.length===bad.length){for(const k of bad)localStorage.setItem(k,b.keys[k]);got=b;break}}
+   if(got)window.__saveRecovered={keys:bad,t:got.t};else{for(const k of bad)localStorage.removeItem(k);window.__saveRecovered={keys:bad,t:0,lost:true}}}
+  const ver=+localStorage.getItem('purrfect-save-v')||1;if(ver<SAVE_V){sbBackup(true);/* future migrations run here, oldest first */localStorage.setItem('purrfect-save-v',String(SAVE_V))}}catch(e){console.warn('save guard',e)}})();
 (()=>{'use strict';
 const root=document.getElementById('game');root.innerHTML='';if(!window.THREE){root.innerHTML='<div style="padding:30px;font:16px system-ui">The 3D engine could not load. Please check your internet connection and reload.</div>';return;}
 const scene=new THREE.Scene();scene.background=new THREE.Color('#b9cbd5');scene.fog=new THREE.Fog('#b9cbd5',48,125);
@@ -4119,7 +4135,8 @@ let prev=performance.now(),elapsed=0,uiT=0,saveT=0;const camTarget=new THREE.Vec
 window.addEventListener('error',ev=>{try{toast('⚠️ '+(ev.message||'error'))}catch(_){}});window.addEventListener('unhandledrejection',ev=>{try{toast('⚠️ '+(ev.reason&&ev.reason.message||'error'))}catch(_){}});
 let animErr=0;function animate(now){requestAnimationFrame(animate);try{animateInner(now)}catch(e){if(animErr++<3){try{console.error(e);toast('⚠️ '+(e&&e.message||e))}catch(_){}}try{renderer.render(scene,camera)}catch(_){}}}
 let TC=null;
-function animateInner(now){if(started&&!awayInit){awayInit=true;let s=0;try{const l=+localStorage.getItem('purrfect-seen');if(l>0)s=(Date.now()-l)/1000}catch(e){}if(s>=30)catchUp(s)}
+function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRecovered.shown){const r=window.__saveRecovered;r.shown=true;setTimeout(()=>toast(r.lost?'⚠️ Part of your save was damaged and could not be restored':'📦 Your save was damaged, so it was restored from a backup'),1500)}
+ if(started&&!awayInit){awayInit=true;let s=0;try{const l=+localStorage.getItem('purrfect-seen');if(l>0)s=(Date.now()-l)/1000}catch(e){}if(s>=30)catchUp(s)}
  const dt=Math.min((now-prev)/1000,.05);prev=now;elapsed+=dt;
  if(document.body.classList.contains('petting')&&!PG.on&&!SG.on&&shopEl.style.display!=='block'&&feedEl.style.display!=='block')document.body.classList.remove('petting');
  {const pm=mins;mins+=dt*(seat&&seat.stage==='lying'&&!seat.leaving?20:1);if(mins>=1440){mins-=1440;day++;try{QM.dayEnd()}catch(e){}}invTick();if((dishT-=dt)<0){dishT=.6;dishSync()}if(seat&&seat.kind==='sleep'&&!seat.leaving&&seat.t>1.5&&(pm<420&&mins>=420))standUp()}if(build.clearArm>0)build.clearArm=Math.max(0,build.clearArm-dt);
@@ -4146,7 +4163,7 @@ function animateInner(now){if(started&&!awayInit){awayInit=true;let s=0;try{cons
  collide(player.position,.3,false);player.position.y+=(groundY(player.position.x,player.position.z)+.05-player.position.y)*Math.min(1,dt*15)}
  try{medTick(dt)}catch(e){}if(started&&!SH.on&&!STU.on)updateCat(dt);if(!SH.on){poseCat(dt,elapsed);petGameTick(dt)}scoopTick(dt);shopTick(dt);try{QM.tick(dt);PERS.tick(dt)}catch(e){}try{if(started&&!AU.begun)AU.begin();AU.tick(dt,Math.floor(mins/60)%24,SH.on||floorAt(player.position.x,player.position.z))}catch(e){}try{lightTick(dt,floorAt(player.position.x,player.position.z),dayNightK())}catch(e){}try{sssTick(dt)}catch(e){}shopImgTick();if(walking&&!SH.on&&!SH.tr){const ddx=player.position.x,ddz=player.position.z;if(shopDoorZone(ddx,ddz))enterShop('shop');else if(hospDoorZone(ddx,ddz))enterShop('hosp');else if(cafeDoorZone(ddx,ddz))enterShop('cafe');else if(grocDoorZone(ddx,ddz))enterShop('groc')}simulate(dt);
  uiT+=dt;if(uiT>.25){uiT=0;updateUI();updateSeatBtn();const h=Math.floor(mins/60)%24,m=Math.floor(mins%60);{const ap=document.getElementById('agePill');if(ap)ap.textContent='🐱 '+ageText();const mo=Math.floor(ageDays()/30);if(window.__lastMo===undefined)window.__lastMo=mo;else if(mo>window.__lastMo){window.__lastMo=mo;toast('🎂 Kitty is now '+(mo>=12&&mo%12===0?mo/12+' year'+(mo>=24?'s':''):mo+' months')+' old!')}}document.getElementById('clock').textContent=`${h>=6&&h<18?'☀️':'🌙'} Day ${day} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
- saveT+=dt;if(saveT>5){saveT=0;saveBuild();saveCat();try{localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}}
+ saveT+=dt;if(saveT>5){saveT=0;saveBuild();saveCat();sbBackup();try{localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}}
  const px=player.position.x,pz=player.position.z,onLot=Math.abs(px)<8&&Math.abs(pz)<7;
  document.getElementById('zone').textContent=SH.on?SH.label:onLot?'🏗️ Your lot':pz>13?'🛍️ Shops':pz>7.5?'🌳 Garden':'🏡 Outside';
  if(build.on){prompt.style.display='block';prompt.textContent=({floor:'🟫 Drag over the grid to lay '+FLOORS[build.floor].name.toLowerCase()+' flooring',wall:'🧱 Drag along the grid to draw '+WALL_STYLES[build.wall].name.toLowerCase()+' walls · drag over a wall to repaint it',door:'🚪 Tap a wall to place a door (tap again to remove it)',double:'🚪🚪 Tap a wall to place a double door (needs 2 wall pieces side by side)',window:'🪟 Tap a wall to place a window (tap again to remove it)',furn:build.fsel&&FURN[build.fsel]?'🛋️ Drag to place the '+FURN[build.fsel].n.toLowerCase()+' · it turns to face the room':'',move:'✋ Drag a piece of furniture to move it',rotate:'🔄 Tap a piece of furniture to turn it',erase:'🧽 Tap or drag over furniture, walls and floors to erase them'})[build.tool]}
