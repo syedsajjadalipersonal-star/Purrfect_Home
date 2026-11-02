@@ -567,7 +567,7 @@ const CP_LEGACY={classic:'mackerel',ticked:'mackerel',torbie:'mackerel',patched:
 let catSpec=null;
 function catDefaults(id){const b=CB_BY[id]||CB_BY[CB_LEGACY[id]]||CB_BY.persian;return {breed:b[0],p:b[7],c:b[8],eye:b[9]}}
 function catNorm(sp){sp=Object.assign({},sp||{});if(!CB_BY[sp.breed]){const nb=CB_LEGACY[sp.breed]||'persian';sp=Object.assign(catDefaults(nb),{p:sp.p,c:sp.c,eye:sp.eye},{breed:nb});}
- sp.sex=sp.sex==='m'?'m':'f';if(CP_LEGACY[sp.p])sp.p=CP_LEGACY[sp.p];if(!CPAT.some(q=>q[0]===sp.p))sp.p=CB_BY[sp.breed][7];if(!CCOL[sp.c])sp.c=CB_BY[sp.breed][8];if(!CEYE[sp.eye])sp.eye=CB_BY[sp.breed][9];return sp}
+ sp.sex=sp.sex==='m'?'m':'f';if(sp.sex==='m'&&sp.p==='calico')sp.p='tuxedo';if(CP_LEGACY[sp.p])sp.p=CP_LEGACY[sp.p];if(!CPAT.some(q=>q[0]===sp.p))sp.p=CB_BY[sp.breed][7];if(!CCOL[sp.c])sp.c=CB_BY[sp.breed][8];if(!CEYE[sp.eye])sp.eye=CB_BY[sp.breed][9];return sp}
 
 // ---- procedural helpers
 const hash3=(x,y,z)=>{const h=Math.sin(x*127.1+y*311.7+z*74.7)*43758.5453;return h-Math.floor(h)};
@@ -792,7 +792,7 @@ function ctSheet(){const sp=ctSpec();const on=(a,b)=>a===b?'on':'';
  ctEl.innerHTML='<div class="fh"><span>🐱 Pick your kitten’s look</span><button class="fx" type="button" data-x="1">✕</button></div><canvas id="catPv"></canvas><div class="lkw">'
   +row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''))
   +row('Gender',[['f','Girl'],['m','Boy']].map(q=>'<button type="button" data-ck="sex" data-v="'+q[0]+'" class="'+on(sp.sex,q[0])+'">'+q[1]+'</button>').join(''))
-  +row('Coat pattern',CPAT.map(q=>'<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'">'+q[1]+'</button>').join(''))
+  +row('Coat pattern',CPAT.map(q=>{const nx=q[0]==='calico'&&sp.sex==='m';return '<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'"'+(nx?' disabled title="Calico cats are almost always girls"':'')+'>'+q[1]+(nx?' ♀':'')+'</button>'}).join(''))
   +row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''))
   +row('Eyes',Object.keys(CEYE).map(k=>'<button type="button" data-ck="eye" data-v="'+k+'" class="'+on(sp.eye,k)+'">'+CEYE[k][1]+'</button>').join(''))+'</div>';
  const cv2=document.getElementById('catPv');
@@ -851,7 +851,7 @@ function stuRender(){const sc=stuPanel.querySelector('.sg'),top=sc?sc.scrollTop:
   else h+=LK_OPT.filter(o=>STU_GROUPS[STU.tab].includes(o[0])).map(([k,n,opts])=>'<div class="lk"><i>'+n+'</i>'+opts.map(o=>{const col=typeof o==='string',v=col?o:o[0],cur=PLK[k]===undefined?null:PLK[k];return '<button type="button" data-k="'+k+'" data-v="'+v+'" class="'+(col?'c ':'')+((cur===v||(cur===null&&v===null))?'on':'')+'"'+(col?' style="background:'+o+'" aria-label="'+n+'"':'')+'>'+(col?'':o[1])+'</button>'}).join('')+'</div>').join('')}
  else{const sp=catSpec||catDefaults('persian'),row=(t,it)=>'<div class="lk"><i>'+t+'</i>'+it+'</div>';
   if(STU.tab==='breed')h+=row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''))+row('Gender',[['f','Girl'],['m','Boy']].map(q=>'<button type="button" data-ck="sex" data-v="'+q[0]+'" class="'+on(sp.sex,q[0])+'">'+q[1]+'</button>').join(''));
-  else if(STU.tab==='coat')h+=row('Coat pattern',CPAT.map(q=>'<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'">'+q[1]+'</button>').join(''))+row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" aria-label="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''));
+  else if(STU.tab==='coat')h+=row('Coat pattern',CPAT.map(q=>{const nx=q[0]==='calico'&&sp.sex==='m';return '<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'"'+(nx?' disabled title="Calico cats are almost always girls"':'')+'>'+q[1]+(nx?' ♀':'')+'</button>'}).join(''))+row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" aria-label="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''));
   else h+=row('Eyes',Object.keys(CEYE).map(k=>'<button type="button" data-ck="eye" data-v="'+k+'" class="'+on(sp.eye,k)+'">'+CEYE[k][1]+'</button>').join(''))}
  h+='</div>';stuPanel.innerHTML=h;const s2=stuPanel.querySelector('.sg');if(s2)s2.scrollTop=top;
  stuEl.querySelector('#stuName').textContent=K==='me'?(PNAME||'You'):(CNAME||'Kitty')}
@@ -2555,6 +2555,7 @@ renderer.domElement.addEventListener('pointerdown',()=>{hideCtx()});
 window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&!build.on)action('interact')});
 // input
 const prompt=document.getElementById('prompt'),toastEl=document.getElementById('toast');let toastTimer;
+{const st=document.createElement('style');st.textContent='.lk button[disabled]{opacity:.38;filter:grayscale(.6)}';document.head.appendChild(st)}
 function isTom(){return !!(catSpec&&catSpec.sex==='m')}
 function pr(t){if(typeof t!=='string'||!isTom())return t;return t.replace(/\b(Herself|herself)\b/g,(m)=>m[0]==='H'?'Himself':'himself').replace(/\b(give|take|find|let|hold|wake|feed|help|tell|pet|keep|bring|save|carry|leave|see|calm|cheer|love|call|thank|follow|watch|treat|ask|visit|put) her\b/gi,(m,v)=>v+' him').replace(/\b(Her|her)\b/g,m=>m[0]==='H'?'His':'his').replace(/\bShe\b/g,'He').replace(/\bshe\b/g,'he').replace(/\b(Spay \/ neuter)\b/g,'Neuter').replace(/\bSpay\/neuter\b/g,'Neuter')}
 function toast(t){t=pr(t);toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2300)}
