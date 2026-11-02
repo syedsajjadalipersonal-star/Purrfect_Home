@@ -1186,7 +1186,7 @@ function homeLoveK(){const h=homeScore();return 1-.25*h.cosy/100-.2*h.fun/100}
 function homeTip(){return Math.round(homeScore().style*.15)}
 function fxHtml(){if(build.cat!=='furn')return '';const k=build.fsel,f=FURN[k],h=homeScore();let a='';
  if(f){const b=BEN[k],t=TIP[k];a='<b>'+f.n+'</b>'+(t?' · '+t:'')+(b?' <span class="fxp">'+ASPECT[b[0]][0]+' +'+b[1]+'</span>':'');if(b&&!t)a+=' <small>'+ASPECT[b[0]][1]+'</small>'}
- const pct=Math.round((1-homeLoveK())*100);return (a?a+'<br>':'')+'<small>Your home: Cosy '+h.cosy+'% · Fun '+h.fun+'% · Style '+h.style+'%'+(pct?' → bond fades '+pct+'% slower':'')+(homeTip()?' · +'+homeTip()+' coins/day':'')+'</small>'}
+ const pct=Math.round((1-homeLoveK())*100);return (a?a+'<br>':'')+'<small>Your home: Cosy '+h.cosy+'% · Fun '+h.fun+'% · Style '+h.style+'%'+(pct?' → bond fades '+pct+'% slower':'')+''+'</small>'}
 const furnLvl=t=>(FURN[t]&&FURN[t].lvl)||1;const lockMsg=t=>furnLvl(t)>homeLv()?'🔒 Unlocks at Home Level '+furnLvl(t)+' ⭐ Complete goals to level up!':'🔒 Buy it at Paws & Pets first 🛍️';
 function homeLv(){try{return QM.Q.lv||1}catch(e){return 99}}
 const INV={items:{},worn:null,tier:{food:1,water:1,tray:50},trayL:5,sandL:0,outfit:'tee',outs:{},med:{v:[],dw:45,sx:0,warn:'',scare:''},treats:{},aff:{},friend:{},fridge:{},pantry:{},rec:{},board:Array(25).fill(null),hot:[]};
@@ -2813,7 +2813,7 @@ var QM=(function(){
  const reward=(n,msg)=>{WALLET.base+=n;try{saveBuild()}catch(e){}sound('good');toast(msg+' +'+n+' 🪙')};
  const need=L=>100+60*(L-1),XPT={feed:3,water:2,litter:4,pet:4,play:3,eat:4,cook:8,photo:4,buy:3,build:1,sit:1,cafe:8};
  function xp(n,key){if(Q.xd.day!==day)Q.xd={day,m:{}};const m=Q.xd.m;m[key]=(m[key]||0)+n;if(m[key]>40)return;Q.xp+=n;let up=0;while(Q.xp>=need(Q.lv)){Q.xp-=need(Q.lv);Q.lv++;up=Q.lv;const c=40+15*Q.lv;reward(c,'⭐ Home Level '+Q.lv+'!');const un=Object.keys(FURN).filter(k=>FURN[k].lvl===Q.lv).map(k=>FURN[k].n);if(un.length)setTimeout(()=>toast('🔓 Unlocked: '+un.slice(0,5).join(', ')+(un.length>5?'…':'')),2400)}}
- function dayEnd(){try{const a=(stats.hunger+stats.thirst+stats.litter+stats.love+stats.health+stats.clean)/6;if(a>=50&&started){const c=Math.round((a-50)*.6)+homeTip();WALLET.base+=c;saveBuild();toast('☀️ New day! Kitty was '+(a>=85?'spoiled':a>=70?'happy':'okay')+' · +'+c+' 🪙');sound('coin')}}catch(e){}}
+ function dayEnd(){}
  const nF=t=>{let c=0;for(const it of furn.values())if(it.type===t)c++;return c};
  // guided steps: poll = checked automatically from the state of the house, ev = happens when the player does it
  // ---------- guided first day: spotlight + tap-locking, like a modern builder ----------
