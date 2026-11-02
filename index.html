@@ -1761,7 +1761,7 @@ function finishScoop(){for(const g of SG.hid)g.visible=true;SG.hid=[];SG.on=fals
  const pct=SG.pct;for(const p of SG.mess||[])p[0].visible=p[1];let gain=0;
  if(pct>=99.5){gain=100-SG.p0;stats.litter=100;clearLitterMess();catSound('clean');qev('litter')}
  else{const n=Math.max(stats.litter,Math.floor(pct));gain=n-SG.p0;stats.litter=n;catSound('clean');if(gain>0)qev('litter')}
- gain=Math.max(0,gain);const used=+Math.min(INV.trayL,gain*.005).toFixed(3);INV.trayL=Math.max(0,+(INV.trayL-used).toFixed(3));
+ gain=Math.max(0,gain);const used=+Math.min(INV.trayL,gain*.005).toFixed(3);INV.trayL=Math.max(0,+(INV.trayL-used).toFixed(3));if(used>0)qev('litterL',1,used);
  toast((pct>=99.5?'Litter tray is sparkling clean! ✨':'Litter is '+Math.floor(pct)+'% clean')+' · used '+(+used.toFixed(2))+' L of sand ('+(+INV.trayL.toFixed(1))+'/5 L left)');saveBuild()
  updateUI();saveCat()}
 function scoopTick(dt){if(!SG.on)return;
@@ -2806,8 +2806,9 @@ function catSound(k){try{AU.cat(k)}catch(e){}}
 // ===== Guided first day + daily goals =====
 // The first day teaches the game one step at a time (a small banner + a pulsing button). After that, three fresh goals every game day, with a streak bonus.
 var QM=(function(){
- const KEY='purrfect-quests';let Q={v:1,tut:0,day:0,g:[],full:false,streak:0,lastFull:0,seen:{},lv:1,xp:0,xd:{day:0,m:{}}},pollT=0,ui={};
+ const KEY='purrfect-quests';let Q={v:1,tut:0,day:0,g:[],full:false,streak:0,lastFull:0,seen:{},lv:1,xp:0,xd:{day:0,m:{}},lt:{},lc:{},pd:{last:'',run:0}},pollT=0,ui={};
  try{Object.assign(Q,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
+ Q.lt=Q.lt||{};Q.lc=Q.lc||{};Q.pd=Q.pd||{last:'',run:0};
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(Q))}catch(e){}};
  const reward=(n,msg)=>{WALLET.base+=n;try{saveBuild()}catch(e){}sound('good');toast(msg+' +'+n+' 🪙')};
  const need=L=>100+60*(L-1),XPT={feed:3,water:2,litter:4,pet:4,play:3,eat:4,cook:8,photo:4,buy:3,build:1,sit:1,cafe:8};
@@ -2847,7 +2848,7 @@ var QM=(function(){
   T('💗 Bond','Bond is how much {c} loves you. Pet, play and spend time with {c} to raise it.',OKB({spot:mt(4)})),
   T('🩺 Health','Health falls when {c} is hungry, thirsty or sick. A visit to the Animal Hospital helps {c} recover.',OKB({spot:mt(5)})),
   T('🛁 Cleanliness','How clean {c} is. A dirty coat lowers happiness, so keep the bathroom and baths handy.',OKB({spot:mt(6)})),
-  T('Daily goals','Your daily goals will appear here after the tour. Each game day brings three small goals for coins, and finishing all three builds a streak bonus.',OKB({spot:'#qBtn'})),
+  T('Goals','Your goals will appear here after the tour. Each game day brings six small goals for a few coins, and finishing them all builds a streak bonus. The Lifetime tab tracks bigger milestones over time.',OKB({spot:'#qBtn'})),
   T('Walking','Try it: drag the round pad to walk around, and drag the open screen to look around. Tap Next when you are ready.',OKB({spot:'#pad',allow:['#tutOk','#pad','canvas']})),
   T('🔨 Build mode','This is Build mode. We have opened it for you so you can try every tool. Whatever you build during this part is just practice and will be cleared.',OKB({bld:true,prac:1,spot:'#buildMenu'})),
   T('🧱 Walls','Try it: pick a wall style, then drag across the ground to draw walls. Tap Next when you are done.',OKB({bld:true,prac:1,free:1,cat:'wall',spot:'#bCatWall',allow:['#tutOk','canvas','#bCatWall','#subBar']})),
@@ -2872,16 +2873,38 @@ var QM=(function(){
   T('🏖️ Litter tray','Last one: a litter tray. Place it somewhere quiet, away from the food.',OKB({bld:true,cat:'furn',fg:'cat',fs:'litter',spot:'#bCatFurn',allow:['#bCatFurn','#subBar','#grpBar','canvas','#bUndo','#bL','#bR'],poll:()=>nF('litter')>0,ok:null,done:0,r:60,free:1})),
   T('All set','You are ready, {n}! Look after {c}, build your dream home and enjoy.',{allow:['#tutOk'],ok:'Start playing!',done:'ok',r:150})];
  const POOL=[
-  {k:'feed',n:2,r:50,t:'Feed Kitty',i:'🍗',c:0},{k:'water',n:1,r:30,t:'Fill the water bowl',i:'💧',c:0},{k:'litter',n:1,r:50,t:'Clean the litter tray',i:'🧹',c:0},{k:'pet',n:2,r:60,t:'Pet Kitty',i:'💗',c:0},{k:'play',n:2,r:60,t:'Let Kitty play',i:'🧶',c:0},
-  {k:'eat',n:1,r:50,t:'Eat a meal',i:'🍽️',c:1},{k:'cook',n:1,r:70,t:'Cook something new',i:'🍳',c:1},{k:'sit',n:1,r:30,t:'Sit down and relax',i:'🛋️',c:1},{k:'cafe',n:1,r:80,t:'Eat at the café',i:'☕',c:1},
-  {k:'photo',n:1,r:40,t:'Take a photo',i:'📷',c:2},{k:'buy',n:1,r:50,t:'Buy something',i:'🛍️',c:2},{k:'build',n:3,r:60,t:'Place 3 things in your home',i:'🔨',c:2}];
- function pickDay(d){let s=d*2654435761%4294967296;const rnd=()=>(s=(s*1664525+1013904223)%4294967296)/4294967296,g=[];for(const c of [0,1,2]){const L=POOL.filter(p=>p.c===c);const p=L[Math.floor(rnd()*L.length)];g.push({k:p.k,n:p.n,h:0,d:false})}return g}
- const info=k=>POOL.find(p=>p.k===k)||{};
+  {id:'feed2',k:'feed',n:2,r:8,t:'Feed Kitty twice',i:'🍗',c:0},{id:'feed3',k:'feed',n:3,r:12,t:'Feed Kitty 3 times',i:'🍗',c:0},{id:'water1',k:'water',n:1,r:5,t:'Fill the water bowl',i:'💧',c:0},{id:'water2',k:'water',n:2,r:9,t:'Fill the water bowl twice',i:'💧',c:0},{id:'litter1',k:'litter',n:1,r:8,t:'Clean the litter tray',i:'🧹',c:0},{id:'litter2',k:'litter',n:2,r:13,t:'Scoop the tray twice',i:'🧹',c:0},
+  {id:'pet2',k:'pet',n:2,r:9,t:'Pet Kitty twice',i:'💗',c:0},{id:'pet4',k:'pet',n:4,r:15,t:'Pet Kitty 4 times',i:'💗',c:0},{id:'play2',k:'play',n:2,r:9,t:'Let Kitty play twice',i:'🧶',c:0},{id:'play3',k:'play',n:3,r:13,t:'Let Kitty play 3 times',i:'🧶',c:0},
+  {id:'eat1',k:'eat',n:1,r:7,t:'Eat a meal',i:'🍽️',c:1},{id:'eat2',k:'eat',n:2,r:12,t:'Eat two meals',i:'🍽️',c:1},{id:'cook1',k:'cook',n:1,r:11,t:'Cook something',i:'🍳',c:1},{id:'cook2',k:'cook',n:2,r:18,t:'Cook two dishes',i:'🍳',c:1},{id:'sit1',k:'sit',n:1,r:5,t:'Sit down and relax',i:'🛋️',c:1},{id:'sit3',k:'sit',n:3,r:11,t:'Relax on 3 seats',i:'🛋️',c:1},{id:'cafe1',k:'cafe',n:1,r:14,t:'Eat at the café',i:'☕',c:1},{id:'groc1',k:'groc',n:1,r:8,t:'Shop at the grocery',i:'🛒',c:1},
+  {id:'photo1',k:'photo',n:1,r:6,t:'Take a photo',i:'📷',c:2},{id:'photo3',k:'photo',n:3,r:13,t:'Take 3 photos',i:'📷',c:2},{id:'buy1',k:'buy',n:1,r:8,t:'Buy something',i:'🛍️',c:2},{id:'buy2',k:'buy',n:2,r:13,t:'Buy two things',i:'🛍️',c:2},{id:'build3',k:'build',n:3,r:9,t:'Place 3 things in your home',i:'🔨',c:2},{id:'build6',k:'build',n:6,r:15,t:'Place 6 things in your home',i:'🔨',c:2}];
+ // 6 goals a day: 3 care, 2 everyday life, 1 extra, never the same activity twice
+ function pickDay(d){let s=d*2654435761%4294967296;const rnd=()=>(s=(s*1664525+1013904223)%4294967296)/4294967296,g=[],used={};for(const c of [0,0,0,1,1,2]){const L=POOL.filter(p=>p.c===c&&!used[p.k]);const p=L[Math.floor(rnd()*L.length)];used[p.k]=1;g.push({id:p.id,k:p.k,n:p.n,h:0,d:false})}return g}
+ const info=g=>POOL.find(p=>p.id===g.id)||POOL.find(p=>p.k===g.k)||{};
  function newDay(){if(Q.day===day||Q.tut!=='done')return;Q.day=day;Q.g=pickDay(day);Q.full=false;if(Q.lastFull&&Q.lastFull<day-1)Q.streak=0;save();refresh()}
- function ev(name,n){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);
+
+ // ---------- lifetime goals: counters that never reset, each with growing tiers ----------
+ const LT=[
+  {k:'pet',i:'💗',t:n=>'Pet Kitty '+n+' times',T:[5,15,30,60,120,250,500,1000]},
+  {k:'feed',i:'🍗',t:n=>'Feed '+n+' bowls of food',T:[5,15,40,80,160,320,640,1200]},
+  {k:'litre',i:'🧹',t:n=>'Clean '+n+' litres of litter sand',T:[1,3,6,12,25,50,100,200],f:1},
+  {k:'water',i:'💧',t:n=>'Fill the water bowl '+n+' times',T:[5,15,40,80,160,320,640]},
+  {k:'play',i:'🧶',t:n=>'Play with Kitty '+n+' times',T:[5,15,35,70,140,280,560]},
+  {k:'cook',i:'🍳',t:n=>'Cook '+n+' dishes',T:[3,10,25,50,100,200]},
+  {k:'photo',i:'📷',t:n=>'Take '+n+' photos',T:[3,10,25,50,100,200]},
+  {k:'goals',i:'🎯',t:n=>'Finish '+n+' daily goals',T:[10,30,70,150,300,600,1200]},
+  {k:'age',i:'🎂',t:n=>'Kitty reaches '+(n<12?n+' months':n/12+(n===12?' year':' years'))+' old',T:[3,6,12,24,36,60,96,120]},
+  {k:'days',i:'📅',t:n=>'Play '+n+' days in a row',T:[2,3,5,7,14,21,30,60,100]}];
+ const LTK={};LT.forEach(l=>{LTK[l.k]=l});LTK.litre=LTK.litre;
+ function ltVal(k){if(k==='age')return Math.floor(ageDays()/30);if(k==='days')return Q.pd.run;return Q.lt[k]||0}
+ const ltRew=(k,i)=>Math.round((20+i*14)*(i+1)/2+(i>=4?i*20:0));
+ function ltChk(k){if(Q.tut!=='done')return;const l=LTK[k];let t=(Q.lc[k]||0);while(t<l.T.length&&ltVal(k)>=l.T[t]){const r=ltRew(k,t);Q.lc[k]=++t;reward(r,l.i+' Milestone: '+l.t(l.T[t-1]));xp(20,'ltm'+k+t);}}
+ function lt(k,n){if(!LTK[k])return;Q.lt[k]=+((Q.lt[k]||0)+n).toFixed(2);ltChk(k)}
+ function ltDays(){const d=new Date(),key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();if(Q.pd.last===key)return;const y=new Date(d.getTime()-864e5),yk=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();Q.pd.run=Q.pd.last===yk?Q.pd.run+1:1;Q.pd.last=key;save()}
+ function ltTick(){try{ltDays();ltChk('age');ltChk('days')}catch(e){}}
+ function ev(name,n,x){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);if(name==='litterL')lt('litre',x||0);else if(LTK[name])lt(name,n);
   if(Q.tut!=='done'){const s=TUT[Q.tut];if(s&&s.ev===name)adv()}
-  if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g.k);reward(Math.round(p.r*.45),p.i+' Goal done!');xp(15,'goal')}}
-   if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=40+10*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
+  if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g);reward(p.r||6,p.i+' Goal done!');xp(8,'goal');lt('goals',1)}}
+   if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=30+5*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
    save()}refresh()}catch(e){}}
  function adv(){const s=TUT[Q.tut];Q.tut++;if(s.r){reward(Math.max(5,Math.round(s.r*.3)),'✅ '+nameT(s.t));xp(25,'tut')}else{try{sound('good')}catch(e){}}if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
  let LD=0;const LK='purrfect-login';function loginBonus(){const dk=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(),t=new Date();let o={};try{o=JSON.parse(localStorage.getItem(LK)||'{}')||{}}catch(e){}if(o.d===dk(t))return;const st=o.d===dk(new Date(t-864e5))?(o.s||0)+1:1;try{localStorage.setItem(LK,JSON.stringify({d:dk(t),s:st}))}catch(e){}const c=20+10*Math.min(st,7);setTimeout(()=>reward(c,'📅 Welcome back! Day '+st),2500)}
@@ -2948,20 +2971,26 @@ var QM=(function(){
  const IDXW=TUT.findIndex(s=>s.guide==='at:foodbowl');
  function catHome(){const U=cat.userData;let x=0,z=0;for(const it of furn.values())if(it.type==='foodbowl'){x=it.x0+.5;z=it.z0+1.5}x=Math.max(HX.x0+.8,Math.min(HX.x1-.8,x));z=Math.max(HX.z0+.8,Math.min(HX.z1-.8,z||0));cat.position.set(x,0,z);if(U.target)U.target.set(x,0,z);U.path=null;U.follow=0;U.happy=0}
  setInterval(()=>{try{if(started&&!OB.on){if(Q.tut!=='done'&&Q.tut>=IDXW&&IDXW>=0&&!inHouse(Math.floor(cat.position.x),Math.floor(cat.position.z)))catHome();if(Q.tut!=='done')poll();refresh();spotTick();gUpdate()}}catch(e){}},140);
+ let ptab='d';
  function panel(){let p=document.getElementById('qPanel');if(p){p.remove();return}p=document.createElement('div');p.id='qPanel';
   p.style.cssText='position:fixed;z-index:50;right:max(12px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 60px);width:min(330px,92vw);max-height:70vh;overflow:auto;background:#fff8e9;border-radius:18px;padding:14px;box-shadow:0 10px 34px #0004;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:13px';
-  let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Today’s goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
-  if(Q.tut==='done'){h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak':'Finish all three to start a streak')+'</div>';
-   for(const g of Q.g){const p=info(g.k);h+='<div style="margin:9px 0;'+(g.d?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+p.i+' '+p.t+(g.d?' ✅':'')+'</span><span>'+g.h+'/'+g.n+' · 🪙'+p.r+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+g.h/g.n*100+'%;background:#2e7658"></i></div></div>'}
-   h+='<div style="font-size:11px;opacity:.7;margin-top:6px">New goals appear every game day. Finish all three for a bonus.</div>'}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
+  if(Q.tut==='done'){const tb=on=>'border:0;border-radius:12px;padding:7px 12px;font-weight:800;font-size:12px;font-family:inherit;'+(on?'background:#2e7658;color:#fff':'background:#fff;color:#24332e');
+   h+='<div style="display:flex;gap:6px;margin:10px 0 2px"><button data-pt="d" style="'+tb(ptab==='d')+'">📅 Daily</button><button data-pt="l" style="'+tb(ptab==='l')+'">🏆 Lifetime</button></div>';
+   if(ptab==='d'){const dn=Q.g.filter(g=>g.d).length;h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak · ':'')+dn+'/'+Q.g.length+' done'+(Q.streak?'':' · finish all to start a streak')+'</div>';
+    for(const g of Q.g){const p=info(g);h+='<div style="margin:9px 0;'+(g.d?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+p.i+' '+p.t+(g.d?' ✅':'')+'</span><span>'+g.h+'/'+g.n+' · 🪙'+(p.r||6)+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+g.h/g.n*100+'%;background:#2e7658"></i></div></div>'}
+    h+='<div style="font-size:11px;opacity:.7;margin-top:6px">Six new goals every game day. Finish them all for a streak bonus.</div>'}
+   else{h+='<div style="font-size:11px;opacity:.7;margin:6px 0">Milestones that keep growing. Each one you reach pays a bigger reward.</div>';
+    for(const l of LT){const t=Q.lc[l.k]||0,done=t>=l.T.length,tg=l.T[Math.min(t,l.T.length-1)],v=ltVal(l.k),sh=l.k==='age'?v:(l.f?+v.toFixed(1):Math.floor(v));
+     h+='<div style="margin:9px 0;'+(done?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800;gap:8px"><span>'+l.i+' '+l.t(tg)+(done?' ✅':'')+'</span><span style="white-space:nowrap">'+(done?'All done':(l.k==='age'?sh+'/'+tg+' mo':sh+'/'+tg)+' · 🪙'+ltRew(l.k,t))+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,v/tg*100)+'%;background:#f3a23a"></i></div><div style="font-size:10px;opacity:.6;margin-top:2px">Tier '+Math.min(t+1,l.T.length)+' of '+l.T.length+'</div></div>'}}}
   else{const secs=[];TUT.forEach((s,i)=>{const t=nameT(s.t),L=secs[secs.length-1];if(L&&L.t===t){L.b=i}else secs.push({t,a:i,b:i})});secs.forEach(S=>{const d=S.b<Q.tut,c=Q.tut>=S.a&&Q.tut<=S.b;h+='<div style="margin:7px 0;'+(d?'opacity:.55':'')+'"><b>'+(d?'✅':c?'👉':'⬜')+' '+escH(S.t)+'</b>'+(c?'<div style="font-weight:600;opacity:.85;margin-left:22px">'+escH(nameT(TUT[Q.tut].h))+'</div>':'')+'</div>'});h+='<button id="qSkip" style="margin-top:8px;border:0;background:#fff;border-radius:12px;padding:8px 12px;font-weight:700;font-size:12px">Skip the guide</button>'}
-  p.innerHTML=h;document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#qX').onclick=()=>p.remove();const sk=p.querySelector('#qSkip');if(sk)sk.onclick=()=>{Q.tut='done';save();p.remove();newDay();refresh()}}
+  p.innerHTML=h;document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#qX').onclick=()=>p.remove();p.querySelectorAll('[data-pt]').forEach(b=>b.onclick=()=>{ptab=b.dataset.pt;const t=p.scrollTop;p.remove();panel();const n=document.getElementById('qPanel');if(n)n.scrollTop=t});const sk=p.querySelector('#qSkip');if(sk)sk.onclick=()=>{Q.tut='done';save();p.remove();newDay();refresh()}}
  function init(){if(Q.tv!==3){Q.tv=3;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
  setTimeout(()=>{try{init();refresh()}catch(e){}},0);
- function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();refresh()}
+ function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();ltTick();refresh()}
  return {ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
 })();
-function qev(n,c){try{QM.ev(n,c)}catch(e){}}
+function qev(n,c,x){try{QM.ev(n,c,x)}catch(e){}}
 // ===== Kitty's personality and little random events =====
 // Each cat gets one personality the first time you play. It nudges how your cat behaves and which surprises you get.
 var PM={love:1,hunger:1,play:1,relax:1,wander:1};
