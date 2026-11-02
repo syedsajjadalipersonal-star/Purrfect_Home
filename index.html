@@ -179,7 +179,10 @@ show(0);window.__spTimer=setInterval(()=>{i=(i+1)%sc.length;show(i)},3300);
  const auto=!!(navigator&&navigator.webdriver);
  function set(v,ms){p=Math.max(p,v);if(fill){fill.style.transitionDuration=(ms||500)+'ms';fill.style.transform='scaleX('+Math.max(.04,p)+')'}if(pct)pct.textContent=Math.round(p*100)+'%'}
  function hide(now){if(gone)return;gone=true;clearInterval(window.__spTimer);sp.classList.add('out');setTimeout(()=>{sp.style.display='none'},now?0:650)}
- function done(){if(fin)return;fin=true;set(1,300);if(msg)msg.textContent='Ready!';const wait=auto?0:Math.max(0,3600-(performance.now()-t0));setTimeout(()=>hide(),wait+250)}
+ function done(){if(fin)return;fin=true;set(1,300);if(msg)msg.textContent='Ready!';
+  try{if(window.__splash3d&&(!auto||location.hash==='#splash')){const st=sp.querySelector('.spstage'),cv=document.createElement('canvas');cv.width=400;cv.height=278;cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .5s;z-index:2';st.appendChild(cv);
+   if(window.__splash3d(cv,()=>hide(),6900)){requestAnimationFrame(()=>{cv.style.opacity=1});sp.addEventListener('pointerdown',()=>{try{window.__spFinish()}catch(e){hide()}},{once:true});return}else cv.remove()}}catch(e){}
+  const wait=auto?0:Math.max(0,3600-(performance.now()-t0));setTimeout(()=>hide(),wait+250)}
  window.__splash={set,done,hide};set(.12,400);
  let c=.12;const cr=setInterval(()=>{if(fin||gone){clearInterval(cr);return}c+=(.46-c)*.05;set(c,400)},200);
 })();
@@ -4249,6 +4252,90 @@ function ocClear(ax,az,bx,bz){return;for(const e of edges.values()){const g=e.in
  for(const it of furn.values()){const g=it.group;if(!g||!g.visible||!OC_TALL[it.type])continue;if(ocBlocks(it.x0+it.fw/2,it.z0+it.fd/2,ax,az,bx,bz,.9)){g.visible=false;OC.hid.push(g)}}}
 let prev=performance.now(),elapsed=0,uiT=0,saveT=0;const camTarget=new THREE.Vector3(),camDesired=new THREE.Vector3(),camTargetWant=new THREE.Vector3();
 window.addEventListener('error',ev=>{try{toast('⚠️ '+(ev.message||'error'))}catch(_){}});window.addEventListener('unhandledrejection',ev=>{try{toast('⚠️ '+(ev.reason&&ev.reason.message||'error'))}catch(_){}});
+// ===== splash showcase: the real cat, in 3D with the game's own graphics, doing little things =====
+var SPL={on:false};
+window.__splash3d=function(canvas,onEnd,ms,first){
+ if(SPL.on||!canvas)return false;
+ let ok=false;
+ try{
+  const W=canvas.width,H=canvas.height,rt=new THREE.WebGLRenderTarget(W,H);rt.texture.encoding=THREE.sRGBEncoding;
+  const buf=new Uint8Array(W*H*4),ctx2=canvas.getContext('2d'),img=ctx2.createImageData(W,H);
+  const ss=new THREE.Scene();ss.background=new THREE.Color('#f7e0b8');
+  ss.add(new THREE.HemisphereLight('#fff6e2','#b99b77',.6));const dl=new THREE.DirectionalLight('#fff0d0',1.0);dl.position.set(3,5,5);ss.add(dl);
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(16,9),M.floor);fl.rotation.x=-Math.PI/2;fl.position.set(0,0,0);ss.add(fl);
+  const wl=new THREE.Mesh(new THREE.PlaneGeometry(16,5),new THREE.MeshStandardMaterial({color:'#efcf9c',roughness:.95}));wl.position.set(0,2.5,-2.4);ss.add(wl);
+  const bb=new THREE.Mesh(new THREE.BoxGeometry(16,.18,.08),new THREE.MeshStandardMaterial({color:'#fff3da',roughness:.8}));bb.position.set(0,.09,-2.36);ss.add(bb);
+  const win=new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.7),new THREE.MeshBasicMaterial({color:'#bfe3f2'}));win.position.set(-2.1,1.9,-2.37);ss.add(win);
+  for(const [x,y,w,h] of [[-2.1,1.9,1.5,.08],[-2.1,1.9,.08,1.9],[-2.1,2.75,1.5,.08],[-2.1,1.05,1.5,.08],[-2.75,1.9,.08,1.9],[-1.45,1.9,.08,1.9]]){const f=new THREE.Mesh(new THREE.BoxGeometry(w,h,.06),new THREE.MeshStandardMaterial({color:'#fffaf0',roughness:.6}));f.position.set(x,y,-2.34);ss.add(f)}
+  const rug=new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,.02,40),new THREE.MeshStandardMaterial({color:'#d9707c',roughness:.95}));rug.scale.z=.55;rug.position.set(.2,.012,.2);ss.add(rug);
+  const rug2=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.35,.025,40),new THREE.MeshStandardMaterial({color:'#f3b79c',roughness:.95}));rug2.scale.z=.55;rug2.position.set(.2,.014,.2);ss.add(rug2);
+  const treeG=new THREE.Group();FURN.tree.make(treeG);treeG.scale.setScalar(1.6);treeG.position.set(2.4,0,-.5);ss.add(treeG);
+  const mouseG=new THREE.Group();FURN.mouse.make(mouseG);mouseG.scale.setScalar(2.6);ss.add(mouseG);
+  const bf=new THREE.Group(),wingM=[new THREE.MeshBasicMaterial({color:'#b99af0',side:THREE.DoubleSide}),new THREE.MeshBasicMaterial({color:'#f09ac4',side:THREE.DoubleSide})];
+  const wings=[-1,1].map(s=>{const g=new THREE.Group(),a=new THREE.PlaneGeometry(.2,.16);a.translate(s*.1,.03,0);const b=new THREE.PlaneGeometry(.14,.12);b.translate(s*.07,-.09,0);g.add(new THREE.Mesh(a,wingM[0]),new THREE.Mesh(b,wingM[1]));g.rotation.x=-Math.PI/2;bf.add(g);return g});
+  bf.add(new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),new THREE.MeshBasicMaterial({color:'#5a3b52'})));ss.add(bf);
+  const cam=new THREE.PerspectiveCamera(33,W/H,.1,60);
+  // take the real cat out of the game world for a moment
+  const par=cat.parent,sv={x:cat.position.x,y:cat.position.y,z:cat.position.z,ry:cat.rotation.y,s:cat.scale.x};
+  ss.add(cat);cat.scale.setScalar(1.5);cat.visible=true;SPL.on=true;
+  const exposure=renderer.toneMappingExposure;renderer.toneMappingExposure=.95;
+  const T=3.4,N=4,s0=first===undefined?Math.floor(Math.random()*N):first,t0=performance.now();let raf=0,lastDraw=0,done=false;
+  const sm=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)},mix=(a,b,k)=>a+(b-a)*k,cl=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const CAMS=[[.45,.8,1.9,.45,.4],[1.45,1.5,3.9,1.45,1.05],[-.1,.8,2.5,-.1,.38],[0,.75,1.6,0,.42]];
+  let cp=null;
+  function rest(t){legs.forEach(l=>{l.rotation.set(0,0,0);l.position.y=.34;l.scale.y=1});catBody.rotation.set(0,0,0);catBody.position.set(0,0,0);catBody.scale.y=1;catHead.position.set(0,.74,.52);catHead.rotation.set(0,0,0);tail.rotation.set(-.8+Math.sin(t*3)*.18,0,Math.sin(t*2)*.25);cat.position.y=0;cat.rotation.set(0,0,0);catTongue.visible=false}
+  function sit(w,t){catBody.rotation.x=-.85*w;catBody.position.y+=.2*w;legs[0].rotation.x=.85*w;legs[1].rotation.x=.85*w;legs[2].rotation.x=-1.35*w;legs[3].rotation.x=-1.35*w;legs[2].scale.y=legs[3].scale.y=1-.45*w;catHead.rotation.x+=.55*w;tail.rotation.x=mix(tail.rotation.x,-2.2+Math.sin(t*2)*.12,w);cat.position.y-=.02*w}
+  function gait(ph,A){const p4=[0,Math.PI,Math.PI,0];legs.forEach((l,i)=>{const q=ph+p4[i];l.rotation.x=Math.sin(q)*A;l.position.y=.34+Math.max(0,Math.cos(q))*.05});catBody.position.y+=Math.abs(Math.sin(ph))*.05}
+  function leap(w){legs[0].rotation.x=mix(legs[0].rotation.x,-1.05,w);legs[1].rotation.x=mix(legs[1].rotation.x,-1.05,w);legs[2].rotation.x=mix(legs[2].rotation.x,.95,w);legs[3].rotation.x=mix(legs[3].rotation.x,.95,w);catBody.rotation.x+=-.3*w;tail.rotation.x=mix(tail.rotation.x,-.2,w)}
+  function pose(si,u,t){
+   rest(t);bf.visible=si===0;bf.scale.setScalar(1.9);mouseG.visible=si===2;
+   if(si===0){ // a butterfly
+    cat.position.set(-.1,0,0);cat.rotation.y=.75;
+    const bx=.65+Math.sin(t*1.7)*.35-sm((u-.78)/.2)*1.2,by=.85+Math.sin(t*2.6)*.2+sm((u-.78)/.2)*1.0,bz=.3+Math.cos(t*1.7)*.2;
+    const pu=sm((u-.5)/.12)*(1-sm((u-.72)/.1)),jump=Math.sin(cl((u-.52)/.22,0,1)*Math.PI);
+    const bxx=u>.5&&u<.74?mix(.65+Math.sin(t*1.7)*.35,.45,sm((u-.5)/.12)):bx;
+    bf.position.set(bxx,u>.5&&u<.74?mix(by,.55,pu):by,bz);bf.rotation.set(0,Math.sin(t*3)*.6,0);
+    wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.15+.9*Math.abs(Math.sin(t*26))));
+    sit(1-pu,t);const a=Math.atan2(bf.position.x-cat.position.x,bf.position.z-cat.position.z)-cat.rotation.y;catHead.rotation.y=cl(a,-.9,.9)*.9;catHead.rotation.x+=-.25*(1-pu)+(bf.position.y-.9)*-.3;
+    cat.position.x+=jump*.4;cat.position.y+=jump*.4;leap(jump);catBody.rotation.x+=-.35*jump;
+   }else if(si===1){ // the cat tree
+    cat.rotation.y=Math.PI/2;const s=1.6,midY=.535*s,topY=1.235*s,tx=2.4;
+    const w1=cl(u/.3,0,1),j1=cl((u-.3)/.14,0,1),j2=cl((u-.6)/.16,0,1);
+    let x=mix(.1,1.5,sm(w1)),y=0;
+    if(u>=.3){x=mix(1.5,tx+.1,sm(j1));y=mix(0,midY,sm(j1))+Math.sin(j1*Math.PI)*.4}
+    if(u>=.6){x=mix(tx+.1,tx,sm(j2));y=mix(midY,topY,sm(j2))+Math.sin(j2*Math.PI)*.45}
+    cat.position.set(x,y,-.45);
+    if(u<.3)gait(t*13,.5);else if(u<.74){leap(Math.sin(cl((u<.6?(u-.3)/.14:(u-.6)/.16),0,1)*Math.PI)*1.1);if(u>=.44&&u<.6){catHead.rotation.x-=.45}}
+    else{const k=sm((u-.74)/.12);sit(k*.8,t);cat.rotation.y=mix(Math.PI/2,.35,k);catHead.rotation.x-=.15*k}
+   }else if(si===2){ // a toy mouse
+    const ph=t*15,mx=mix(.3,3.2,u*u*.6+u*.4),mz=.1+Math.sin(u*14)*.35*(1-u);
+    mouseG.position.set(mx,0,mz);mouseG.rotation.y=Math.sin(u*14)*.45*(1-u);
+    const cx=mix(-1.6,.75,sm(u/.78)),pu=cl((u-.74)/.2,0,1);
+    cat.rotation.y=Math.PI/2-.12;cat.position.set(cx+Math.sin(pu*Math.PI)*.0,Math.sin(pu*Math.PI)*.45,mz*.7);
+    if(u<.78)gait(ph,.62);else{leap(Math.sin(pu*Math.PI));const sl=sm((u-.9)/.1);catHead.rotation.y=Math.sin(t*3)*.5*sl;sit(sl*.5,t)}
+    catBody.rotation.x+=.0;tail.rotation.x=-.2+Math.sin(t*9)*.15;
+   }else{ // washing up
+    cat.position.set(0,0,0);cat.rotation.y=1.0;sit(1,t);
+    const k=sm(u/.18)*(1-sm((u-.9)/.1)),lk=Math.sin(t*11)*.5+.5;
+    legs[0].rotation.x=mix(legs[0].rotation.x,-1.6-lk*.2,k);catHead.rotation.x+=.2*k+lk*.08*k;catHead.rotation.y+=-.5*k;catTongue.visible=k>.5&&lk>.4;if(catTongue.visible){catTongue.position.z=.268+.03*lk}
+   }
+   const c=CAMS[si];if(!cp)cp=c.slice();for(let i=0;i<5;i++)cp[i]=mix(cp[i],c[i],.07);cam.position.set(cp[0],cp[1],cp[2]);cam.lookAt(cp[3],cp[4],0);
+  }
+  function draw(){const old=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ss,cam);renderer.readRenderTargetPixels(rt,0,0,W,H,buf);renderer.setRenderTarget(old);
+   const d=img.data;for(let y=0;y<H;y++){const so=(H-1-y)*W*4,dofs=y*W*4;for(let k=0;k<W*4;k++)d[dofs+k]=buf[so+k]}ctx2.putImageData(img,0,0)}
+  function frame(now){raf=requestAnimationFrame(frame);if(done||window.__spHold)return;const t=Math.max(0,(now-t0)/1000),k=t/T,si=(s0+Math.floor(k))%N,u=k-Math.floor(k);
+   try{pose(si,u,t)}catch(e){console.warn('splash3d pose',e)}
+   if(now-lastDraw>45){lastDraw=now;try{draw()}catch(e){console.warn('splash3d draw',e);finish()}}
+   if(t*1000>(ms||6800))finish()}
+  function finish(){if(done)return;done=true;cancelAnimationFrame(raf);
+   try{ss.remove(cat);par.add(cat);cat.position.set(sv.x,sv.y,sv.z);cat.rotation.set(0,sv.ry,0);cat.scale.setScalar(sv.s);rest(0)}catch(e){}
+   renderer.toneMappingExposure=exposure;SPL.on=false;try{rt.dispose()}catch(e){}
+   try{onEnd&&onEnd()}catch(e){}}
+  window.__spFinish=finish;window.__spPose=(si,u)=>{pose(si,u,u*3);draw()};
+  ok=true;raf=requestAnimationFrame(frame);
+ }catch(e){console.warn('splash3d',e);try{if(cat.parent!==scene)scene.add(cat)}catch(_){}SPL.on=false;ok=false}
+ return ok}
+
 let animErr=0;function animate(now){requestAnimationFrame(animate);try{animateInner(now)}catch(e){if(animErr++<3){try{console.error(e);toast('⚠️ '+(e&&e.message||e))}catch(_){}}try{renderer.render(scene,camera)}catch(_){}}}
 let TC=null;
 function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRecovered.shown){const r=window.__saveRecovered;r.shown=true;setTimeout(()=>toast(r.lost?'⚠️ Part of your save was damaged and could not be restored':'📦 Your save was damaged, so it was restored from a backup'),1500)}
@@ -4277,7 +4364,7 @@ function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRec
  duvetTick(dt);
  if(!seat&&!act&&!CI.on&&!KP.on&&!GE.on){body.position.y=walking?Math.abs(Math.sin(elapsed*10))*.045:Math.sin(elapsed*2)*.012;
  collide(player.position,.3,false);player.position.y+=(groundY(player.position.x,player.position.z)+.05-player.position.y)*Math.min(1,dt*15)}
- try{medTick(dt)}catch(e){}if(started&&!SH.on&&!STU.on)updateCat(dt);if(!SH.on){poseCat(dt,elapsed);petGameTick(dt)}scoopTick(dt);shopTick(dt);try{QM.tick(dt);PERS.tick(dt)}catch(e){}try{if(started&&!AU.begun)AU.begin();AU.tick(dt,Math.floor(mins/60)%24,SH.on||floorAt(player.position.x,player.position.z))}catch(e){}try{lightTick(dt,floorAt(player.position.x,player.position.z),dayNightK())}catch(e){}try{sssTick(dt)}catch(e){}shopImgTick();if(walking&&!SH.on&&!SH.tr){const ddx=player.position.x,ddz=player.position.z;if(shopDoorZone(ddx,ddz))enterShop('shop');else if(hospDoorZone(ddx,ddz))enterShop('hosp');else if(cafeDoorZone(ddx,ddz))enterShop('cafe');else if(grocDoorZone(ddx,ddz))enterShop('groc')}simulate(dt);
+ try{medTick(dt)}catch(e){}if(started&&!SH.on&&!STU.on&&!SPL.on)updateCat(dt);if(!SH.on&&!SPL.on){poseCat(dt,elapsed);petGameTick(dt)}scoopTick(dt);shopTick(dt);try{QM.tick(dt);PERS.tick(dt)}catch(e){}try{if(started&&!AU.begun)AU.begin();AU.tick(dt,Math.floor(mins/60)%24,SH.on||floorAt(player.position.x,player.position.z))}catch(e){}try{lightTick(dt,floorAt(player.position.x,player.position.z),dayNightK())}catch(e){}try{sssTick(dt)}catch(e){}shopImgTick();if(walking&&!SH.on&&!SH.tr){const ddx=player.position.x,ddz=player.position.z;if(shopDoorZone(ddx,ddz))enterShop('shop');else if(hospDoorZone(ddx,ddz))enterShop('hosp');else if(cafeDoorZone(ddx,ddz))enterShop('cafe');else if(grocDoorZone(ddx,ddz))enterShop('groc')}simulate(dt);
  uiT+=dt;if(uiT>.25){uiT=0;updateUI();updateSeatBtn();const h=Math.floor(mins/60)%24,m=Math.floor(mins%60);{const ap=document.getElementById('agePill');if(ap)ap.textContent='🐱 '+ageText();const mo=Math.floor(ageDays()/30);if(window.__lastMo===undefined)window.__lastMo=mo;else if(mo>window.__lastMo){window.__lastMo=mo;toast('🎂 Kitty is now '+(mo>=12&&mo%12===0?mo/12+' year'+(mo>=24?'s':''):mo+' months')+' old!')}}document.getElementById('clock').textContent=`${h>=6&&h<18?'☀️':'🌙'} Day ${day} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
  saveT+=dt;if(saveT>5){saveT=0;saveBuild();saveCat();sbBackup();try{localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}}
  const px=player.position.x,pz=player.position.z,onLot=Math.abs(px)<8&&Math.abs(pz)<7;
@@ -4307,8 +4394,8 @@ function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRec
  else if(STU.on){stuCam(dt)}
  else if((TC=QM.cam())){scene.fog.near=fogN;scene.fog.far=fogF;const d=TC[2],yw=TC[4];camTarget.set(TC[0],1.2,TC[1]);camDesired.set(TC[0]+Math.sin(yw)*d,TC[3],TC[1]+Math.cos(yw)*d);cameraYaw=yw}
  else{scene.fog.near=fogN;scene.fog.far=fogF;camTarget.set(px,player.position.y+1.7,pz);if(!SH.on)ocClear(camera.position.x,camera.position.z,px,pz);camDesired.set(px+Math.sin(cameraYaw)*(SH.on?5.2:7),player.position.y+1.9+cameraPitch*4.5,pz+Math.cos(cameraYaw)*(SH.on?5.2:7))}
- cineCam(dt);camera.position.lerp(camDesired,1-Math.pow(.001,dt));camera.lookAt(camTarget);renderer.render(scene,camera);if(PHO.snap)photoGrab()}
-window.__cfErr=0;window.purrDebug=()=>({catchUp,hospEndVisit,hospTick,hospStartVisit,bookService,HP,HV,SH,enterShop,hospFinish,setDay:v=>{day=v},stats,openHospMenu,SICK,INV,svcState,openCatInfo,medTick,MED,KP,startKneelPet,petChoose,stuOpen,stuClose,STU,openWardrobe,catHeadRef:()=>catHead,CINE,cineGo,LIFE,SICK,startTask,setMins:v=>{mins=v},accGroups,applyWorn,toggleWear,addFurn,napTarget,deskWork,coffeeBrew,openFridge,openFeedMenu,openLitterMenu,openShopMenu,openHospMenu,FURN,makeFurnModel,homeScore,furn,FGROUPS,BEN,TIP,build,tptsN:()=>tpts.size,bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{mins=v},getDay:()=>day,setDay:v=>{day=v},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
+ cineCam(dt);camera.position.lerp(camDesired,1-Math.pow(.001,dt));camera.lookAt(camTarget);if(!SPL.on)renderer.render(scene,camera);if(PHO.snap)photoGrab()}
+window.__cfErr=0;window.purrDebug=()=>({catchUp,hospEndVisit,hospTick,hospStartVisit,bookService,HP,HV,SH,enterShop,hospFinish,setDay:v=>{day=v},stats,openHospMenu,SICK,INV,svcState,openCatInfo,medTick,MED,KP,startKneelPet,petChoose,stuOpen,stuClose,STU,openWardrobe,catHeadRef:()=>catHead,catRef:()=>cat,CINE,cineGo,LIFE,SICK,startTask,setMins:v=>{mins=v},accGroups,applyWorn,toggleWear,addFurn,napTarget,deskWork,coffeeBrew,openFridge,openFeedMenu,openLitterMenu,openShopMenu,openHospMenu,FURN,makeFurnModel,homeScore,furn,FGROUPS,BEN,TIP,build,tptsN:()=>tpts.size,bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{mins=v},getDay:()=>day,setDay:v=>{day=v},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));layoutView()});window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
 requestAnimationFrame(animate);
 document.getElementById('start').addEventListener('click',()=>{started=true;document.getElementById('welcome').style.display='none';toast(furn.size||edges.size?'Welcome back, '+(PNAME||'friend')+'! '+CNAME+' is waiting 🐱':'Welcome, '+(PNAME||'friend')+'! 🏡')});
