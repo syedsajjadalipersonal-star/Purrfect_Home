@@ -351,7 +351,7 @@ function buildEdge(parent,x,z,o,type,style){const L=1+WT,T2=WT+.05,g=group(paren
  else if(type==='window'){
   wb(0,SILL/2,0,L,SILL,WT);wb(0,(WIN_TOP+WH)/2,0,L,WH-WIN_TOP,WT);for(const s of [-1,1])wb(s*.53,(SILL+WIN_TOP)/2,0,.16,WIN_TOP-SILL,WT);
   const cy=(SILL+WIN_TOP)/2,ch=WIN_TOP-SILL;box(g,0,cy,0,.9,ch,.025,M.glass,false);
-  box(g,0,SILL+.02,0,1.0,.05,WT+.12,M.white,false);box(g,0,WIN_TOP-.02,0,.96,.05,T2,M.white,false);for(const s of [-1,1])box(g,s*.455,cy,0,.05,ch,T2,M.white,false);
+  box(g,0,SILL+.02,0,1.0,.05,1.0,M.white,false);box(g,0,WIN_TOP-.02,0,.96,.05,T2,M.white,false);for(const s of [-1,1])box(g,s*.455,cy,0,.05,ch,T2,M.white,false);
   box(g,0,cy,0,.035,ch,.05,M.white,false);box(g,0,cy,0,.9,.035,.05,M.white,false)}
  else wb(0,WH/2,0,L,WH,WT);
  return info}
@@ -567,7 +567,7 @@ const CP_LEGACY={classic:'mackerel',ticked:'mackerel',torbie:'mackerel',patched:
 let catSpec=null;
 function catDefaults(id){const b=CB_BY[id]||CB_BY[CB_LEGACY[id]]||CB_BY.persian;return {breed:b[0],p:b[7],c:b[8],eye:b[9]}}
 function catNorm(sp){sp=Object.assign({},sp||{});if(!CB_BY[sp.breed]){const nb=CB_LEGACY[sp.breed]||'persian';sp=Object.assign(catDefaults(nb),{p:sp.p,c:sp.c,eye:sp.eye},{breed:nb});}
- if(CP_LEGACY[sp.p])sp.p=CP_LEGACY[sp.p];if(!CPAT.some(q=>q[0]===sp.p))sp.p=CB_BY[sp.breed][7];if(!CCOL[sp.c])sp.c=CB_BY[sp.breed][8];if(!CEYE[sp.eye])sp.eye=CB_BY[sp.breed][9];return sp}
+ sp.sex=sp.sex==='m'?'m':'f';if(CP_LEGACY[sp.p])sp.p=CP_LEGACY[sp.p];if(!CPAT.some(q=>q[0]===sp.p))sp.p=CB_BY[sp.breed][7];if(!CCOL[sp.c])sp.c=CB_BY[sp.breed][8];if(!CEYE[sp.eye])sp.eye=CB_BY[sp.breed][9];return sp}
 
 // ---- procedural helpers
 const hash3=(x,y,z)=>{const h=Math.sin(x*127.1+y*311.7+z*74.7)*43758.5453;return h-Math.floor(h)};
@@ -791,6 +791,7 @@ function ctSheet(){const sp=ctSpec();const on=(a,b)=>a===b?'on':'';
  const row=(t,items)=>'<div class="lk"><i>'+t+'</i>'+items+'</div>';
  ctEl.innerHTML='<div class="fh"><span>🐱 Pick your kitten’s look</span><button class="fx" type="button" data-x="1">✕</button></div><canvas id="catPv"></canvas><div class="lkw">'
   +row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''))
+  +row('Gender',[['f','Girl'],['m','Boy']].map(q=>'<button type="button" data-ck="sex" data-v="'+q[0]+'" class="'+on(sp.sex,q[0])+'">'+q[1]+'</button>').join(''))
   +row('Coat pattern',CPAT.map(q=>'<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'">'+q[1]+'</button>').join(''))
   +row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''))
   +row('Eyes',Object.keys(CEYE).map(k=>'<button type="button" data-ck="eye" data-v="'+k+'" class="'+on(sp.eye,k)+'">'+CEYE[k][1]+'</button>').join(''))+'</div>';
@@ -815,7 +816,7 @@ function ctOpen(){if(LOCKED)return;stuOpen('cat')}
 function ctClose(){stuClose()}
 ctBtn.addEventListener('click',e=>{e.stopPropagation();ctOpen()});ctBtn.addEventListener('pointerdown',e=>e.stopPropagation());
 ctEl.addEventListener('pointerdown',e=>e.stopPropagation());
-ctEl.addEventListener('click',e=>{e.stopPropagation();const t=e.target.closest('button');if(!t)return;if(t.dataset.x){ctClose();return}if(t.dataset.ck){const k=t.dataset.ck,v=t.dataset.v;let sp=ctSpec();if(k==='breed')sp=catDefaults(v);else sp=Object.assign({},sp,{[k]:v});const sl=ctEl.querySelector('.lkw'),top=sl?sl.scrollTop:0;catRebuild(sp);const pv=CPV;ctSheet();const sl2=ctEl.querySelector('.lkw');if(sl2)sl2.scrollTop=top;if(!ctRaf)ctRaf=requestAnimationFrame(ctLoop);try{sound()}catch(e2){}}});
+ctEl.addEventListener('click',e=>{e.stopPropagation();const t=e.target.closest('button');if(!t)return;if(t.dataset.x){ctClose();return}if(t.dataset.ck){const k=t.dataset.ck,v=t.dataset.v;let sp=ctSpec();if(k==='breed')sp=Object.assign(catDefaults(v),{sex:sp.sex});else sp=Object.assign({},sp,{[k]:v});const sl=ctEl.querySelector('.lkw'),top=sl?sl.scrollTop:0;catRebuild(sp);const pv=CPV;ctSheet();const sl2=ctEl.querySelector('.lkw');if(sl2)sl2.scrollTop=top;if(!ctRaf)ctRaf=requestAnimationFrame(ctLoop);try{sound()}catch(e2){}}});
 // ===== Studio: full-screen character / cat creator rendered by the real game renderer (HD, true lighting, orbit + zoom) =====
 const STU={on:false,kind:'',tab:'',oc:'all',yaw:0,pitch:.14,z:0,zt:0,t:0,idle:0,hid:[],lights:null,fit:3,ptr:new Map(),pd:0,saved:null,ez:0,ctr:new THREE.Vector3(),hv:new THREE.Vector3()};
 {const st=document.createElement('style');st.textContent='#stu{position:fixed;inset:0;z-index:26;display:none;pointer-events:none;font-family:Nunito,ui-rounded,system-ui,-apple-system,sans-serif;color:#24332e;-webkit-user-select:none;user-select:none;--pw:min(430px,45vw);--ph:0px}#stu.on{display:block}'
@@ -849,7 +850,7 @@ function stuRender(){const sc=stuPanel.querySelector('.sg'),top=sc?sc.scrollTop:
     +OUTFITS.filter(o=>(STU.oc==='all'||o.c===STU.oc)&&!(OB.on&&OPRICE[o.id])).map(o=>'<button type="button" class="oc'+(INV.outfit===o.id?' on':'')+'" data-o="'+o.id+'"><div class="sw"><i style="background:'+o.top+'"></i><i style="background:'+o.bot+'"></i><span>'+o.ic+'</span></div><b>'+o.n+'</b>'+(ownsO(o.id)?'':'<em>🪙 '+OPRICE[o.id]+'</em>')+'</button>').join('')+'</div>'}
   else h+=LK_OPT.filter(o=>STU_GROUPS[STU.tab].includes(o[0])).map(([k,n,opts])=>'<div class="lk"><i>'+n+'</i>'+opts.map(o=>{const col=typeof o==='string',v=col?o:o[0],cur=PLK[k]===undefined?null:PLK[k];return '<button type="button" data-k="'+k+'" data-v="'+v+'" class="'+(col?'c ':'')+((cur===v||(cur===null&&v===null))?'on':'')+'"'+(col?' style="background:'+o+'" aria-label="'+n+'"':'')+'>'+(col?'':o[1])+'</button>'}).join('')+'</div>').join('')}
  else{const sp=catSpec||catDefaults('persian'),row=(t,it)=>'<div class="lk"><i>'+t+'</i>'+it+'</div>';
-  if(STU.tab==='breed')h+=row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''));
+  if(STU.tab==='breed')h+=row('Breed',CBREEDS.map(b=>'<button type="button" data-ck="breed" data-v="'+b[0]+'" class="'+on(sp.breed,b[0])+'">'+b[1]+'</button>').join(''))+row('Gender',[['f','Girl'],['m','Boy']].map(q=>'<button type="button" data-ck="sex" data-v="'+q[0]+'" class="'+on(sp.sex,q[0])+'">'+q[1]+'</button>').join(''));
   else if(STU.tab==='coat')h+=row('Coat pattern',CPAT.map(q=>'<button type="button" data-ck="p" data-v="'+q[0]+'" class="'+on(sp.p,q[0])+'">'+q[1]+'</button>').join(''))+row('Colour',Object.keys(CCOL).map(k=>'<button type="button" title="'+CCOL[k][2]+'" aria-label="'+CCOL[k][2]+'" data-ck="c" data-v="'+k+'" class="c '+on(sp.c,k)+'" style="background:'+CCOL[k][0]+'"></button>').join(''));
   else h+=row('Eyes',Object.keys(CEYE).map(k=>'<button type="button" data-ck="eye" data-v="'+k+'" class="'+on(sp.eye,k)+'">'+CEYE[k][1]+'</button>').join(''))}
  h+='</div>';stuPanel.innerHTML=h;const s2=stuPanel.querySelector('.sg');if(s2)s2.scrollTop=top;
@@ -904,7 +905,7 @@ stuPanel.addEventListener('click',e=>{e.stopPropagation();const t=e.target.close
  if(d.oc){STU.oc=d.oc;stuRender();return}
  if(d.k){const k=d.k;let v=d.v;if(k==='nose'||k==='glasses')v=+v;else if(v==='null')v=null;PLK[k]=v;applyLook(true);try{sound()}catch(_){}stuRender();return}
  if(d.o){const id=d.o;if(!ownsO(id)){const pr=OPRICE[id];if(coins()<pr){noCoins(pr);return}WALLET.base-=pr;INV.outs[id]=1;sound();saveBuild()}applyOutfit(id);stuRender();return}
- if(d.ck){const k=d.ck,v=d.v;let sp=catSpec||catDefaults('persian');if(k==='breed')sp=catDefaults(v);else sp=Object.assign({},sp,{[k]:v});catRebuild(sp);try{sound()}catch(_){}stuRender()}});
+ if(d.ck){const k=d.ck,v=d.v;let sp=catSpec||catDefaults('persian');if(k==='breed')sp=Object.assign(catDefaults(v),{sex:sp.sex});else sp=Object.assign({},sp,{[k]:v});catRebuild(sp);try{sound()}catch(_){}stuRender()}});
 addEventListener('keydown',e=>{if(STU.on&&e.key==='Escape'&&!OB.on)stuClose()});
 var PNAME='',CNAME='Kitty';try{PNAME=localStorage.getItem('purrfect-name')||'';CNAME=localStorage.getItem('purrfect-catname')||'Kitty'}catch(e){}
 const OB={on:false,el:null},OBSKIP=LOCKED&&!!PNAME;
@@ -1593,7 +1594,7 @@ function petGameTick(dt){if(!PG.on)return;
 const KP={on:false,t:0,kn:0,q:[-1.2,-.3,-1.0],end:false,hb:0,sx:0,sz:0,yw:0};
 {const st=document.createElement('style');st.textContent='#petPick{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(100vw,520px);z-index:9;display:none;background:rgba(255,248,233,.98);border-radius:24px 24px 0 0;padding:12px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -6px 28px rgba(36,51,46,.28);font:800 15px system-ui,-apple-system,sans-serif;color:#24332e;text-align:center}#petPick .pk{display:flex;gap:10px;margin-top:10px}#petPick button{flex:1;border:2px solid #eadfc4;background:#fff;border-radius:18px;padding:12px 6px;font:800 14px system-ui;color:#24332e;touch-action:manipulation}#petPick button small{display:block;font-weight:600;opacity:.65;margin-top:3px;font-size:11px}#petPick .x{flex:0 0 auto;padding:12px 14px}';document.head.appendChild(st)}
 const ppEl=document.createElement('div');ppEl.id='petPick';ppEl.innerHTML='<div>How would you like to pet Kitty? 💗</div><div class="pk"><button type="button" data-m="lift">🤲 Pick up<small>Hold her in your arms · timing game</small></button><button type="button" data-m="kneel">🐾 Pet<small>Kneel beside her · timing game</small></button><button type="button" class="x" data-m="no" aria-label="Cancel">✕</button></div>';document.body.appendChild(ppEl);
-function petChoose(){ppEl.style.display='block';document.body.classList.add('petting')}
+function petChoose(){if(isTom())ppEl.querySelectorAll('small').forEach(e=>{e.textContent=pr(e.textContent)});ppEl.style.display='block';document.body.classList.add('petting')}
 ppEl.addEventListener('pointerdown',e=>e.stopPropagation());
 ppEl.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;ppEl.style.display='none';document.body.classList.remove('petting');if(b.dataset.m==='lift')startPetGame(false);else if(b.dataset.m==='kneel')startKneelPet()});
 function startKneelPet(){if(KP.on||PG.on)return;const P=player.position,c=cat.position,yaw=cat.rotation.y,fx=Math.sin(yaw),fz=Math.cos(yaw),n1=[fz,-fx],n2=[-fz,fx],d1=(c.x+n1[0]-P.x)**2+(c.z+n1[1]-P.z)**2,d2=(c.x+n2[0]-P.x)**2+(c.z+n2[1]-P.z)**2,n=d1<d2?n1:n2,L=cat.scale.x/.7,d=.62*Math.max(.7,L);
@@ -2172,8 +2173,8 @@ function hospFinish(){const id=HV.svc,U=cat.userData;let msg='';const age=+ageDa
  else if(id==='groom'){stats.clean=100;stats.love=Math.min(100,stats.love+12);msg='🫧 Squeaky clean<br>🪮 Coat brushed and extra fluffy<br>👂 Ears cleaned<br>✂️ Claws trimmed<br>🧼 Sanitary trim done'}
  else{const scare=INV.med.scare;stats.health=100;stats.love=Math.max(0,stats.love-4);RECOVER.t=150;
   if(scare){const f={hernia:'🏥 A hernia was repaired.',foreign:'🏥 A swallowed object was removed.',hairball:'🏥 A stuck hairball was removed.'}[scare]||'🏥 The operation went well.';msg=f+'<br>🧻 Kitty wears a comfy cone while she heals. Let her rest!';INV.med.scare=''}
-  else{INV.med.sx=1;msg='🏥 Spay/neuter surgery went well.<br>🧻 Kitty wears a comfy cone for a little while and will nap more. Let her rest!'}saveBuild()}
- updateUI();saveCat();HV.done=true;hvT.textContent='Visit complete 🎉';hvS.textContent=HV.rm.vet+' says:';hvR.innerHTML=msg;hvR.style.display='block';hvB.style.display='inline-block';hvF.style.width='100%';U.task=''}
+  else{INV.med.sx=1;msg='🏥 '+(isTom()?'Neuter':'Spay')+' surgery went well.<br>🧻 Kitty wears a comfy cone for a little while and will nap more. Let her rest!'}saveBuild()}
+ updateUI();saveCat();HV.done=true;hvT.textContent='Visit complete 🎉';hvS.textContent=HV.rm.vet+' says:';hvR.innerHTML=pr(msg);hvR.style.display='block';hvB.style.display='inline-block';hvF.style.width='100%';U.task=''}
 function hospAbort(e){toast('⚠️ '+(e&&e.message||'Hospital hiccup')+' — visit ended');try{HV.done=true;HV.rm=HV.rm||HP.rooms[0];hospEndVisit()}catch(_){}HV.on=false;HV.book=null;HV.rm=null;SH.lock=false;try{hvEl.style.display='none';closeHospMenu()}catch(_){}}
 function hospEndVisit(){if(!HV.on||!HV.done)return;const U=cat.userData,S=HV.catSave;cat.position.set(S.x,0,S.z);cat.rotation.set(0,S.ry,0);U.lift=0;U.napBase=undefined;U.stage='';U.task='';U.t=0;U.wait=2;U.moving=false;
  for(const k in HV.rm.tools)HV.rm.tools[k].visible=false;for(const d of HP.rooms[1].dot)d.visible=false;{const B=HP.rooms[1];B.dryP.g.visible=false;B.brushP.g.visible=false;B.brushP.sp.forEach(m=>m.visible=false);B.staff.g.position.set(-0.2,0,-5.0)}
@@ -2314,7 +2315,7 @@ const fmtAge=d=>{const m=Math.floor(d/30),r=Math.floor(d%30);return m+' mo'+(r?'
 function svcState(id){const S=SVC[id];
  if(id==='vacc'){const n=vaxNext(),o=medOver(n);return o>=0?{ok:true,d:n.name+' is due'+(o>0?' · '+plural(Math.floor(o),'day')+' late':' now')}:{ok:false,why:n.name+' not due yet · '+medText(n).replace('⏳ ','')}}
  if(id==='deworm'){const n=dewNext(),o=medOver(n);return o>=0?{ok:true,d:'Deworming is due'+(o>0?' · '+plural(Math.floor(o),'day')+' late':' now')}:{ok:false,why:'Not due yet · '+medText(n).replace('⏳ ','')}}
- if(id==='surg'){if(stats.health<=.5&&INV.med.scare)return {ok:true,d:{hernia:'Emergency: a hernia needs repairing',foreign:'Emergency: something was swallowed',hairball:'Emergency: a stuck hairball'}[INV.med.scare]||S.d};if(!INV.med.sx&&ageDays()>=SPAY_AGE)return {ok:true,d:'Spay / neuter surgery is due'};return {ok:false,why:INV.med.sx?'Only for emergencies (health at zero)':'For spay/neuter (from 6 months) or a health emergency'}}
+ if(id==='surg'){if(stats.health<=.5&&INV.med.scare)return {ok:true,d:{hernia:'Emergency: a hernia needs repairing',foreign:'Emergency: something was swallowed',hairball:'Emergency: a stuck hairball'}[INV.med.scare]||S.d};if(!INV.med.sx&&ageDays()>=SPAY_AGE)return {ok:true,d:(isTom()?'Neuter':'Spay')+' surgery is due'};return {ok:false,why:INV.med.sx?'Only for emergencies (health at zero)':'For spay/neuter (from 6 months) or a health emergency'}}
  return {ok:true,d:S.d}}
 function forceSick(msg){if(SICK.t>0||MED.cool>0)return;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;MED.cool=240;catSound('sad');toast(msg)}
 function medTick(dt){MED.cool=Math.max(0,MED.cool-dt);MED.t-=dt;if(MED.t>0)return;MED.t=2;if(!started||OB.on||tutHold()||HV.on||SH.on)return;
@@ -2337,7 +2338,7 @@ function openCatInfo(){let p=document.getElementById('infoPanel');if(p){p.remove
  h+=sec('🪱 Deworming');
  h+=row('Every month',(INV.med.dw>=60?'Last dose at '+fmtAge(INV.med.dw)+'<br>':'')+medText(dewNext()),stt(dewNext()));
  h+=sec('🏥 Surgery');
- h+=row('Spay / neuter <small style="font-weight:600">(from 6 months)</small>',INV.med.sx?'✅ Done':ageDays()>=SPAY_AGE?'⚠️ Due now':'⏳ Due in '+plural(Math.ceil(SPAY_AGE-ageDays()),'day'),INV.med.sx?'ok':ageDays()>=SPAY_AGE?'due':'ok');
+ h+=row((isTom()?'Neuter':'Spay')+' <small style="font-weight:600">(from 6 months)</small>',INV.med.sx?'✅ Done':ageDays()>=SPAY_AGE?'⚠️ Due now':'⏳ Due in '+plural(Math.ceil(SPAY_AGE-ageDays()),'day'),INV.med.sx?'ok':ageDays()>=SPAY_AGE?'due':'ok');
  h+='<div style="font-size:11.5px;opacity:.75;margin-top:10px;line-height:1.4">If a vaccine or deworming is more than '+MED_GRACE+' days late, '+escH(CNAME||'Kitty')+' will get sick. Book visits at the Animal Hospital reception: Vaccinations and Deworming unlock when they are due.</div>';
  p.innerHTML=h;document.body.appendChild(p);p.addEventListener('pointerdown',e=>e.stopPropagation());p.querySelector('#infoX').onclick=()=>p.remove()}
 function ageText(){const a=Math.floor(ageDays()),mo=Math.floor(a/30),y=Math.floor(mo/12);return (a<365?'Kitten':'Cat')+' · '+(y>0?y+' yr'+(mo%12?' '+(mo%12)+' mo':''):mo+' mo')}
@@ -2437,7 +2438,7 @@ function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.payT=(LIFE.payT||30)-d
 function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;const bill=sickPay(Math.max(12,Math.min(60,Math.round(coins()*.08))));catSound('sad');toast('🤒 Kitty is unwell'+(bill?' · medicine −'+bill+' 🪙':'')+'. Medicine keeps costing coins until she recovers. A vet visit cures her fast');return true}
 function windowSpot(){const ws=[...edges.values()].filter(e=>e.type==='window');if(!ws.length)return null;const e=ws[Math.floor(Math.random()*ws.length)],o=[[0,.55],[0,-.55]],q=e.o==='h'?[[0,.55],[0,-.55]]:[[.55,0],[-.55,0]];
  let best=q[0],bs=-1;for(const [dx,dz] of q){const x=e.cx+dx,z=e.cz+dz,sc=(floorAt(x,z)?2:0)+(blockedPoint(x,z,.25)?-3:0)+Math.random();if(sc>bs){bs=sc;best=[dx,dz]}}
- return {e,x:e.cx+best[0],z:e.cz+best[1],sx:e.cx+best[0]*.3,sz:e.cz+best[1]*.3,face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
+ return {e,x:e.cx+best[0],z:e.cz+best[1],sx:e.cx+best[0]*.5,sz:e.cz+best[1]*.5,face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
 
 // ===== Cinematic camera moments + depth of field =====
 const CINE={k:0,t:0,cool:12,kind:'',side:1,yaw:0,menu:0,mt:0,on:true,fov:49};
@@ -2515,7 +2516,8 @@ function updateCat(dt){const U=cat.userData,sad=stats.love<=0;lifeSick(dt);
   case 'beg-food':case 'beg-water':U.meow-=dt;if(U.meow<=0){U.meow=5;catSound('meow')}break;
   case 'accident':{const aq=1.2+(U.doPoop?6:4);if(U.t<1.2&&tick(6))catSound('scratch');if(U.t>=aq&&!U.done){U.done=true;const fx=Math.sin(cat.rotation.y),fz=Math.cos(cat.rotation.y),mx=cat.position.x-fx*.4,mz=cat.position.z-fz*.4;if(U.doPee){clocks.pee=0;addFloorMess('pee',mx,mz)}if(U.doPoop){clocks.poop=0;addFloorMess('poop',mx-fz*.1,mz+fx*.1)}toast('Oh no! The tray was too dirty, so Kitty went on the floor 😿 Tap 🧽 Clean mess.');catSound('sad')}if(U.t>=U.dur)endTask();break}
   default:if(U.t>=U.dur){const wasRefuse=U.task==='refuse';endTask();if(wasRefuse&&(stats.litter<=0||INV.trayL<.5))startTask('accident')}}}
-function catStateText(){const U=cat.userData,tk=U.stage==='do'?U.task:U.task?'walk':'';if(LIFE.hide)return 'Hiding… find her! 🔍';if(LIFE.bug)return 'Chasing a bug 🪰';if(SICK.t>0)return 'Under the weather 🤒';if(U.happy>0)return 'Purring 💗';if(tk==='beg-food')return 'Hungry — bowl empty!';if(tk==='beg-water')return 'Thirsty — bowl empty!';if(tk==='refuse'&&INV.trayL<.5)return 'Empty tray! 🤢';
+function catStateText(){return pr(catStateText0())}
+function catStateText0(){const U=cat.userData,tk=U.stage==='do'?U.task:U.task?'walk':'';if(LIFE.hide)return 'Hiding… find her! 🔍';if(LIFE.bug)return 'Chasing a bug 🪰';if(SICK.t>0)return 'Under the weather 🤒';if(U.happy>0)return 'Purring 💗';if(tk==='beg-food')return 'Hungry — bowl empty!';if(tk==='beg-water')return 'Thirsty — bowl empty!';if(tk==='refuse'&&INV.trayL<.5)return 'Empty tray! 🤢';
  if(stats.love<=0)return 'Sad 😿';return {eat:'Eating 😋',drink:'Drinking 💧',litter:'Using the tray 🚽',scratch:'Scratching 🐾',play:'Playing 🧶','play-mouse':'Chasing the mouse 🐭','play-ball':'Batting the ball 🔴','play-feather':'Chasing feathers 🪶',climb:'Climbing 🌳',nap:'Napping 💤',sleep:'Sleeping 💤',relax:'Relaxing 😌',refuse:'Dirty tray! 🧹',accident:'Having an accident 😿',sulk:'Sulking',window:'Watching outside 🪟',wander:'Roaming'}[tk]||(tk==='walk'?'Walking':'Relaxing')}
 function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THREE.MathUtils.lerp;
  const sad=stats.love<=0,tk=U.stage==='do'?U.task:'',sqEnd=2.2+(U.doPoop?6:4),ph=tk==='litter'?(U.t<2.2?'dig':U.t<sqEnd?'sq':'cv'):tk==='accident'?(U.t<1.2?'dig':U.t<1.2+(U.doPoop?6:4)?'sq':''):'';
@@ -2553,7 +2555,9 @@ renderer.domElement.addEventListener('pointerdown',()=>{hideCtx()});
 window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&!build.on)action('interact')});
 // input
 const prompt=document.getElementById('prompt'),toastEl=document.getElementById('toast');let toastTimer;
-function toast(t){toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2300)}
+function isTom(){return !!(catSpec&&catSpec.sex==='m')}
+function pr(t){if(typeof t!=='string'||!isTom())return t;return t.replace(/\b(Herself|herself)\b/g,(m)=>m[0]==='H'?'Himself':'himself').replace(/\b(give|take|find|let|hold|wake|feed|help|tell|pet|keep|bring|save|carry|leave|see|calm|cheer|love|call|thank|follow|watch|treat|ask|visit|put) her\b/gi,(m,v)=>v+' him').replace(/\b(Her|her)\b/g,m=>m[0]==='H'?'His':'his').replace(/\bShe\b/g,'He').replace(/\bshe\b/g,'he').replace(/\b(Spay \/ neuter)\b/g,'Neuter').replace(/\bSpay\/neuter\b/g,'Neuter')}
+function toast(t){t=pr(t);toastEl.textContent=t;toastEl.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2300)}
 const bRay=new THREE.Raycaster(),bNdc=new THREE.Vector2(),bPlane=new THREE.Plane(new THREE.Vector3(0,1,0),-.04),bHit=new THREE.Vector3(),cv=renderer.domElement;
 function pick(e){const r=cv.getBoundingClientRect();bNdc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);if(!bRay.ray.intersectPlane(bPlane,bHit))return null;
  if(Math.abs(bHit.x)>LOT.x1+2||Math.abs(bHit.z)>LOT.z1+2)return null;
