@@ -1595,7 +1595,7 @@ function action(type,target){
  const obj={pet:cat,feed:foodBowl,water:waterBowl,clean:litter}[resolved];
  if(!obj){toast('That action is not available yet.');return}
  if(resolved!=='pet'&&!isPlaced(obj)){toast('Place it first · Build → Furniture → Cat 🐾');return}
- if(resolved==='pet'){const U0=cat.userData;if(PG.on)return;const bz=/^(eat|drink|litter|accident|window|play)/.test(U0.task||'');if(bz||SG.on||(typeof HV!=='undefined'&&HV&&HV.on)){const nm=catStateText().replace(/\s*[^\x00-\x7F]+\s*$/,'');toast('Kitty is busy right now'+(nm?' ('+nm.toLowerCase()+')':'')+' 🐾 Wait until she finishes.');return}if((U0.annoyed||0)>0){toast('Kitty is still annoyed 😾 Give her some space.');return}if(stats.love>=99.5){catSound('purr');toast('Kitty already feels totally loved 💗');return}}
+ if(resolved==='pet'){const U0=cat.userData;if(PG.on)return;const bz=/^(eat|drink|litter|accident|window|play|nap|sleep)/.test(U0.task||'');if(bz||SG.on||(typeof HV!=='undefined'&&HV&&HV.on)){const nm=catStateText().replace(/\s*[^\x00-\x7F]+\s*$/,'');toast('Kitty is busy right now'+(nm?' ('+nm.toLowerCase()+')':'')+' 🐾 Wait until she finishes.');return}if((U0.annoyed||0)>0){toast('Kitty is still annoyed 😾 Give her some space.');return}if(stats.love>=99.5){catSound('purr');toast('Kitty already feels totally loved 💗');return}}
  if(resolved==='feed'&&bowl.food>=99.5){toast('The food bowl is already full 🍗');return}
  if(resolved==='water'&&bowl.water>=99.5){toast('The water bowl is already full 💧');return}
  // Step the player to a safe spot beside the target so a tap always performs the activity.
