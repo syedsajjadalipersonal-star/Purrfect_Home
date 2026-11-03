@@ -133,10 +133,7 @@ body.building #vig{opacity:.45}
 <text x="180" y="172" font-size="56" fill="#e2625f" stroke="#fff8e9" stroke-width="10" letter-spacing="-.5">Purrfect</text>
 <text x="180" y="208" font-size="30" fill="#2e7658" stroke="#fff8e9" stroke-width="7" letter-spacing="9">HOME</text>
 </g></svg></div>
-<div class="spstage"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3d2"/><stop offset="1" stop-color="#ffe2b4"/></linearGradient><linearGradient id="spFloor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9a06a"/><stop offset="1" stop-color="#c58953"/></linearGradient></defs>
-<rect width="360" height="250" fill="url(#spWall)"/><rect y="205" width="360" height="45" fill="url(#spFloor)"/><path d="M0 205 H360" stroke="#b9794a" stroke-width="3"/><g stroke="#b9794a44" stroke-width="2"><path d="M60 205 V250"/><path d="M150 205 V250"/><path d="M240 205 V250"/><path d="M330 205 V250"/></g>
-<g><rect x="22" y="38" width="64" height="76" rx="30" fill="#bfe3f2"/><path d="M54 38 V114 M22 76 H86" stroke="#fff8e9" stroke-width="5"/><rect x="22" y="38" width="64" height="76" rx="30" fill="none" stroke="#fff8e9" stroke-width="6"/><path d="M30 106 L60 46" stroke="#ffffff66" stroke-width="7" stroke-linecap="round"/></g>
-<g id="spScenes"></g></svg></div>
+<div class="spstage"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb4e0"/><stop offset=".6" stop-color="#b9d6ea"/><stop offset="1" stop-color="#dbe8ee"/></linearGradient></defs><rect width="360" height="250" fill="url(#spWall)"/><rect y="168" width="360" height="82" fill="#718d61"/></svg></div>
 <div class="spcap" id="spCap"></div>
 <div class="spld"><div class="spbar"><div class="spfill2"><i id="spFill"></i></div></div><div class="sppct2"><span id="spMsg">Loading your home…</span><span id="spPct">0%</span></div></div></div>
 <script>
@@ -172,7 +169,7 @@ const sc=[
 S.innerHTML=sc.map(s=>'<g class="spscene '+s[0]+'" id="'+s[0]+'">'+s[2]+'</g>').join('');
 const cap=document.getElementById('spCap');let i=0;
 function show(n){sc.forEach((s,k)=>{const g=document.getElementById(s[0]);if(g)g.classList.toggle('on',k===n)});if(cap)cap.textContent=sc[n][1]+'…'}
-show(0);window.__spTimer=setInterval(()=>{i=(i+1)%sc.length;show(i)},3300);
+
 }catch(e){console.warn('splash',e)}})();
 (function(){const sp=document.getElementById('splash');if(!sp){window.__splash={set(){},done(){},hide(){}};return}
  const t0=performance.now(),fill=document.getElementById('spFill'),pct=document.getElementById('spPct'),msg=document.getElementById('spMsg');let p=0,fin=false,gone=false;
@@ -180,8 +177,8 @@ show(0);window.__spTimer=setInterval(()=>{i=(i+1)%sc.length;show(i)},3300);
  function set(v,ms){p=Math.max(p,v);if(fill){fill.style.transitionDuration=(ms||500)+'ms';fill.style.transform='scaleX('+Math.max(.04,p)+')'}if(pct)pct.textContent=Math.round(p*100)+'%'}
  function hide(now){if(gone)return;gone=true;clearInterval(window.__spTimer);sp.classList.add('out');setTimeout(()=>{sp.style.display='none'},now?0:650)}
  function done(){if(fin)return;fin=true;set(1,300);if(msg)msg.textContent='Ready!';
-  try{if(window.__splash3d&&(!auto||location.hash==='#splash')){const st=sp.querySelector('.spstage'),cv=document.createElement('canvas');cv.width=400;cv.height=278;cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .5s;z-index:2';st.appendChild(cv);
-   if(window.__splash3d(cv,()=>hide(),6900)){requestAnimationFrame(()=>{cv.style.opacity=1});sp.addEventListener('pointerdown',()=>{try{window.__spFinish()}catch(e){hide()}},{once:true});return}else cv.remove()}}catch(e){}
+  try{if(window.__splash3d&&(!auto||location.hash==='#splash')){const st=sp.querySelector('.spstage'),cv=document.createElement('canvas');cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;z-index:2';st.appendChild(cv);
+   if(window.__splash3d(cv)){requestAnimationFrame(()=>requestAnimationFrame(()=>{cv.style.opacity=1}));window.__spFinish=()=>hide();sp.addEventListener('pointerdown',()=>hide(),{once:true})}else cv.remove()}}catch(e){}
   const wait=auto?0:Math.max(0,3600-(performance.now()-t0));setTimeout(()=>hide(),wait+250)}
  window.__splash={set,done,hide};set(.12,400);
  let c=.12;const cr=setInterval(()=>{if(fin||gone){clearInterval(cr);return}c+=(.46-c)*.05;set(c,400)},200);
@@ -4254,88 +4251,51 @@ let prev=performance.now(),elapsed=0,uiT=0,saveT=0;const camTarget=new THREE.Vec
 window.addEventListener('error',ev=>{try{toast('⚠️ '+(ev.message||'error'))}catch(_){}});window.addEventListener('unhandledrejection',ev=>{try{toast('⚠️ '+(ev.reason&&ev.reason.message||'error'))}catch(_){}});
 // ===== splash showcase: the real cat, in 3D with the game's own graphics, doing little things =====
 var SPL={on:false};
-window.__splash3d=function(canvas,onEnd,ms,first){
- if(SPL.on||!canvas)return false;
- let ok=false;
+window.__splash3d=function(canvas){
+ // One still picture of the real game: the house front (real wall, door and window pieces) with a Maine Coon sitting in a window.
+ // Everything is built and drawn in a single synchronous step and the game state is put back before returning.
+ if(!canvas)return false;
+ const par=cat.parent,U=cat.userData,svCat={x:cat.position.x,y:cat.position.y,z:cat.position.z,ry:cat.rotation.y,s:cat.scale.x,vis:cat.visible},svSpec=catSpec,svLS=(()=>{try{return localStorage.getItem('purrfect-cat')}catch(e){return null}})();
+ const svU={task:U.task,stage:U.stage,lift:U.lift,leap:U.leap,moving:U.moving,t:U.t,happy:U.happy,init:U.init,P:U.P?Object.assign({},U.P):null};
+ const vp=new THREE.Vector4();renderer.getViewport(vp);const svSc=renderer.getScissorTest(),svAuto=renderer.autoClear;
+ let ok=false;const made=[];
  try{
-  const W=canvas.width,H=canvas.height,rt=new THREE.WebGLRenderTarget(W,H);rt.texture.encoding=THREE.sRGBEncoding;
-  const buf=new Uint8Array(W*H*4),ctx2=canvas.getContext('2d'),img=ctx2.createImageData(W,H);
-  const ss=new THREE.Scene();ss.background=new THREE.Color('#f7e0b8');
-  ss.add(new THREE.HemisphereLight('#fff6e2','#b99b77',.6));const dl=new THREE.DirectionalLight('#fff0d0',1.0);dl.position.set(3,5,5);ss.add(dl);
-  const fl=new THREE.Mesh(new THREE.PlaneGeometry(16,9),M.floor);fl.rotation.x=-Math.PI/2;fl.position.set(0,0,0);ss.add(fl);
-  const wl=new THREE.Mesh(new THREE.PlaneGeometry(16,5),new THREE.MeshStandardMaterial({color:'#efcf9c',roughness:.95}));wl.position.set(0,2.5,-2.4);ss.add(wl);
-  const bb=new THREE.Mesh(new THREE.BoxGeometry(16,.18,.08),new THREE.MeshStandardMaterial({color:'#fff3da',roughness:.8}));bb.position.set(0,.09,-2.36);ss.add(bb);
-  const win=new THREE.Mesh(new THREE.PlaneGeometry(1.3,1.7),new THREE.MeshBasicMaterial({color:'#bfe3f2'}));win.position.set(-2.1,1.9,-2.37);ss.add(win);
-  for(const [x,y,w,h] of [[-2.1,1.9,1.5,.08],[-2.1,1.9,.08,1.9],[-2.1,2.75,1.5,.08],[-2.1,1.05,1.5,.08],[-2.75,1.9,.08,1.9],[-1.45,1.9,.08,1.9]]){const f=new THREE.Mesh(new THREE.BoxGeometry(w,h,.06),new THREE.MeshStandardMaterial({color:'#fffaf0',roughness:.6}));f.position.set(x,y,-2.34);ss.add(f)}
-  const rug=new THREE.Mesh(new THREE.CylinderGeometry(1.9,1.9,.02,40),new THREE.MeshStandardMaterial({color:'#d9707c',roughness:.95}));rug.scale.z=.55;rug.position.set(.2,.012,.2);ss.add(rug);
-  const rug2=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.35,.025,40),new THREE.MeshStandardMaterial({color:'#f3b79c',roughness:.95}));rug2.scale.z=.55;rug2.position.set(.2,.014,.2);ss.add(rug2);
-  const treeG=new THREE.Group();FURN.tree.make(treeG);treeG.scale.setScalar(1.6);treeG.position.set(2.4,0,-.5);ss.add(treeG);
-  const mouseG=new THREE.Group();FURN.mouse.make(mouseG);mouseG.scale.setScalar(2.6);ss.add(mouseG);
-  const bf=new THREE.Group(),wingM=[new THREE.MeshBasicMaterial({color:'#b99af0',side:THREE.DoubleSide}),new THREE.MeshBasicMaterial({color:'#f09ac4',side:THREE.DoubleSide})];
-  const wings=[-1,1].map(s=>{const g=new THREE.Group(),a=new THREE.PlaneGeometry(.2,.16);a.translate(s*.1,.03,0);const b=new THREE.PlaneGeometry(.14,.12);b.translate(s*.07,-.09,0);g.add(new THREE.Mesh(a,wingM[0]),new THREE.Mesh(b,wingM[1]));g.rotation.x=-Math.PI/2;bf.add(g);return g});
-  bf.add(new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),new THREE.MeshBasicMaterial({color:'#5a3b52'})));ss.add(bf);
-  const cam=new THREE.PerspectiveCamera(33,W/H,.1,60);
-  // take the real cat out of the game world for a moment
-  const par=cat.parent,sv={x:cat.position.x,y:cat.position.y,z:cat.position.z,ry:cat.rotation.y,s:cat.scale.x};
-  ss.add(cat);cat.scale.setScalar(1.5);cat.visible=true;SPL.on=true;
-  const exposure=renderer.toneMappingExposure;renderer.toneMappingExposure=.95;
-  const T=3.4,N=4,s0=first===undefined?Math.floor(Math.random()*N):first,t0=performance.now();let raf=0,lastDraw=0,done=false;
-  const sm=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)},mix=(a,b,k)=>a+(b-a)*k,cl=(v,a,b)=>Math.max(a,Math.min(b,v));
-  const CAMS=[[.45,.8,1.9,.45,.4],[1.45,1.5,3.9,1.45,1.05],[-.1,.8,2.5,-.1,.38],[0,.75,1.6,0,.42]];
-  let cp=null;
-  function rest(t){legs.forEach(l=>{l.rotation.set(0,0,0);l.position.y=.34;l.scale.y=1});catBody.rotation.set(0,0,0);catBody.position.set(0,0,0);catBody.scale.y=1;catHead.position.set(0,.74,.52);catHead.rotation.set(0,0,0);tail.rotation.set(-.8+Math.sin(t*3)*.18,0,Math.sin(t*2)*.25);cat.position.y=0;cat.rotation.set(0,0,0);catTongue.visible=false}
-  function sit(w,t){catBody.rotation.x=-.85*w;catBody.position.y+=.2*w;legs[0].rotation.x=.85*w;legs[1].rotation.x=.85*w;legs[2].rotation.x=-1.35*w;legs[3].rotation.x=-1.35*w;legs[2].scale.y=legs[3].scale.y=1-.45*w;catHead.rotation.x+=.55*w;tail.rotation.x=mix(tail.rotation.x,-2.2+Math.sin(t*2)*.12,w);cat.position.y-=.02*w}
-  function gait(ph,A){const p4=[0,Math.PI,Math.PI,0];legs.forEach((l,i)=>{const q=ph+p4[i];l.rotation.x=Math.sin(q)*A;l.position.y=.34+Math.max(0,Math.cos(q))*.05});catBody.position.y+=Math.abs(Math.sin(ph))*.05}
-  function leap(w){legs[0].rotation.x=mix(legs[0].rotation.x,-1.05,w);legs[1].rotation.x=mix(legs[1].rotation.x,-1.05,w);legs[2].rotation.x=mix(legs[2].rotation.x,.95,w);legs[3].rotation.x=mix(legs[3].rotation.x,.95,w);catBody.rotation.x+=-.3*w;tail.rotation.x=mix(tail.rotation.x,-.2,w)}
-  function pose(si,u,t){
-   rest(t);bf.visible=si===0;bf.scale.setScalar(1.9);mouseG.visible=si===2;
-   if(si===0){ // a butterfly
-    cat.position.set(-.1,0,0);cat.rotation.y=.75;
-    const bx=.65+Math.sin(t*1.7)*.35-sm((u-.78)/.2)*1.2,by=.85+Math.sin(t*2.6)*.2+sm((u-.78)/.2)*1.0,bz=.3+Math.cos(t*1.7)*.2;
-    const pu=sm((u-.5)/.12)*(1-sm((u-.72)/.1)),jump=Math.sin(cl((u-.52)/.22,0,1)*Math.PI);
-    const bxx=u>.5&&u<.74?mix(.65+Math.sin(t*1.7)*.35,.45,sm((u-.5)/.12)):bx;
-    bf.position.set(bxx,u>.5&&u<.74?mix(by,.55,pu):by,bz);bf.rotation.set(0,Math.sin(t*3)*.6,0);
-    wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.15+.9*Math.abs(Math.sin(t*26))));
-    sit(1-pu,t);const a=Math.atan2(bf.position.x-cat.position.x,bf.position.z-cat.position.z)-cat.rotation.y;catHead.rotation.y=cl(a,-.9,.9)*.9;catHead.rotation.x+=-.25*(1-pu)+(bf.position.y-.9)*-.3;
-    cat.position.x+=jump*.4;cat.position.y+=jump*.4;leap(jump);catBody.rotation.x+=-.35*jump;
-   }else if(si===1){ // the cat tree
-    cat.rotation.y=Math.PI/2;const s=1.6,midY=.535*s,topY=1.235*s,tx=2.4;
-    const w1=cl(u/.3,0,1),j1=cl((u-.3)/.14,0,1),j2=cl((u-.6)/.16,0,1);
-    let x=mix(.1,1.5,sm(w1)),y=0;
-    if(u>=.3){x=mix(1.5,tx+.1,sm(j1));y=mix(0,midY,sm(j1))+Math.sin(j1*Math.PI)*.4}
-    if(u>=.6){x=mix(tx+.1,tx,sm(j2));y=mix(midY,topY,sm(j2))+Math.sin(j2*Math.PI)*.45}
-    cat.position.set(x,y,-.45);
-    if(u<.3)gait(t*13,.5);else if(u<.74){leap(Math.sin(cl((u<.6?(u-.3)/.14:(u-.6)/.16),0,1)*Math.PI)*1.1);if(u>=.44&&u<.6){catHead.rotation.x-=.45}}
-    else{const k=sm((u-.74)/.12);sit(k*.8,t);cat.rotation.y=mix(Math.PI/2,.35,k);catHead.rotation.x-=.15*k}
-   }else if(si===2){ // a toy mouse
-    const ph=t*15,mx=mix(.3,3.2,u*u*.6+u*.4),mz=.1+Math.sin(u*14)*.35*(1-u);
-    mouseG.position.set(mx,0,mz);mouseG.rotation.y=Math.sin(u*14)*.45*(1-u);
-    const cx=mix(-1.6,.75,sm(u/.78)),pu=cl((u-.74)/.2,0,1);
-    cat.rotation.y=Math.PI/2-.12;cat.position.set(cx+Math.sin(pu*Math.PI)*.0,Math.sin(pu*Math.PI)*.45,mz*.7);
-    if(u<.78)gait(ph,.62);else{leap(Math.sin(pu*Math.PI));const sl=sm((u-.9)/.1);catHead.rotation.y=Math.sin(t*3)*.5*sl;sit(sl*.5,t)}
-    catBody.rotation.x+=.0;tail.rotation.x=-.2+Math.sin(t*9)*.15;
-   }else{ // washing up
-    cat.position.set(0,0,0);cat.rotation.y=1.0;sit(1,t);
-    const k=sm(u/.18)*(1-sm((u-.9)/.1)),lk=Math.sin(t*11)*.5+.5;
-    legs[0].rotation.x=mix(legs[0].rotation.x,-1.6-lk*.2,k);catHead.rotation.x+=.2*k+lk*.08*k;catHead.rotation.y+=-.5*k;catTongue.visible=k>.5&&lk>.4;if(catTongue.visible){catTongue.position.z=.268+.03*lk}
-   }
-   const c=CAMS[si];if(!cp)cp=c.slice();for(let i=0;i<5;i++)cp[i]=mix(cp[i],c[i],.07);cam.position.set(cp[0],cp[1],cp[2]);cam.lookAt(cp[3],cp[4],0);
-  }
-  function draw(){const old=renderer.getRenderTarget();renderer.setRenderTarget(rt);renderer.render(ss,cam);renderer.readRenderTargetPixels(rt,0,0,W,H,buf);renderer.setRenderTarget(old);
-   const d=img.data;for(let y=0;y<H;y++){const so=(H-1-y)*W*4,dofs=y*W*4;for(let k=0;k<W*4;k++)d[dofs+k]=buf[so+k]}ctx2.putImageData(img,0,0)}
-  function frame(now){raf=requestAnimationFrame(frame);if(done||window.__spHold)return;const t=Math.max(0,(now-t0)/1000),k=t/T,si=(s0+Math.floor(k))%N,u=k-Math.floor(k);
-   try{pose(si,u,t)}catch(e){console.warn('splash3d pose',e)}
-   if(now-lastDraw>45){lastDraw=now;try{draw()}catch(e){console.warn('splash3d draw',e);finish()}}
-   if(t*1000>(ms||6800))finish()}
-  function finish(){if(done)return;done=true;cancelAnimationFrame(raf);
-   try{ss.remove(cat);par.add(cat);cat.position.set(sv.x,sv.y,sv.z);cat.rotation.set(0,sv.ry,0);cat.scale.setScalar(sv.s);rest(0)}catch(e){}
-   renderer.toneMappingExposure=exposure;SPL.on=false;try{rt.dispose()}catch(e){}
-   try{onEnd&&onEnd()}catch(e){}}
-  window.__spFinish=finish;window.__spPose=(si,u)=>{pose(si,u,u*3);draw()};
-  ok=true;raf=requestAnimationFrame(frame);
- }catch(e){console.warn('splash3d',e);try{if(cat.parent!==scene)scene.add(cat)}catch(_){}SPL.on=false;ok=false}
- return ok}
-
+  const ss=new THREE.Scene();
+  const sk=document.createElement('canvas');sk.width=4;sk.height=256;{const x=sk.getContext('2d'),g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,'#7fb4e0');g.addColorStop(.55,'#b9d6ea');g.addColorStop(1,'#dbe8ee');x.fillStyle=g;x.fillRect(0,0,4,256)}
+  const skT=new THREE.CanvasTexture(sk);skT.encoding=THREE.sRGBEncoding;ss.background=skT;
+  ss.add(new THREE.HemisphereLight('#eaf4ff','#6a7660',.85));ss.add(new THREE.AmbientLight('#fff4e6',.25));
+  const sn=new THREE.DirectionalLight('#fff1dc',1.9);sn.position.set(-10,12,-7);sn.target.position.set(.5,0,1);sn.castShadow=true;sn.shadow.mapSize.set(2048,2048);sn.shadow.bias=-.0004;sn.shadow.normalBias=.04;sn.shadow.radius=3;
+  Object.assign(sn.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:1,far:50});ss.add(sn);ss.add(sn.target);
+  const gr=new THREE.Mesh(new THREE.PlaneGeometry(80,60),M.grass);gr.rotation.x=-Math.PI/2;gr.position.set(.5,-.02,-8);gr.receiveShadow=true;ss.add(gr);
+  const root=new THREE.Group();ss.add(root);
+  // front wall: wall, wall, window, wall, DOOR, wall, window, wall, wall (z=0, outside is -z, inside is +z)
+  const front=[[-4,'wall'],[-3,'wall'],[-2,'wall'],[-1,'window'],[0,'door'],[1,'window'],[2,'wall'],[3,'wall'],[4,'wall']];
+  for(const [x,t] of front)buildEdge(root,x,0,'h',t,'normal');
+  for(let x=-4;x<=4;x++)buildEdge(root,x,4,'h','wall','normal');
+  for(let z=0;z<4;z++){buildEdge(root,-4,z,'v','wall','normal');buildEdge(root,5,z,'v','wall','normal')}
+  const fl=new THREE.Mesh(new THREE.PlaneGeometry(9,4),M.floor);fl.rotation.x=-Math.PI/2;fl.position.set(.5,0,2);fl.receiveShadow=true;ss.add(fl);
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  // the cat: a brown Maine Coon, full grown, sitting on the window sill like in the game's window-watching moment
+  try{const o0=svSpec;catRebuild(catDefaults('mainecoon'));try{if(svLS===null)localStorage.removeItem('purrfect-cat');else localStorage.setItem('purrfect-cat',svLS)}catch(e){}}catch(e){}
+  ss.add(cat);cat.visible=true;cat.scale.setScalar(CAT_SCALE);catHead.scale.set(...catHeadK);
+  const wx=1.5,H=SILL-.08;cat.position.set(wx,0,.275);cat.rotation.y=Math.PI;U.init=true;if(!U.P)U.P={};U.task='window';U.stage='do';U.lift=H;U.leap=false;U.moving=false;U.t=5;U.happy=0;
+  for(let i=0;i<50;i++)poseCat(.05,1.3);
+  cat.position.set(wx,cat.position.y-groundY(wx,.275)+0,.275);cat.rotation.y=Math.PI;
+  cat.traverse(o=>{if(o.isMesh){o.castShadow=true}});
+  const rc=renderer.domElement,W=Math.min(rc.width,820),Hh=Math.round(W*.72),pr=renderer.getPixelRatio();
+  canvas.width=W;canvas.height=Hh;
+  const cam=new THREE.PerspectiveCamera(31,W/Hh,.1,80);cam.position.set(.6,1.5,-5.6);cam.lookAt(.6,1.35,0);
+  renderer.setScissorTest(true);renderer.setViewport(0,0,W/pr,Hh/pr);renderer.setScissor(0,0,W/pr,Hh/pr);renderer.autoClear=true;
+  renderer.render(ss,cam);
+  canvas.getContext('2d').drawImage(rc,0,rc.height-Hh,W,Hh,0,0,W,Hh);
+  ok=true;
+ }catch(e){console.warn('splash3d',e)}
+ // put everything back exactly as it was
+ try{renderer.setScissorTest(svSc);renderer.setViewport(vp);renderer.autoClear=svAuto;
+  catRebuild(svSpec);try{if(svLS===null)localStorage.removeItem('purrfect-cat');else localStorage.setItem('purrfect-cat',svLS)}catch(e){}
+  if(par)par.add(cat);cat.position.set(svCat.x,svCat.y,svCat.z);cat.rotation.y=svCat.ry;cat.visible=svCat.vis;applyAge();
+  Object.assign(U,{task:svU.task,stage:svU.stage,lift:svU.lift,leap:svU.leap,moving:svU.moving,t:svU.t,happy:svU.happy,init:svU.init});if(svU.P){for(const k in U.P)delete U.P[k];Object.assign(U.P,svU.P)}else delete U.P;cat.scale.setScalar(svCat.s)}catch(e){console.warn('splash3d restore',e)}
+ return ok};
 let animErr=0;function animate(now){requestAnimationFrame(animate);try{animateInner(now)}catch(e){if(animErr++<3){try{console.error(e);toast('⚠️ '+(e&&e.message||e))}catch(_){}}try{renderer.render(scene,camera)}catch(_){}}}
 let TC=null;
 function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRecovered.shown){const r=window.__saveRecovered;r.shown=true;setTimeout(()=>toast(r.lost?'⚠️ Part of your save was damaged and could not be restored':'📦 Your save was damaged, so it was restored from a backup'),1500)}
