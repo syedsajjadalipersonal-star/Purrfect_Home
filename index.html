@@ -68,24 +68,24 @@ body.building #vig{opacity:.45}
 
 @media (orientation:landscape) and (max-height:520px){body #wdMenu .gd{grid-template-columns:repeat(5,1fr)!important;gap:6px!important;max-height:52vh!important}body #wdMenu .gd>*{padding:5px 3px!important;font-size:11px!important}}
 .oc .pr{display:block;font-style:normal;font-size:11px;font-weight:700;color:#b7791f;margin-top:2px}#dof{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .35s;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}#dof.cine{-webkit-mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%);mask-image:radial-gradient(ellipse 62% 52% at 50% 48%,transparent 38%,#000 100%)}#dof.menu{-webkit-backdrop-filter:blur(4px) brightness(.92);backdrop-filter:blur(4px) brightness(.92)}@media (prefers-reduced-motion:reduce){#dof{transition:none}}
-#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:max(22px,env(safe-area-inset-top)) 16px max(26px,env(safe-area-inset-bottom));background:radial-gradient(120% 70% at 50% 0%,#fff6dc 0%,#ffe9c4 38%,#f6d3b0 100%);font-family:Nunito,ui-rounded,system-ui,sans-serif;color:#24332e;transition:opacity .55s ease;overflow:hidden}
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:max(22px,env(safe-area-inset-top)) 16px max(34px,env(safe-area-inset-bottom));background:#7fb4e0;font-family:Nunito,ui-rounded,system-ui,sans-serif;color:#24332e;transition:opacity .55s ease;overflow:hidden}
 #splash.out{opacity:0;pointer-events:none}
-#splash .sppw{position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 20px 26px,#8a5a3c 0 7px,transparent 8px),radial-gradient(circle at 8px 12px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 20px 8px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 32px 12px,#8a5a3c 0 3.4px,transparent 4.4px);background-size:92px 92px;pointer-events:none}
-#splash .splogo{position:relative;width:min(80vw,360px);margin-top:2vh;animation:spLogo .9s cubic-bezier(.2,1.3,.4,1) both}
+#splash .sppw{display:none;position:absolute;inset:0;opacity:.07;background-image:radial-gradient(circle at 20px 26px,#8a5a3c 0 7px,transparent 8px),radial-gradient(circle at 8px 12px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 20px 8px,#8a5a3c 0 3.4px,transparent 4.4px),radial-gradient(circle at 32px 12px,#8a5a3c 0 3.4px,transparent 4.4px);background-size:92px 92px;pointer-events:none}
+#splash .splogo{position:absolute;left:50%;top:34%;width:min(80vw,360px);transform:translate(-50%,-50%);z-index:3;animation:spLogo 1.6s ease-out .25s both}
 #splash .splogo svg{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 10px #8a5a3c33)}
-#splash .spstage{position:relative;width:min(92vw,400px);aspect-ratio:36/25;border-radius:28px;overflow:hidden;box-shadow:0 14px 34px #8a5a3c40,0 0 0 4px #fff8e9;background:#fdf1d6}
+#splash .spstage{position:absolute;inset:0;overflow:hidden;background:#7fb4e0;z-index:0}
 #splash .spstage svg{position:absolute;inset:0;width:100%;height:100%}
 #splash .spscene{opacity:0;transition:opacity .4s}
 #splash .spscene.on{opacity:1}
 #splash .spcap{margin-top:12px;font-weight:800;font-size:15px;letter-spacing:.02em;color:#7a4c2e;min-height:20px;text-align:center}
-#splash .spld{width:min(82vw,340px);text-align:center}
+#splash .spld{position:relative;z-index:3;width:min(82vw,340px);text-align:center}
 #splash .spbar{position:relative;height:16px;border-radius:10px;background:#fff8e9;box-shadow:inset 0 2px 4px #8a5a3c33,0 0 0 3px #fff8e9aa}
 #splash .spfill2{position:absolute;left:3px;right:3px;top:3px;bottom:3px;border-radius:8px;overflow:hidden}
 #splash .spfill2 i{position:absolute;inset:0;border-radius:8px;transform-origin:0 50%;transform:scaleX(.04);transition:transform .5s ease-out;background:linear-gradient(90deg,#f3bd56,#ef8f66 60%,#e46c7a)}
 #splash .spfill2 i:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,#ffffff30 0 8px,transparent 8px 16px);animation:spStripe 1s linear infinite}
-#splash .sppct2{display:flex;justify-content:space-between;margin-top:7px;font-weight:800;font-size:13px;color:#7a4c2e}
+#splash .sppct2{display:flex;justify-content:space-between;margin-top:7px;font-weight:800;font-size:13px;color:#fff8e9;text-shadow:0 1px 4px #0006}
 @keyframes spStripe{to{background-position:16px 0}}
-@keyframes spLogo{from{transform:translateY(-24px) scale(.88);opacity:0}to{transform:none;opacity:1}}
+@keyframes spLogo{from{opacity:0}to{opacity:1}}
 #splash .spk{transform-box:fill-box;transform-origin:50% 50%}
 @media (prefers-reduced-motion:reduce){#splash *{animation:none!important}}
 /* ---- scene animation (each scene restarts when it gets .on) ---- */
@@ -133,8 +133,8 @@ body.building #vig{opacity:.45}
 <text x="180" y="172" font-size="56" fill="#e2625f" stroke="#fff8e9" stroke-width="10" letter-spacing="-.5">Purrfect</text>
 <text x="180" y="208" font-size="30" fill="#2e7658" stroke="#fff8e9" stroke-width="7" letter-spacing="9">HOME</text>
 </g></svg></div>
-<div class="spstage"><svg viewBox="0 0 360 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb4e0"/><stop offset=".6" stop-color="#b9d6ea"/><stop offset="1" stop-color="#dbe8ee"/></linearGradient></defs><rect width="360" height="250" fill="url(#spWall)"/><rect y="168" width="360" height="82" fill="#718d61"/></svg></div>
-<div class="spcap" id="spCap"></div>
+<div class="spstage"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%"><defs><linearGradient id="spWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb4e0"/><stop offset=".8" stop-color="#b9d6ea"/><stop offset="1" stop-color="#dbe8ee"/></linearGradient></defs><rect width="100" height="100" fill="url(#spWall)"/><rect y="80" width="100" height="20" fill="#718d61"/></svg></div>
+
 <div class="spld"><div class="spbar"><div class="spfill2"><i id="spFill"></i></div></div><div class="sppct2"><span id="spMsg">Loading your home…</span><span id="spPct">0%</span></div></div></div>
 <script>
 (function(){try{
@@ -177,7 +177,7 @@ function show(n){sc.forEach((s,k)=>{const g=document.getElementById(s[0]);if(g)g
  function set(v,ms){p=Math.max(p,v);if(fill){fill.style.transitionDuration=(ms||500)+'ms';fill.style.transform='scaleX('+Math.max(.04,p)+')'}if(pct)pct.textContent=Math.round(p*100)+'%'}
  function hide(now){if(gone)return;gone=true;clearInterval(window.__spTimer);sp.classList.add('out');setTimeout(()=>{sp.style.display='none'},now?0:650)}
  function done(){if(fin)return;fin=true;set(1,300);if(msg)msg.textContent='Ready!';
-  try{if(window.__splash3d&&(!auto||location.hash==='#splash')){const st=sp.querySelector('.spstage'),cv=document.createElement('canvas');cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s;z-index:2';st.appendChild(cv);
+  try{if(window.__splash3d&&(!auto||location.hash==='#splash')){const st=sp.querySelector('.spstage'),cv=document.createElement('canvas');cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .8s;z-index:1';st.appendChild(cv);
    if(window.__splash3d(cv)){requestAnimationFrame(()=>requestAnimationFrame(()=>{cv.style.opacity=1}));window.__spFinish=()=>hide();sp.addEventListener('pointerdown',()=>hide(),{once:true})}else cv.remove()}}catch(e){}
   const wait=auto?0:Math.max(0,3600-(performance.now()-t0));setTimeout(()=>hide(),wait+250)}
  window.__splash={set,done,hide};set(.12,400);
@@ -4282,9 +4282,9 @@ window.__splash3d=function(canvas){
   for(let i=0;i<50;i++)poseCat(.05,1.3);
   cat.position.set(wx,cat.position.y-groundY(wx,.275)+0,.275);cat.rotation.y=Math.PI;
   cat.traverse(o=>{if(o.isMesh){o.castShadow=true}});
-  const rc=renderer.domElement,W=Math.min(rc.width,820),Hh=Math.round(W*.72),pr=renderer.getPixelRatio();
+  const rc=renderer.domElement,pr=renderer.getPixelRatio(),host=canvas.parentNode,asp=Math.max(.3,Math.min(2.2,(host&&host.clientWidth||innerWidth)/(host&&host.clientHeight||innerHeight))),W=Math.min(rc.width,Math.round(rc.height*asp),900),Hh=Math.round(W/asp);
   canvas.width=W;canvas.height=Hh;
-  const cam=new THREE.PerspectiveCamera(31,W/Hh,.1,80);cam.position.set(.6,1.5,-5.6);cam.lookAt(.6,1.35,0);
+  const hW=2.5,dd=5.6,hH=hW/asp,lookY=.6*hH,cam=new THREE.PerspectiveCamera(2*Math.atan(hH/dd)*180/Math.PI,asp,.1,80);cam.position.set(.5,lookY,-dd);cam.lookAt(.5,lookY,0);
   renderer.setScissorTest(true);renderer.setViewport(0,0,W/pr,Hh/pr);renderer.setScissor(0,0,W/pr,Hh/pr);renderer.autoClear=true;
   renderer.render(ss,cam);
   canvas.getContext('2d').drawImage(rc,0,rc.height-Hh,W,Hh,0,0,W,Hh);

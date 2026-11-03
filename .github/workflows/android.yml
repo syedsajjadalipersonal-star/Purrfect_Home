@@ -19,6 +19,15 @@ jobs:
         run: |
           [ -d android ] || npx cap add android
           npx cap sync android
+      - name: Use the Purrfect Home logo as the app icon and launch screen
+        run: |
+          RES=android/app/src/main/res
+          cp -r android-icons/* $RES/
+          rm -f $RES/drawable-v24/ic_launcher_foreground.xml $RES/drawable/ic_launcher_background.xml
+          rm -f $RES/drawable-land*/splash.png $RES/drawable-port*/splash.png
+          mkdir -p $RES/values $RES/mipmap-anydpi-v26
+          printf '<?xml version="1.0" encoding="utf-8"?>\n<resources><color name="ic_launcher_background">#2E7658</color></resources>\n' > $RES/values/ic_launcher_background.xml
+          for n in ic_launcher ic_launcher_round; do printf '<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/ic_launcher_background"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>\n' > $RES/mipmap-anydpi-v26/$n.xml; done
       - name: Allow vibration (haptics)
         run: grep -q VIBRATE android/app/src/main/AndroidManifest.xml || sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.VIBRATE" />#' android/app/src/main/AndroidManifest.xml
       - name: Use the fixed debug signing key (so every build installs over the last one)
