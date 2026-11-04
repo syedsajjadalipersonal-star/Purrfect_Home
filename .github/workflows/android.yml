@@ -30,6 +30,8 @@ jobs:
           for n in ic_launcher ic_launcher_round; do printf '<?xml version="1.0" encoding="utf-8"?>\n<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/ic_launcher_background"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>\n' > $RES/mipmap-anydpi-v26/$n.xml; done
       - name: Allow vibration (haptics)
         run: grep -q VIBRATE android/app/src/main/AndroidManifest.xml || sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.VIBRATE" />#' android/app/src/main/AndroidManifest.xml
+      - name: Allow gentle reminders (notifications)
+        run: grep -q POST_NOTIFICATIONS android/app/src/main/AndroidManifest.xml || sed -i 's#<uses-permission android:name="android.permission.INTERNET" />#&\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />#' android/app/src/main/AndroidManifest.xml
       - name: Use the fixed debug signing key (so every build installs over the last one)
         run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
       - name: Build debug APK
