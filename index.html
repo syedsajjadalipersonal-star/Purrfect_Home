@@ -2872,7 +2872,7 @@ function catSound(k){try{AU.cat(k)}catch(e){}}
 var QM=(function(){
  const KEY='purrfect-quests';let Q={v:1,tut:0,day:0,g:[],full:false,streak:0,lastFull:0,seen:{},lv:1,xp:0,xd:{day:0,m:{}},lt:{},lc:{},pd:{last:'',run:0},ls:{last:'',n:0,claimed:''},mo:null,sh:null},pollT=0,ui={};
  try{Object.assign(Q,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
- Q.lt=Q.lt||{};Q.lc=Q.lc||{};Q.pd=Q.pd||{last:'',run:0};Q.ls=Q.ls||{last:'',n:0,claimed:''};
+ Q.lt=Q.lt||{};Q.lc=Q.lc||{};Q.ch=Q.ch||0;Q.pd=Q.pd||{last:'',run:0};Q.ls=Q.ls||{last:'',n:0,claimed:''};
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(Q))}catch(e){}};
  const reward=(n,msg)=>{WALLET.base+=n;try{saveBuild()}catch(e){}fxCoins(n,msg)};
  const need=L=>100+60*(L-1),XPT={feed:3,water:2,litter:4,pet:4,play:3,eat:4,cook:8,photo:4,buy:3,build:1,sit:1,cafe:8};
@@ -2946,6 +2946,19 @@ var QM=(function(){
  const info=g=>POOL.find(p=>p.id===g.id)||POOL.find(p=>p.k===g.k)||{};
  function newDay(){if(Q.day===day||Q.tut!=='done')return;Q.day=day;Q.g=pickDay(day);Q.full=false;if(Q.lastFull&&Q.lastFull<day-1)Q.streak=0;save();refresh()}
 
+
+ // ---------- chapters: a story told through goals that look ahead ----------
+ const CH=[
+  {t:'A Warm Welcome',i:'🏡',s:'{c} settles in and learns to trust you.',c:40,g:()=>giftFood('tuna',1),S:[['feed',3,'Feed {c} 3 times'],['water',3,'Fill the water bowl 3 times'],['pet',5,'Pet {c} 5 times'],['litre',1,'Clean 1 litre of litter']]},
+  {t:'Making Friends',i:'💗',s:'{c} starts to follow you around the house.',c:60,g:()=>giftToy(),S:[['pet',25,'Pet {c} 25 times'],['play',10,'Play together 10 times'],['photo',3,'Take 3 photos'],['days',3,'Play 3 days in a row']]},
+  {t:'Home Sweet Home',i:'🔨',s:'Your little house starts to feel like a real home.',c:90,g:()=>giftAcc(),S:[['build',25,'Place 25 things in your home'],['buy',3,'Buy 3 things'],['cook',3,'Cook 3 dishes'],['goals',10,'Finish 10 daily goals']]},
+  {t:'Café Days',i:'☕',s:'Town life, and a few new furry friends.',c:130,g:()=>giftSand(10),S:[['cafe',3,'Visit the café 3 times'],['play',40,'Play together 40 times'],['photo',10,'Take 10 photos'],['days',5,'Play 5 days in a row']]},
+  {t:'Growing Up',i:'🌱',s:'{c} is not a tiny kitten any more.',c:180,g:()=>giftToy(),S:[['age',3,'{c} reaches 3 months old'],['days',7,'Play 7 days in a row'],['feed',60,'Feed {c} 60 times'],['goals',30,'Finish 30 daily goals']]},
+  {t:'A Family Home',i:'🏠',s:'Every room is filled with love, and with {c}’s things.',c:250,g:()=>giftAcc(),S:[['build',100,'Place 100 things in your home'],['buy',15,'Buy 15 things'],['pet',120,'Pet {c} 120 times'],['days',14,'Play 14 days in a row']]},
+  {t:'Best Friends Forever',i:'👑',s:'You and {c} are inseparable now.',c:400,g:()=>giftAcc(),S:[['pet',400,'Pet {c} 400 times'],['play',150,'Play together 150 times'],['days',30,'Play 30 days in a row'],['age',12,'{c} turns 1 year old']]}];
+ const CHH={build:1,buy:1,cafe:1};
+ const chVal=k=>ltVal(k),chPct=c=>c.S.reduce((a,x)=>a+Math.min(1,chVal(x[0])/x[1]),0)/c.S.length;
+ function chChk(){if(Q.tut!=='done'||Q.ch>=CH.length)return;const c=CH[Q.ch];if(!c.S.every(x=>chVal(x[0])>=x[1]))return;Q.ch++;let g=null;try{g=c.g()}catch(e){}save();try{saveBuild()}catch(e){}reward(c.c,'📖 Chapter complete: '+c.t+(g?' · '+g.ic+' '+g.t:''));try{fxHearts(12)}catch(e){}xp(40,'ch'+Q.ch)}
  // ---------- lifetime goals: counters that never reset, each with growing tiers ----------
  const LT=[
   {k:'pet',i:'💗',t:n=>'Pet Kitty '+n+' times',T:[5,15,30,60,120,250,500,1000]},
@@ -2962,7 +2975,7 @@ var QM=(function(){
  function ltVal(k){if(k==='age')return Math.floor(ageDays()/30);if(k==='days')return Q.pd.run;return Q.lt[k]||0}
  const ltRew=(k,i)=>Math.round((20+i*14)*(i+1)/2+(i>=4?i*20:0));
  function ltChk(k){if(Q.tut!=='done')return;const l=LTK[k];let t=(Q.lc[k]||0);while(t<l.T.length&&ltVal(k)>=l.T[t]){const r=ltRew(k,t);Q.lc[k]=++t;reward(r,l.i+' Milestone: '+l.t(l.T[t-1]));xp(20,'ltm'+k+t);}}
- function lt(k,n){if(!LTK[k])return;Q.lt[k]=+((Q.lt[k]||0)+n).toFixed(2);ltChk(k)}
+ function lt(k,n){if(!LTK[k]&&!CHH[k])return;Q.lt[k]=+((Q.lt[k]||0)+n).toFixed(2);if(LTK[k])ltChk(k);try{chChk()}catch(e){}}
  function ltDays(){const d=new Date(),key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();if(Q.pd.last===key)return;const y=new Date(d.getTime()-864e5),yk=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();Q.pd.run=Q.pd.last===yk?Q.pd.run+1:1;Q.pd.last=key;save()}
 
  // ---------- daily visit streak: one gift (never coins) per real day, one missed day is forgiven ----------
@@ -3001,8 +3014,8 @@ var QM=(function(){
   const td=dkey(new Date());if(!Q.sh||Q.sh.d!==td)Q.sh={d:td,s:0,m:0};
   if(!Q.sh.s){Q.sh.s=1;save();if(!streakInfo().done){loginCard();return}}
   if(!Q.sh.m){Q.sh.m=1;save();if(!monthInfo().got)monthCard()}}catch(e){}}
- function ltTick(){try{ltDays();ltChk('age');ltChk('days')}catch(e){}loginTick()}
- function ev(name,n,x){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);if(name==='litterL')lt('litre',x||0);else if(LTK[name])lt(name,n);
+ function ltTick(){try{ltDays();ltChk('age');ltChk('days');chChk()}catch(e){}loginTick()}
+ function ev(name,n,x){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);if(name==='litterL')lt('litre',x||0);else if(LTK[name]||CHH[name])lt(name,n);
   if(Q.tut!=='done'){const s=TUT[Q.tut];if(s&&s.ev===name)adv()}
   if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g);reward(p.r||6,p.i+' Goal done!');xp(8,'goal');lt('goals',1)}}
    if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=30+5*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
@@ -3071,13 +3084,20 @@ var QM=(function(){
  const IDXW=TUT.findIndex(s=>s.guide==='at:foodbowl');
  function catHome(){const U=cat.userData;let x=0,z=0;for(const it of furn.values())if(it.type==='foodbowl'){x=it.x0+.5;z=it.z0+1.5}x=Math.max(HX.x0+.8,Math.min(HX.x1-.8,x));z=Math.max(HX.z0+.8,Math.min(HX.z1-.8,z||0));cat.position.set(x,0,z);if(U.target)U.target.set(x,0,z);U.path=null;U.follow=0;U.happy=0}
  setInterval(()=>{try{if(started&&!OB.on){if(Q.tut!=='done'&&Q.tut>=IDXW&&IDXW>=0&&!inHouse(Math.floor(cat.position.x),Math.floor(cat.position.z)))catHome();if(Q.tut!=='done')poll();refresh();spotTick();gUpdate()}}catch(e){}},140);
- let ptab='d';
+ let ptab='c';
  function panel(){let p=document.getElementById('qPanel');if(p){p.remove();return}p=document.createElement('div');p.id='qPanel';
   p.style.cssText='position:fixed;z-index:50;right:max(12px,env(safe-area-inset-right));top:calc(max(10px,env(safe-area-inset-top)) + 60px);width:min(330px,92vw);max-height:70vh;overflow:auto;background:#fff8e9;border-radius:18px;padding:14px;box-shadow:0 10px 34px #0004;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:13px';
   let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
   if(Q.tut==='done'){const tb=on=>'border:0;border-radius:12px;padding:7px 12px;font-weight:800;font-size:12px;font-family:inherit;'+(on?'background:#2e7658;color:#fff':'background:#fff;color:#24332e');
-   h+='<div style="display:flex;gap:6px;margin:10px 0 2px;flex-wrap:wrap"><button data-pt="d" style="'+tb(ptab==='d')+'">📅 Daily</button><button data-pt="l" style="'+tb(ptab==='l')+'">🏆 Lifetime</button></div>';
-   if(ptab==='d'){const dn=Q.g.filter(g=>g.d).length;h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak · ':'')+dn+'/'+Q.g.length+' done'+(Q.streak?'':' · finish all to start a streak')+'</div>';
+   h+='<div style="display:flex;gap:6px;margin:10px 0 2px;flex-wrap:wrap"><button data-pt="c" style="'+tb(ptab==='c')+'">📖 Chapters</button><button data-pt="d" style="'+tb(ptab==='d')+'">📅 Daily</button><button data-pt="l" style="'+tb(ptab==='l')+'">🏆 Lifetime</button></div>';
+   if(ptab==='c'){const nm=x=>nameT(x),cur=Q.ch;h+='<div style="margin:8px 0 2px;font-weight:800">📖 '+(cur>=CH.length?'Story complete':'Chapter '+(cur+1)+' of '+CH.length)+'</div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+(cur/CH.length*100)+'%;background:#a56bd0"></i></div>';
+    CH.forEach((c,i)=>{const done=i<cur,act=i===cur,pc=done?1:act?chPct(c):0;
+     h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:'+(act?'#fff':'transparent')+';'+(done?'opacity:.6':'')+(i>cur?';opacity:.75':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;font-weight:800"><span>'+(i>cur?'🔒':c.i)+' '+(i+1)+'. '+c.t+(done?' ✅':'')+'</span><span style="white-space:nowrap">'+(done?'Done':'🪙'+c.c+' + 🎁')+'</span></div>';
+     if(act||done){h+='<div style="font-size:11px;opacity:.75;margin:3px 0 6px">'+escH(nm(c.s))+'</div>';c.S.forEach(x=>{const v=chVal(x[0]),ok=done||v>=x[1],sh=Math.min(x[1],Math.floor(v));h+='<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;margin:2px 0;'+(ok?'opacity:.6':'')+'"><span>'+(ok?'✅ ':'⬜ ')+escH(nm(x[2]))+'</span><span style="white-space:nowrap">'+(ok?'':sh+'/'+x[1])+'</span></div>'})}
+     else h+='<div style="font-size:11px;opacity:.75;margin-top:3px">Coming up: '+escH(nm(c.s))+'</div>';
+     h+='<div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(pc*100)+'%;background:#a56bd0"></i></div></div>'});
+    h+='<div style="font-size:11px;opacity:.7">Each chapter pays coins and a gift when every step is done. More chapters are coming.</div>'}
+   else if(ptab==='d'){const dn=Q.g.filter(g=>g.d).length;h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak · ':'')+dn+'/'+Q.g.length+' done'+(Q.streak?'':' · finish all to start a streak')+'</div>';
     for(const g of Q.g){const p=info(g);h+='<div style="margin:9px 0;'+(g.d?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+p.i+' '+p.t+(g.d?' ✅':'')+'</span><span>'+g.h+'/'+g.n+' · 🪙'+(p.r||6)+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+g.h/g.n*100+'%;background:#2e7658"></i></div></div>'}
     h+='<div style="font-size:11px;opacity:.7;margin-top:6px">Six new goals every day. Finish them all for a streak bonus.</div>'}
    else if(ptab==='l'){h+='<div style="font-size:11px;opacity:.7;margin:6px 0">Milestones that keep growing. Each one you reach pays a bigger reward.</div>';
