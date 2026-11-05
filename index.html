@@ -2995,7 +2995,8 @@ var QM=(function(){
   el.innerHTML='<div style="font-size:18px;font-weight:900">🗓️ '+m.name+' · day '+m.next+' of '+m.N+'</div><div style="font-size:12px;opacity:.7;margin-top:3px">'+(m.missed?'You skipped '+m.missed+' day'+(m.missed>1?'s':'')+' this month':'Perfect so far!')+'</div>'+monthGrid(m)+'<div style="font-weight:800;margin:4px 0 12px">Today’s prize: '+monthIcon(m.next,m.N)+'</div><button type="button" style="width:100%;border:0;border-radius:14px;padding:12px;background:#2e7658;color:#fff;font-weight:800;font-size:15px">Thanks!</button>';
   const b=el.querySelector('button');el.addEventListener('pointerdown',e=>e.stopPropagation());b.onclick=()=>el.remove();const g=claimMonth()||{ic:'',t:''};save();try{saveBuild()}catch(e){}try{sound('good')}catch(e){}try{fxHearts(10)}catch(e){}el.children[3].innerHTML='You got:<br>'+g.ic+' '+escH(g.t)+' 🎉';el.children[2].outerHTML=monthGrid(monthInfo());refresh();
   document.body.appendChild(el)}
- function loginTick(){try{if(Q.tut!=='done'||!started||OB.on)return;const w=document.getElementById('welcome'),sp=document.getElementById('splash');if((w&&w.style.display!=='none')||(sp&&sp.style.display!=='none'))return;if(document.getElementById('awayCard')||document.getElementById('loginCard'))return;if(build.on||SH.on||PG.on||(typeof HV!=='undefined'&&HV&&HV.on))return;
+ let holdLogin=0;
+ function loginTick(){try{if(holdLogin||Q.tut!=='done'||!started||OB.on)return;const w=document.getElementById('welcome'),sp=document.getElementById('splash');if((w&&w.style.display!=='none')||(sp&&sp.style.display!=='none'))return;if(document.getElementById('awayCard')||document.getElementById('loginCard'))return;if(build.on||SH.on||PG.on||(typeof HV!=='undefined'&&HV&&HV.on))return;
   // each pop-up shows once per day, when the game is first opened: the daily gift first, then (after it is closed) the monthly prize
   const td=dkey(new Date());if(!Q.sh||Q.sh.d!==td)Q.sh={d:td,s:0,m:0};
   if(!Q.sh.s){Q.sh.s=1;save();if(!streakInfo().done){loginCard();return}}
@@ -3006,7 +3007,7 @@ var QM=(function(){
   if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g);reward(p.r||6,p.i+' Goal done!');xp(8,'goal');lt('goals',1)}}
    if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=30+5*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
    save()}refresh()}catch(e){}}
- function adv(){const s=TUT[Q.tut];Q.tut++;try{sound('good')}catch(e){}if(Q.tut>=TUT.length){Q.tut='done';setTimeout(()=>{toast('🎉 First day complete! Daily goals unlocked 🎯');newDay()},1800)}save();refresh()}
+ function adv(){const s=TUT[Q.tut];Q.tut++;try{sound('good')}catch(e){}if(Q.tut>=TUT.length){Q.tut='done';holdLogin=1;setTimeout(()=>{holdLogin=0;toast('🎉 Tutorial complete! Here are your first-day rewards 🎁');newDay();try{loginTick()}catch(e){}},1800)}save();refresh()}
  let LD=0;const LK='purrfect-login';function loginBonus(){const dk=d=>d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(),t=new Date();let o={};try{o=JSON.parse(localStorage.getItem(LK)||'{}')||{}}catch(e){}if(o.d===dk(t))return;const st=o.d===dk(new Date(t-864e5))?(o.s||0)+1:1;try{localStorage.setItem(LK,JSON.stringify({d:dk(t),s:st}))}catch(e){}const c=20+10*Math.min(st,7);setTimeout(()=>reward(c,'📅 Welcome back! Day '+st),2500)}
  let snap=null;const SNK='purrfect-tutsnap';
  function takeSnap(){try{snap=JSON.parse(localStorage.getItem(SNK)||'null')}catch(e){}if(snap)return;snap={w:[...edges.values()].map(e=>[e.x,e.z,e.o,e.type,e.style]),f:[...floors.values()].map(f=>[f.cx,f.cz,f.type]),u:[...furn.values()].map(o=>[o.type,o.x0,o.z0,o.rot,o.uid]),it:JSON.parse(JSON.stringify(INV.items||{}))};try{localStorage.setItem(SNK,JSON.stringify(snap))}catch(e){}}
@@ -3090,7 +3091,7 @@ var QM=(function(){
  function init(){if(Q.tv!==3){Q.tv=3;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
  setTimeout(()=>{try{init();refresh()}catch(e){}},0);
  function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();ltTick();refresh()}
- return {loginCard,monthCard,streakInfo,monthInfo,loginTick,ltTick,ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
+ return {tutEnd:()=>{Q.tut=TUT.length-1;adv()},loginCard,monthCard,streakInfo,monthInfo,loginTick,ltTick,ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
 })();
 function qev(n,c,x){try{QM.ev(n,c,x)}catch(e){}}
 // ===== Kitty's personality and little random events =====
