@@ -618,10 +618,10 @@ function rotateFurn(it){const cx=it.x0+it.fw/2,cz=it.z0+it.fd/2,nr=frot(it.rot+1
  for(const x of xs)for(const z of zs)if(canPlace(it.type,x,z,nr,it.uid)){const from=[it.x0,it.z0,it.rot];it.x0=x;it.z0=z;it.rot=nr;placeModel(it);build.undo.push({furnSet:[[it.uid,from]]});saveBuild();sound();return true}
  toast('No room to turn it here');return false}
 // cat with tail, ears, face and articulated legs
-const CAT_SCALE=.7;const cat=group(scene,1.2,0,5.2);cat.scale.setScalar(CAT_SCALE);const catBody=group(cat);
+const CAT_SCALE=.7;let cat=group(scene,1.2,0,5.2);cat.scale.setScalar(CAT_SCALE);let catBody=group(cat);
 var catPupils=[],catPd=0,catHead=group(catBody,0,.74,.52),catEars=[],catLids=[],catTears=[],catJaw=null,catTongue=null;
 var legs=[0,1,2,3].map(()=>group(catBody,0,.34,0));var tail=group(catBody,0,.5,-.42);
-let catMount=group(catBody,0,0,0);catMount.add(catHead);const catNew=[],catMats=[];
+let catMount=group(catBody,0,0,0);catMount.add(catHead);let catNew=[],catMats=[];var AGE0=60,OTH=null,CID='a',BGP=false,NOSAVE=false;
 // ===== Cat creator data: 5 famous breeds x coat patterns x colours =====
 const CCOL={black:['#2a2630','#17171b','Black'],white:['#f7f3ea','#cfc6b6','White'],cream:['#f2c46f','#b9a06c','Cream'],blue:['#6a86ad','#4f5764','Blue (grey)'],cinnamon:['#b8651f','#7d4f28','Cinnamon'],red:['#f0771a','#9c5420','Red (ginger)'],brown:['#6e3d1f','#3a2d22','Brown'],silver:['#9db0c8','#6f737c','Silver']};
 const CPAT=[['solid','Solid'],['mackerel','Tabby'],['spotted','Spotted'],['point','Colour point'],['tuxedo','Tuxedo'],['calico','Calico']];
@@ -850,7 +850,7 @@ function catRebuild(spec,silent){
  catEars=R.ears;catPupils=R.pupils;catLids=R.lids;catJaw=R.jaw;catTongue=R.tongue;catTears=R.tears;catHeadK=R.hd;
  catMount.position.set(0,R.oy,.52*(R.Z-1));
  catRefit();
- try{localStorage.setItem('purrfect-cat',JSON.stringify(spec))}catch(e){}
+ if(!NOSAVE)try{localStorage.setItem('purrfect-cat',JSON.stringify(spec))}catch(e){}
 }
 let catHeadK=[1,1,1];function catRefit(){catHead.scale.set(...catHeadK.map(v=>v*(1+.3*(1-ageF())/.48)))}
 // ---- cat creator sheet (live preview in its own small renderer)
@@ -963,14 +963,14 @@ const OB={on:false,el:null},OBSKIP=LOCKED&&!!PNAME;
 const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // swap the default cat name for the one the player chose, everywhere text appears
 function ncRename(){if(!CNAME||/kitty/i.test(CNAME))return;
- const fix=n=>{if(n.nodeType===3){const v=n.nodeValue;if(v&&/kitty/i.test(v))n.nodeValue=v.replace(/\bKitty\b/g,CNAME).replace(/\bkitty\b/g,CNAME)}else if(n.nodeType===1&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/.test(n.tagName)){for(const c of n.childNodes)fix(c)}};
+ const fix=n=>{if(!CNAME||/kitty/i.test(CNAME))return;if(n.nodeType===3){const v=n.nodeValue;if(v&&/kitty/i.test(v))n.nodeValue=v.replace(/\bKitty\b/g,CNAME).replace(/\bkitty\b/g,CNAME)}else if(n.nodeType===1&&!/^(SCRIPT|STYLE|TEXTAREA|INPUT)$/.test(n.tagName)){for(const c of n.childNodes)fix(c)}};
  if(!ncRename.mo){ncRename.mo=new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')fix(m.target);else for(const a of m.addedNodes)fix(a)}});ncRename.mo.observe(document.body,{childList:true,subtree:true,characterData:true})}
  fix(document.body)}
 function obHost(){if(!OB.el){OB.el=document.createElement('div');OB.el.id='onb';document.body.appendChild(OB.el);OB.el.addEventListener('pointerdown',e=>e.stopPropagation())}return OB.el}
-function obNameCard(kind,next){const me=kind==='me',h=obHost();OB.on=true;document.body.classList.add('ob');
- h.innerHTML='<div class="obc"><div class="obe">'+(me?'🏡':'🐱')+'</div><h1>'+(me?'Welcome to Purrfect Home!':'Now meet your kitten, '+escH(PNAME)+'!')+'</h1><p>'+(me?'First things first. What should we call you?':'Every home needs a cat. What will you name your kitten?')+'</p><input id="obIn" maxlength="14" autocomplete="off" spellcheck="false" placeholder="'+(me?'Your name':'Kitten’s name')+'" value="'+escH(me?PNAME:(CNAME==='Kitty'?'':CNAME))+'"><button id="obNx" type="button">Next</button></div>';
+function obNameCard(kind,next){const me=kind==='me',c2=kind==='cat2',h=obHost();OB.on=true;document.body.classList.add('ob');
+ h.innerHTML='<div class="obc"><div class="obe">'+(me?'🏡':'🐱')+'</div><h1>'+(me?'Welcome to Purrfect Home!':c2?'A newcomer, '+escH(PNAME)+'!':'Now meet your kitten, '+escH(PNAME)+'!')+'</h1><p>'+(me?'First things first. What should we call you?':c2?'Every new friend needs a name. What will you call the newcomer?':'Every home needs a cat. What will you name your kitten?')+'</p><input id="obIn" maxlength="14" autocomplete="off" spellcheck="false" placeholder="'+(me?'Your name':c2?'Newcomer’s name':'Kitten’s name')+'" value="'+escH(me?PNAME:(CNAME==='Kitty'?'':CNAME))+'"><button id="obNx" type="button">Next</button></div>';
  const inp=h.querySelector('#obIn'),bt=h.querySelector('#obNx'),chk=()=>{bt.disabled=!inp.value.trim()};inp.addEventListener('input',chk);chk();
- const go=()=>{const v=inp.value.trim().replace(/[<>&"]/g,'').slice(0,14);if(!v)return;if(me){PNAME=v;try{localStorage.setItem('purrfect-name',v)}catch(e){}}else{CNAME=v;try{localStorage.setItem('purrfect-catname',v)}catch(e){}ncRename()}h.style.display='none';next()};
+ const go=()=>{const v=inp.value.trim().replace(/[<>&"]/g,'').slice(0,14);if(!v)return;if(me){PNAME=v;try{localStorage.setItem('purrfect-name',v)}catch(e){}}else{CNAME=v;if(!c2){try{localStorage.setItem('purrfect-catname',v)}catch(e){}}ncRename()}h.style.display='none';next()};
  bt.addEventListener('click',go);inp.addEventListener('keydown',e=>{if(e.key==='Enter')go()});h.style.display='flex';setTimeout(()=>{try{inp.focus()}catch(e){}},250)}
 function obSheet(kind,next){const bar=document.createElement('div');bar.id='obBar';
  bar.innerHTML='<span>'+(kind==='me'?'Design yourself, '+escH(PNAME):'Design '+escH(CNAME))+'</span><button type="button" id="obGo">Continue ➜</button>';document.body.appendChild(bar);bar.addEventListener('pointerdown',e=>e.stopPropagation());
@@ -1239,13 +1239,13 @@ const SND={purr:['sine',72,72,.045,.55],clean:['triangle',420,180,.035,.24],eat:
 const CKEY='purrfect-home-cat1';
 try{const saved=JSON.parse(localStorage.getItem(CKEY)||'null');if(saved){stats={...stats,...saved.stats};bowl={...bowl,...saved.bowl};clocks={...clocks,...saved.clocks};savedFloor=saved.floor||[];if(saved.sand&&saved.sand.length===sandH.length){saved.sand.forEach((v,i)=>sandH[i]=v/1000);buriedCount=saved.buried||0;sandDirty=true}if(saved.pos){cat.position.x=+saved.pos[0]||cat.position.x;cat.position.z=+saved.pos[1]||cat.position.z}}}catch(e){}
 function setStat(k,v){stats[k]=Math.max(0,Math.min(100,v));document.getElementById(k).style.width=stats[k]+'%'}
-function saveCat(){try{localStorage.setItem(CKEY,JSON.stringify({stats,bowl,clocks,floor:floorMess.map(m=>[m.x,m.z,m.kind]),sand:Array.from(sandH,v=>Math.round(v*1000)),buried:buriedCount,pos:(HV&&HV.on&&HV.catSave)?[HV.catSave.x,HV.catSave.z]:[cat.position.x,cat.position.z]}))}catch(e){}}
+function saveCat(){try{c2Save()}catch(e){}try{localStorage.setItem(CKEY,JSON.stringify({stats,bowl,clocks,floor:floorMess.map(m=>[m.x,m.z,m.kind]),sand:Array.from(sandH,v=>Math.round(v*1000)),buried:buriedCount,pos:(HV&&HV.on&&HV.catSave)?[HV.catSave.x,HV.catSave.z]:[cat.position.x,cat.position.z]}))}catch(e){}}
 function missingText(){const m=[];if(!isPlaced(foodBowl))m.push('food bowl');if(!isPlaced(waterBowl))m.push('water bowl');if(!isPlaced(litter))m.push('litter tray');return m.length?'Add a '+m.join(', ')+' · Build → Furniture → Cat':''}
 function updateUI(){for(const k in stats)setStat(k,stats[k]);
  const miss=missingText();document.getElementById('bowls').textContent=miss||`🍗 Food bowl ${Math.round(bowl.food)}% · 💧 Water bowl ${Math.round(bowl.water)}% · 🐱 ${catStateText()}`+(isPlaced(litter)?` · 🏖️ ${(+INV.trayL.toFixed(1))}/5 L`:'');const dirt=1-stats.litter/100;litterMat.color.setRGB(1-.45*dirt,1-.5*dirt,1-.55*dirt)}
 function simulate(dtReal){if(!started||build.on)return;const dm=dtReal*GAME_MIN_PER_SEC;const slp=sleepInfo(mins)?1:0;if(isPlaced(litter)&&INV.trayL<.5){stats.love=Math.max(0,stats.love-DEC.love*dm*2.5);smellT-=dtReal;if(smellT<=0){smellT=40;fxStink(litter.position.x,litter.position.y+.25,litter.position.z,8)}}
  stats.love=Math.max(0,stats.love-DEC.love*PM.love*homeLoveK()*dm*(slp?.15:1));
- stats.health=Math.max(0,stats.health-DEC.health*dm*((stats.hunger<=0||stats.thirst<=0)?3:1)*(SICK.t>0?4:1));stats.clean=Math.max(0,stats.clean-DEC.clean*dm);if(RECOVER.t>0){RECOVER.t-=dtReal;if(RECOVER.t<=0)toast('Kitty healed — cone off 🎉')}coneMesh.visible=RECOVER.t>0;if(stats.health<25&&!warnH){warnH=true;toast('Kitty looks unwell 🩺 Visit Petspace Animal Hospital')}else if(stats.health>40)warnH=false;if(stats.clean<20&&!warnC){warnC=true;toast('Kitty is scruffy 🛁 A grooming trip would help')}else if(stats.clean>40)warnC=false;
+ stats.health=Math.max(0,stats.health-DEC.health*dm*((stats.hunger<=0||stats.thirst<=0)?3:1)*(SICK.t>0?4:1));stats.clean=Math.max(0,stats.clean-DEC.clean*dm);if(RECOVER.t>0){RECOVER.t-=dtReal;if(RECOVER.t<=0)toast('Kitty healed — cone off 🎉')}if(!BGP)coneMesh.visible=RECOVER.t>0;if(stats.health<25&&!warnH){warnH=true;toast('Kitty looks unwell 🩺 Visit Petspace Animal Hospital')}else if(stats.health>40)warnH=false;if(stats.clean<20&&!warnC){warnC=true;toast('Kitty is scruffy 🛁 A grooming trip would help')}else if(stats.clean>40)warnC=false;
  if(isPlaced(foodBowl))stats.hunger=Math.max(0,stats.hunger-DEC.hunger*PM.hunger*dm*(slp?.3:1));if(isPlaced(waterBowl))stats.thirst=Math.max(0,stats.thirst-DEC.thirst*dm*(slp?.3:1));
  if(isPlaced(litter)){stats.litter=Math.max(0,stats.litter-DEC.litter*dm);clocks.pee+=dm;clocks.poop+=dm}}
 // ---- time keeps passing while the app is closed or in the background: the clock, the day and the care stats catch up when you return ----
@@ -1254,12 +1254,12 @@ function catchUp(awaySec){
  if(!started||!isFinite(awaySec)||awaySec<30)return;
  try{if(QM.Q.tut!=='done')return}catch(e){}
  awaySec=Math.min(awaySec,30*86400);
- const b0={...stats},d0=day;
+ const b0={...stats},d0=day,h2=OTH?OTH.stats.health:0;
  QUIET=true;
  try{const hp=stats.health,step=Math.max(30,awaySec/1500);let left=awaySec;
-  const t0=Date.now()-awaySec*1000;while(left>0){const d=Math.min(step,left);left-=d;const c=clockAt(t0+(awaySec-left)*1000);mins=c.mins;day=c.day;simulate(d)}syncClock()
+  const t0=Date.now()-awaySec*1000;while(left>0){const d=Math.min(step,left);left-=d;const c=clockAt(t0+(awaySec-left)*1000);mins=c.mins;day=c.day;simulate(d);if(OTH){xchg(false);try{simulate(d)}finally{xchg(false)}}}syncClock()
   // a cat left alone gets hungry, thirsty and scruffy, but is never left in real danger: health stops falling at 20
-  stats.health=Math.max(stats.health,Math.min(hp,20));
+  stats.health=Math.max(stats.health,Math.min(hp,20));if(OTH)OTH.stats.health=Math.max(OTH.stats.health,Math.min(h2,20));
   clocks.pee=Math.min(clocks.pee,PEE_DUE*1.2);clocks.poop=Math.min(clocks.poop,POOP_DUE*1.2)}
  catch(e){console.warn('catchUp',e)}
  QUIET=false;smellT=0;warnH=false;warnC=false;
@@ -2413,7 +2413,7 @@ function navPath(sx,sz,tx,tz){if(navBuilt!==navVer)navBuild();const s=navC(sx,sz
 let NAPC={d:-1,n:[]};
 function napsOf(d){if(NAPC.d===d)return NAPC.n;let s=(Math.imul(d+7919,2654435761)^0x9e3779b9)>>>0;const r=()=>{s=(s+0x6D2B79F5)>>>0;let t=s;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296},a=540+Math.floor(r()*240),la=60+Math.floor(r()*31),b=870+Math.floor(r()*270),lb=60+Math.floor(r()*31);NAPC={d,n:[[a,a+la],[b,b+lb]]};return NAPC.n}
 function sleepInfo(m,dd){m=((m%1440)+1440)%1440;if(m>=1380||m<300)return 'night';for(const n of napsOf(dd===undefined?day:dd))if(m>=n[0]&&m<n[1])return 'nap';return null}
-const ageDays=()=>60+(day-1)+(((mins%1440)+1440)%1440)/1440;
+const ageDays=()=>AGE0+(day-1)+(((mins%1440)+1440)%1440)/1440;
 const ageF=()=>.52+.48*Math.min(1,(1-Math.exp(-(ageDays()-60)/120))/(1-Math.exp(-305/120)));
 // ===== Health record: vaccinations, deworming, spay/neuter =====
 const VAX_FIRST=75,VAX_BOOST=7,VAX_YEAR=365,DEW_EVERY=30,MED_GRACE=10,SPAY_AGE=180,MED={t:0,cool:0};
@@ -2458,10 +2458,10 @@ function mealWin(){const m=((mins%1440)+1440)%1440;return m>=300&&m<540?'B':m>=7
 function mealState(){const U=cat.userData;if(!U.meal||U.meal.d!==day)U.meal={d:day,B:0,L:0,D:0,BW:0,LW:0,DW:0};return U.meal}
 function onCatWake(kind){const U=cat.userData;U.wakeDrink=true;if(kind==='night')toast('Good morning! Kitty is awake 🌅 She wants breakfast and water.');else toast('Kitty woke up from her nap 😺')}
 function bedtimePenalty(){const ML=mealState(),msg=[];if(!ML.D&&stats.hunger<70){stats.love=Math.max(0,stats.love-10);stats.health=Math.max(0,stats.health-6);msg.push('without dinner')}if(!ML.DW&&stats.thirst<70){stats.love=Math.max(0,stats.love-4);stats.health=Math.max(0,stats.health-3);msg.push('thirsty')}if(msg.length)toast('Kitty went to bed '+msg.join(' and ')+' 😿 Her mood and health dropped.');else toast('Kitty is off to bed 🌙 Sweet dreams.')}
-function pendingNeed(){const U=cat.userData,due=clocks.pee>=PEE_DUE||clocks.poop>=POOP_DUE,hf=isPlaced(foodBowl),hw=isPlaced(waterBowl),hl=isPlaced(litter);
- if(hf&&stats.hunger<=0&&bowl.food>0)return 'eat';if(hw&&stats.thirst<=0&&bowl.water>0)return 'drink';if(hl&&due&&stats.litter>0&&INV.trayL>=.5)return 'litter';
- {const w=mealWin(),ML=mealState();if(w&&hf&&!ML[w]&&stats.hunger<88)return bowl.food>0?'eat':'beg-food';
-  if(w&&hw&&!ML[w+'W']&&stats.thirst<88)return bowl.water>0?'drink':'beg-water';
+function pendingNeed(){const U=cat.userData,ou=OTH&&OTH.cat.visible?OTH.cat.userData:null,ob=k=>ou&&ou.stage==='do'&&ou.task===k,due=clocks.pee>=PEE_DUE||clocks.poop>=POOP_DUE,hf=isPlaced(foodBowl),hw=isPlaced(waterBowl),hl=isPlaced(litter);
+ if(hf&&stats.hunger<=0&&bowl.food>0&&!ob('eat'))return 'eat';if(hw&&stats.thirst<=0&&bowl.water>0&&!ob('drink'))return 'drink';if(hl&&due&&stats.litter>0&&INV.trayL>=.5&&!ob('litter'))return 'litter';
+ {const w=mealWin(),ML=mealState();if(w&&hf&&!ML[w]&&stats.hunger<88&&!(bowl.food>0&&ob('eat')))return bowl.food>0?'eat':'beg-food';
+  if(w&&hw&&!ML[w+'W']&&stats.thirst<88&&!(bowl.water>0&&ob('drink')))return bowl.water>0?'drink':'beg-water';
   if(U.wakeDrink){if(!hw||stats.thirst>=80||bowl.water<=0)U.wakeDrink=false;else return 'drink'}}
  if(hf&&stats.hunger<=0)return 'beg-food';if(hw&&stats.thirst<=0)return 'beg-water';if(hl&&due)return (U.refuseCD||0)>0?'accident':'refuse';return null}
 function accFront(o,dist){const cx=o.position.x,cz=o.position.z,dirs=[[0,1],[0,-1],[1,0],[-1,0]];
@@ -2555,7 +2555,7 @@ function windowSpot(){const ws=[...edges.values()].filter(e=>e.type==='window');
 const CINE={k:0,t:0,cool:12,kind:'',side:1,yaw:0,menu:0,mt:0,on:true,fov:49};
 try{CINE.on=localStorage.getItem('purrfect-cine')!=='0'&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){}
 const dofEl=document.getElementById('dof');
-function cineGo(kind,dur,force){if(STU.on||!CINE.on||CINE.t>0||(!force&&CINE.cool>0)||CINE.menu)return false;if(build.on||PG.on||HV.on||SG.on||SH.on||CI.on||ck.on||DN.on||seat||act||GE.on||!cat.visible)return false;
+function cineGo(kind,dur,force){if(BGP)return false;if(STU.on||!CINE.on||CINE.t>0||(!force&&CINE.cool>0)||CINE.menu)return false;if(build.on||PG.on||HV.on||SG.on||SH.on||CI.on||ck.on||DN.on||seat||act||GE.on||!cat.visible)return false;
  if(Math.hypot(player.position.x-cat.position.x,player.position.z-cat.position.z)>9)return false;if(Math.hypot(moveX,moveY)>.3||keys.w||keys.a||keys.s||keys.d)return false;
  CINE.kind=kind;CINE.t=dur;CINE.side=Math.random()<.5?-1:1;CINE.yaw=0;CINE.dur=dur;return true}
 function cineMenuPoll(){let m=0;for(const e of document.querySelectorAll('.fh'))if(e.getClientRects().length){m=1;break}CINE.menu=m;if(m&&CINE.t>0)CINE.t=0}
@@ -2577,7 +2577,7 @@ function updateCat(dt){const U=cat.userData,sad=stats.love<=0;lifeSick(dt);
  if(U.happy>0){U.happy-=dt;return}                                   // being petted: purrs in place
  if(U.follow>0){U.follow-=dt;const dx=player.position.x-cat.position.x,dz=player.position.z-cat.position.z,d=Math.hypot(dx,dz);if(d>1.7)stepCat(dx,dz,d,.95*dt,dt);return}
  if(tutHold()){if(U.task)endTask();U.wait=1;U.zoom=0;return}
- if(LIFE.hide){hideTick(dt);return}if(LIFE.bug&&bugTick(dt))return;
+ if(!BGP){if(LIFE.hide){hideTick(dt);return}if(LIFE.bug&&bugTick(dt))return}
  const locked=U.task==='eat'||U.task==='drink'||U.task==='litter';
  {const sl=sleepInfo(mins);if(sl&&U.task!=='sleep'&&!locked&&!(HV&&HV.on)){if(U.task)endTask();U.sleepKind=sl;startTask('sleep')}else if(!sl&&U.task==='sleep'){const k=U.sleepKind;endTask();U.wait=.5;onCatWake(k)}}
  if(U.potty>0&&U.task!=='sleep'){U.potty-=dt;if(U.potty<=0){clocks.pee=Math.max(clocks.pee,PEE_DUE);if(Math.random()<.45)clocks.poop=Math.max(clocks.poop,POOP_DUE)}}
@@ -2659,9 +2659,10 @@ function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THRE
  const open=P.chew*(Math.sin(t*14)*.5+.5)+P.beg*Math.max(0,Math.sin(t*3));catJaw.scale.y=.004+.03*open;
  catTongue.visible=P.lap>.3;if(catTongue.visible){catTongue.position.z=.268+.035*Math.max(0,Math.sin(t*10));catTongue.position.y=-.125-.01*Math.max(0,Math.sin(t*10))}
  catTears.forEach((tr,i)=>{tr.visible=sd>.5;if(tr.visible){const f=(t*.5+i*.5)%1;tr.position.y=-.02-f*.2;tr.scale.set(.012,.018*(1-f*.5),.01)}});
+ if(!BGP){
  ripple.material.opacity=tk==='drink'?.55*(1-(t*1.6)%1):0;if(tk==='drink'){const s=.08+((t*1.6)%1)*.26;ripple.scale.set(s,s,1);ripple.position.set(0,waterDisc.position.y+.008,.18)}
  updateBowlVisuals();sandApply();updateSandParticles(dt);
- setBubble(U.annoyed>0&&!U.happy?'😾':tk==='play'?'🧶':tk==='beg-food'?'🍗':tk==='beg-water'?'💧':tk==='refuse'?(INV.trayL<.5?'🤢':'🧹'):sad?'😿':U.happy>0?'💗':tk==='nap'||tk==='sleep'?'💤':'')}
+ setBubble(U.annoyed>0&&!U.happy?'😾':tk==='play'?'🧶':tk==='beg-food'?'🍗':tk==='beg-water'?'💧':tk==='refuse'?(INV.trayL<.5?'🤢':'🧹'):sad?'😿':U.happy>0?'💗':tk==='nap'||tk==='sleep'?'💤':'')}}
 renderer.domElement.addEventListener('pointerdown',()=>{hideCtx()});
 window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&!build.on)action('interact')});
 // input
@@ -2866,7 +2867,49 @@ var AU=(function(){
 })();
 function saveAll(){try{saveBuild()}catch(e){}try{saveCat()}catch(e){}try{QM.save()}catch(e){}}
 function sound(k){try{AU.sfx(k||'place');if(k==='coin')qev('buy')}catch(e){}}
-function catSound(k){try{AU.cat(k)}catch(e){}}
+function catSound(k){if(BGP)return;try{AU.cat(k)}catch(e){}}
+// ===== A second cat. The cat you are looking after lives in the usual globals; the other one waits in OTH. xchg() swaps them. =====
+const STATS0={hunger:70,thirst:70,litter:100,love:30,health:95,clean:70};
+const C2={busy:false,ageT:0,uiT:0};
+function newRig(){const c=group(scene,1.2,0,5.2);c.scale.setScalar(CAT_SCALE);const body=group(c),head=group(body,0,.74,.52),lg=[0,1,2,3].map(()=>group(body,0,.34,0)),tl=group(body,0,.5,-.42),mount=group(body,0,0,0);mount.add(head);
+ return {cat:c,catBody:body,catHead:head,legs:lg,tail:tl,catMount:mount,catEars:[],catPupils:[],catLids:[],catTears:[],catJaw:null,catTongue:null,catHeadK:[1,1,1],catNew:[],catMats:[],catPd:0}}
+function capCat(){return {id:CID,cat,catBody,catHead,legs,tail,catMount,catEars,catPupils,catLids,catTears,catJaw,catTongue,catHeadK,catNew,catMats,catPd,spec:catSpec,name:CNAME,stats,clocks,sick:SICK.t,rec:RECOVER.t,med:INV.med,age0:AGE0,warnH,warnC}}
+function putCat(o){CID=o.id;cat=o.cat;catBody=o.catBody;catHead=o.catHead;legs=o.legs;tail=o.tail;catMount=o.catMount;catEars=o.catEars;catPupils=o.catPupils;catLids=o.catLids;catTears=o.catTears;catJaw=o.catJaw;catTongue=o.catTongue;catHeadK=o.catHeadK;catNew=o.catNew;catMats=o.catMats;catPd=o.catPd;catSpec=o.spec;CNAME=o.name;stats=o.stats;clocks=o.clocks;SICK.t=o.sick;RECOVER.t=o.rec;INV.med=o.med;AGE0=o.age0;warnH=o.warnH;warnC=o.warnC}
+function xchg(real){if(!OTH)return;const cur=capCat();putCat(OTH);OTH=cur;if(real){for(const k in accGroups)catHead.add(accGroups[k]);try{applyWorn()}catch(e){}}}
+function c2Save(){if(!OTH||C2.busy)return;try{const o=OTH;localStorage.setItem('purrfect-c2',JSON.stringify({cid:CID,fa:AGE0,o:{id:o.id,spec:o.spec,name:o.name,stats:o.stats,clocks:o.clocks,sick:o.sick,rec:o.rec,med:o.med,age0:o.age0,x:o.cat.position.x,z:o.cat.position.z,ry:o.cat.rotation.y}}))}catch(e){}}
+function afterSwap(){try{localStorage.setItem('purrfect-catname',CNAME);localStorage.setItem('purrfect-cat',JSON.stringify(catSpec));localStorage.setItem('purrfect-sick',String(Math.round(SICK.t)))}catch(e){}try{ncRename()}catch(e){}try{updateUI();saveBuild();saveCat()}catch(e){}}
+function c2Load(){let r=null;try{r=JSON.parse(localStorage.getItem('purrfect-c2')||'null')}catch(e){}if(!r||!r.o||!r.o.spec)return;const o=r.o;CID=r.cid||'a';AGE0=isFinite(r.fa)?r.fa:60;
+ OTH=Object.assign(newRig(),{id:o.id||'b',spec:null,name:o.name||'Kitty',stats:Object.assign({},STATS0,o.stats),clocks:Object.assign({pee:70,poop:200},o.clocks),sick:o.sick||0,rec:o.rec||0,med:o.med||{v:[],dw:45,sx:0,warn:'',scare:''},age0:isFinite(o.age0)?o.age0:60,warnH:false,warnC:false});
+ xchg(false);NOSAVE=true;try{catRebuild(o.spec,true)}finally{NOSAVE=false}cat.position.set(isFinite(o.x)?o.x:2.4,0,isFinite(o.z)?o.z:5.2);cat.rotation.y=o.ry||0;applyAge();xchg(false);c2Ui()}
+function nameOf(id){return CID===id?CNAME:(OTH&&OTH.id===id?OTH.name:(id==='a'?CNAME:'Kitty'))}
+function c2Focus(){if(!OTH||C2.busy||SH.on||HV.on||OB.on||STU.on||build.on)return;xchg(true);afterSwap();c2Ui();try{AU.sfx('good')}catch(e){}try{fxHearts(6)}catch(e){}toast('Now looking after '+CNAME+' 🐾')}
+function c2HitOther(ev){if(!OTH||!OTH.cat.visible||C2.busy)return false;const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);const h2=bRay.intersectObject(OTH.cat,true);if(!h2.length)return false;const h1=bRay.intersectObject(cat,true).filter(h=>h.object!==bubble);return !h1.length||h2[0].distance<h1[0].distance}
+function c2Tick(dt,t){if(!OTH)return;const o=OTH.cat;o.visible=!(SH.on||HV.on||SPL.on);C2.uiT-=dt;if(C2.uiT<=0){C2.uiT=.5;c2Ui()}if(C2.busy)return;
+ xchg(false);BGP=true;const q=QUIET;QUIET=true;
+ try{if((C2.ageT-=dt)<=0){C2.ageT=1;applyAge()}simulate(dt);if(started&&!SH.on&&!STU.on&&!SPL.on&&!HV.on)updateCat(dt);if(!SH.on&&!SPL.on)poseCat(dt,t)}catch(e){C2.err=e}
+ finally{QUIET=q;BGP=false;xchg(false)}
+ if(o.visible&&!SH.on&&Math.hypot(cat.position.x-o.position.x,cat.position.z-o.position.z)<2.4){try{QM.near(dt)}catch(e){}}}
+const c2El=document.createElement('div');c2El.id='c2Sw';c2El.style.cssText='position:fixed;z-index:8;left:max(12px,env(safe-area-inset-left));top:calc(max(10px,env(safe-area-inset-top)) + 150px);display:none;gap:5px;font-family:Nunito,ui-rounded,system-ui';document.body.appendChild(c2El);
+c2El.addEventListener('pointerdown',e=>e.stopPropagation());c2El.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-o]');if(b)c2Focus()});
+function c2Need(st){return st.hunger<25||st.thirst<25||st.love<=0||st.health<40}
+function c2Ui(){const show=!!OTH&&!C2.busy&&!SH.on&&!HV.on&&!OB.on&&!build.on&&!STU.on&&started;c2El.style.display=show?'flex':'none';if(!show)return;
+ const key=CNAME+'|'+OTH.name+'|'+(c2Need(OTH.stats)?1:0);if(c2El._k===key)return;c2El._k=key;
+ const chip=(on,txt,warn)=>'<button type="button" '+(on?'':'data-o="1" ')+'style="border:0;border-radius:14px;padding:6px 11px;font-weight:800;font-size:12px;font-family:inherit;box-shadow:0 3px 10px #0003;'+(on?'background:#2e7658;color:#fff':'background:#fff8e9;color:#24332e')+'">'+(on?'🐱 ':'')+escH(txt)+(warn?' ❗':'')+'</button>';
+ c2El.innerHTML=chip(true,CNAME,false)+chip(false,OTH.name,c2Need(OTH.stats))}
+// arrival of the second cat
+function c2Intro(){if(OTH||C2.busy||document.getElementById('c2Card')||OB.on||STU.on||build.on||SH.on||HV.on)return;try{if(document.getElementById('loginCard')||document.getElementById('awayCard'))return}catch(e){}
+ const el=document.createElement('div');el.id='c2Card';el.style.cssText='position:fixed;z-index:80;left:50%;top:50%;transform:translate(-50%,-50%);width:min(340px,92vw);background:#fff8e9;border-radius:20px;padding:18px;box-shadow:0 14px 44px #0006;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:14px;text-align:center';
+ el.innerHTML='<div style="font-size:42px">🌧️🐾</div><div style="font-size:19px;font-weight:900;margin:4px 0 8px">Part 2 · Two’s Company</div><div style="line-height:1.45;margin-bottom:14px">One rainy evening a soft mew drifts in from the gate. A tiny stranger is peeking through the bars, eyes wide. '+escH(CNAME)+' has noticed too, tail swishing. Could '+escH(CNAME)+' use a friend?</div><button type="button" style="width:100%;border:0;border-radius:14px;padding:12px;background:#2e7658;color:#fff;font-weight:800;font-size:15px">Open the door</button>';
+ el.addEventListener('pointerdown',e=>e.stopPropagation());el.querySelector('button').onclick=()=>{el.remove();c2Begin()};document.body.appendChild(el)}
+function c2Begin(){if(OTH||C2.busy)return;C2.busy=true;LOCKED=false;
+ const a=cat.position,o=Math.random()<.5?'m':'f',bk=CBREEDS.filter(b=>b[0]!==(catSpec&&catSpec.breed)),br=bk[Math.floor(Math.random()*bk.length)];
+ const fr=(((mins%1440)+1440)%1440)/1440;
+ OTH=Object.assign(newRig(),{id:'b',spec:null,name:'Kitty',stats:Object.assign({},STATS0),clocks:{pee:70,poop:200},sick:0,rec:0,med:{v:[],dw:45,sx:0,warn:'',scare:''},age0:60-(day-1)-fr,warnH:false,warnC:false});
+ const ap={x:a.x,z:a.z};xchg(true);NOSAVE=true;catRebuild(Object.assign(catDefaults(br[0]),{sex:o}),true);cat.position.set(ap.x+1.3,0,ap.z+.6);applyAge();
+ obNameCard('cat2',()=>obSheet('cat2',c2Done))}
+function c2Done(){NOSAVE=false;OB.on=false;document.body.classList.remove('ob');if(OB.el){OB.el.remove();OB.el=null}LOCKED=true;try{ctClose()}catch(e){}
+ stats.love=30;C2.busy=false;xchg(true);afterSwap();c2Save();c2Ui();try{sound('good')}catch(e){}try{fxHearts(14)}catch(e){}
+ const g=giftFood('wet1',2);toast('🎉 '+OTH.name+' has joined your home! '+g.ic+' '+g.t);try{QM.ev('c2join')}catch(e){}}
 // ===== Guided first day + daily goals =====
 // The first day teaches the game one step at a time (a small banner + a pulsing button). After that, three fresh goals every game day, with a streak bonus.
 var QM=(function(){
@@ -2888,7 +2931,7 @@ var QM=(function(){
  const perDone=()=>PER.every(([x,z,o])=>edges.has(ekey(x,z,o)));
  const hasDoor=()=>DOORE.some(([x,z,o])=>{const e=edges.get(ekey(x,z,o));return e&&e.type==='door'});
  const floorN=()=>{let n=0;for(const f of floors.values())if(inHouse(f.cx,f.cz))n++;return n};
- const nameT=t=>String(typeof t==='function'?t():t).replace(/\{n\}/g,PNAME||'friend').replace(/\{c\}/g,CNAME||'Kitty');
+ const nameT=t=>String(typeof t==='function'?t():t).replace(/\{n\}/g,PNAME||'friend').replace(/\{a\}/g,nameOf('a')).replace(/\{b\}/g,nameOf('b')).replace(/\{c\}/g,CNAME||'Kitty');
  const NEAR=(t,r)=>{for(const it of furn.values())if(it.type===t)return Math.hypot(player.position.x-(it.x0+it.fw/2),player.position.z-(it.z0+it.fd/2))<r;return false};
  const BM=['canvas','#bUndo','#bL','#bR'],CARE=['canvas','#pad','#feedMenu','#litMenu','#ctxBtn','#petGame','#servedPop'];
  const sel=(q)=>({allow:[q],spot:q,click:q}),opt=o=>sel('#subBar [data-o="'+o+'"]'),grp=g=>sel('#grpBar [data-g="'+g+'"]');
@@ -2948,17 +2991,26 @@ var QM=(function(){
 
 
  // ---------- chapters: a story told through goals that look ahead ----------
- const CH=[
-  {t:'A Warm Welcome',i:'🏡',s:'{c} settles in and learns to trust you.',c:40,g:()=>giftFood('tuna',1),S:[['feed',3,'Feed {c} 3 times'],['water',3,'Fill the water bowl 3 times'],['pet',5,'Pet {c} 5 times'],['litre',1,'Clean 1 litre of litter']]},
-  {t:'Making Friends',i:'💗',s:'{c} starts to follow you around the house.',c:60,g:()=>giftToy(),S:[['pet',25,'Pet {c} 25 times'],['play',10,'Play together 10 times'],['photo',3,'Take 3 photos'],['days',3,'Play 3 days in a row']]},
+ const CH1=[
+  {t:'A Warm Welcome',i:'🏡',s:'{a} settles in and learns to trust you.',c:40,g:()=>giftFood('tuna',1),S:[['feed',3,'Feed {a} 3 times'],['water',3,'Fill the water bowl 3 times'],['pet',5,'Pet {a} 5 times'],['litre',1,'Clean 1 litre of litter']]},
+  {t:'Making Friends',i:'💗',s:'{a} starts to follow you around the house.',c:60,g:()=>giftToy(),S:[['pet',25,'Pet {a} 25 times'],['play',10,'Play together 10 times'],['photo',3,'Take 3 photos'],['days',3,'Play 3 days in a row']]},
   {t:'Home Sweet Home',i:'🔨',s:'Your little house starts to feel like a real home.',c:90,g:()=>giftAcc(),S:[['build',25,'Place 25 things in your home'],['buy',3,'Buy 3 things'],['cook',3,'Cook 3 dishes'],['goals',10,'Finish 10 daily goals']]},
   {t:'Café Days',i:'☕',s:'Town life, and a few new furry friends.',c:130,g:()=>giftSand(10),S:[['cafe',3,'Visit the café 3 times'],['play',40,'Play together 40 times'],['photo',10,'Take 10 photos'],['days',5,'Play 5 days in a row']]},
-  {t:'Growing Up',i:'🌱',s:'{c} is not a tiny kitten any more.',c:180,g:()=>giftToy(),S:[['age',3,'{c} reaches 3 months old'],['days',7,'Play 7 days in a row'],['feed',60,'Feed {c} 60 times'],['goals',30,'Finish 30 daily goals']]},
-  {t:'A Family Home',i:'🏠',s:'Every room is filled with love, and with {c}’s things.',c:250,g:()=>giftAcc(),S:[['build',100,'Place 100 things in your home'],['buy',15,'Buy 15 things'],['pet',120,'Pet {c} 120 times'],['days',14,'Play 14 days in a row']]},
-  {t:'Best Friends Forever',i:'👑',s:'You and {c} are inseparable now. One last promise to keep, for {c}’s health.',c:400,g:()=>giftAcc(),S:[['pet',400,'Pet {c} 400 times'],['play',150,'Play together 150 times'],['days',30,'Play 30 days in a row'],['sx',1,()=>'Get {c} '+(isTom()?'neutered':'spayed')+' at the vet (from 6 months old)']]}];
- const CHH={build:1,buy:1,cafe:1};
+  {t:'Growing Up',i:'🌱',s:'{a} is not a tiny kitten any more.',c:180,g:()=>giftToy(),S:[['age',3,'{a} reaches 3 months old'],['days',7,'Play 7 days in a row'],['feed',60,'Feed {a} 60 times'],['goals',30,'Finish 30 daily goals']]},
+  {t:'A Family Home',i:'🏠',s:'Every room is filled with love, and with {a}’s things.',c:250,g:()=>giftAcc(),S:[['build',100,'Place 100 things in your home'],['buy',15,'Buy 15 things'],['pet',120,'Pet {a} 120 times'],['days',14,'Play 14 days in a row']]},
+  {t:'Best Friends Forever',i:'👑',s:'You and {a} are inseparable now. One last promise to keep, for {a}’s health.',c:400,g:()=>giftAcc(),S:[['pet',400,'Pet {a} 400 times'],['play',150,'Play together 150 times'],['days',30,'Play 30 days in a row'],['sx',1,()=>'Get {a} '+((CID==='a'?isTom():(OTH&&OTH.spec&&OTH.spec.sex==='m'))?'neutered':'spayed')+' at the vet (from 6 months old)']]}];
+ const CH2=[
+  {t:'A Stranger at the Door',i:'🚪',s:'A tiny newcomer is shy and unsure. Go slowly.',c:80,g:()=>giftFood('wet1',2),S:[['b_feed',2,'Feed {b} 2 times'],['b_water',2,'Fill the water bowl for {b} 2 times'],['b_pet',3,'Pet {b} 3 times'],['near',2,'Let {a} and {b} share a room for 2 minutes']]},
+  {t:'Careful Sniffs',i:'👃',s:'{a} and {b} circle each other, curious but careful.',c:110,g:()=>giftToy(),S:[['near',10,'Let {a} and {b} share a room for 10 minutes'],['b_pet',10,'Pet {b} 10 times'],['a_pet',10,'Pet {a} 10 times'],['b_play',5,'Play with {b} 5 times']]},
+  {t:'Sharing the Space',i:'🛋️',s:'One home, two cats, a lot of new rules.',c:150,g:()=>giftSand(10),S:[['near',30,'Let {a} and {b} share a room for 30 minutes'],['b_feed',6,'Feed {b} 6 times'],['b_water',6,'Fill the water bowl for {b} 6 times'],['p_photo',3,'Take 3 photos together']]},
+  {t:'First Play Date',i:'🧶',s:'The first game of chase, and the first purr together.',c:200,g:()=>giftToy(),S:[['b_play',10,'Play with {b} 10 times'],['a_play',10,'Play with {a} 10 times'],['near',60,'Let {a} and {b} share a room for 1 hour'],['b_pet',25,'Pet {b} 25 times']]},
+  {t:'Two Bowls Full',i:'🍗',s:'Twice the appetite, twice the love.',c:260,g:()=>giftAcc(),S:[['b_feed',15,'Feed {b} 15 times'],['a_feed',15,'Feed {a} 15 times'],['b_water',15,'Fill the water bowl for {b} 15 times'],['near',120,'Let {a} and {b} share a room for 2 hours']]},
+  {t:'Health Check for Two',i:'🩺',s:'Being a good parent to two means looking after both.',c:330,g:()=>giftAcc(),S:[['bvax',1,'Give {b} the first vaccination at the vet'],['bdew',1,'Deworm {b} at the vet'],['b_pet',60,'Pet {b} 60 times'],['near',240,'Let {a} and {b} share a room for 4 hours']]},
+  {t:'Two of a Kind',i:'💞',s:'{a} and {b} are inseparable now, and a family at last.',c:500,g:()=>giftAcc(),S:[['b_pet',120,'Pet {b} 120 times'],['a_pet',120,'Pet {a} 120 times'],['near',480,'Let {a} and {b} share a room for 8 hours'],['bsx',1,()=>'Get {b} '+((OTH&&OTH.id==='b'?OTH.spec:catSpec)&&(OTH&&OTH.id==='b'?OTH.spec:catSpec).sex==='m'?'neutered':'spayed')+' at the vet (from 6 months old)']]}];
+ CH1.forEach(c=>c.p=1);CH2.forEach(c=>c.p=2);const CH=CH1.concat(CH2);
+ const CHH={build:1,buy:1,cafe:1,near:1,p_photo:1},isHid=k=>CHH[k]||/^[ab]_(feed|water|pet|play)$/.test(k),PAIR={feed:1,water:1,pet:1,play:1};
  const chVal=k=>ltVal(k),chPct=c=>c.S.reduce((a,x)=>a+Math.min(1,chVal(x[0])/x[1]),0)/c.S.length;
- function chChk(){if(Q.tut!=='done'||Q.ch>=CH.length)return;const c=CH[Q.ch];if(!c.S.every(x=>chVal(x[0])>=x[1]))return;Q.ch++;let g=null;try{g=c.g()}catch(e){}save();try{saveBuild()}catch(e){}reward(c.c,'📖 Chapter complete: '+c.t+(g?' · '+g.ic+' '+g.t:''));try{fxHearts(12)}catch(e){}xp(40,'ch'+Q.ch)}
+ function chChk(){if(Q.tut!=='done'||Q.ch>=CH.length)return;if(Q.ch>=CH1.length&&!OTH)return;const c=CH[Q.ch];if(!c.S.every(x=>chVal(x[0])>=x[1]))return;Q.ch++;let g=null;try{g=c.g()}catch(e){}save();try{saveBuild()}catch(e){}reward(c.c,'📖 Chapter complete: '+c.t+(g?' · '+g.ic+' '+g.t:''));try{fxHearts(12)}catch(e){}xp(40,'ch'+Q.ch);if(Q.ch===CH1.length&&!OTH)setTimeout(()=>{try{c2Intro()}catch(e){}},2500)}
  // ---------- lifetime goals: counters that never reset, each with growing tiers ----------
  const LT=[
   {k:'pet',i:'💗',t:n=>'Pet Kitty '+n+' times',T:[5,15,30,60,120,250,500,1000]},
@@ -2972,10 +3024,10 @@ var QM=(function(){
   {k:'age',i:'🎂',t:n=>'Kitty reaches '+(n<12?n+' months':n/12+(n===12?' year':' years'))+' old',T:[3,6,12,24,36,60,96,120]},
   {k:'days',i:'📅',t:n=>'Play '+n+' days in a row',T:[2,3,5,7,14,21,30,60,100]}];
  const LTK={};LT.forEach(l=>{LTK[l.k]=l});LTK.litre=LTK.litre;
- function ltVal(k){if(k==='sx')return INV.med&&INV.med.sx?1:0;if(k==='age')return Math.floor(ageDays()/30);if(k==='days')return Q.pd.run;return Q.lt[k]||0}
+ function ltVal(k){if(k==='bvax'||k==='bdew'||k==='bsx'){const m=CID==='b'?INV.med:(OTH&&OTH.med);if(!m)return 0;return k==='bvax'?m.v.length:k==='bdew'?(m.dw>45?1:0):(m.sx?1:0)}if(k==='sx')return INV.med&&INV.med.sx?1:0;if(k==='age')return Math.floor(ageDays()/30);if(k==='days')return Q.pd.run;return Q.lt[k]||0}
  const ltRew=(k,i)=>Math.round((20+i*14)*(i+1)/2+(i>=4?i*20:0));
  function ltChk(k){return;const l=LTK[k];let t=(Q.lc[k]||0);while(t<l.T.length&&ltVal(k)>=l.T[t]){const r=ltRew(k,t);Q.lc[k]=++t;reward(r,l.i+' Milestone: '+l.t(l.T[t-1]));xp(20,'ltm'+k+t);}}
- function lt(k,n){if(!LTK[k]&&!CHH[k])return;Q.lt[k]=+((Q.lt[k]||0)+n).toFixed(2);if(LTK[k])ltChk(k);try{chChk()}catch(e){}}
+ function lt(k,n){if(!LTK[k]&&!isHid(k))return;Q.lt[k]=+((Q.lt[k]||0)+n).toFixed(2);if(LTK[k])ltChk(k);try{chChk()}catch(e){}}
  function ltDays(){const d=new Date(),key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();if(Q.pd.last===key)return;const y=new Date(d.getTime()-864e5),yk=y.getFullYear()+'-'+(y.getMonth()+1)+'-'+y.getDate();Q.pd.run=Q.pd.last===yk?Q.pd.run+1:1;Q.pd.last=key;save()}
 
  // ---------- daily visit streak: one gift (never coins) per real day, one missed day is forgiven ----------
@@ -3014,8 +3066,9 @@ var QM=(function(){
   const td=dkey(new Date());if(!Q.sh||Q.sh.d!==td)Q.sh={d:td,s:0,m:0};
   if(!Q.sh.s){Q.sh.s=1;save();if(!streakInfo().done){loginCard();return}}
   if(!Q.sh.m){Q.sh.m=1;save();if(!monthInfo().got)monthCard()}}catch(e){}}
- function ltTick(){try{ltDays();ltChk('age');ltChk('days');chChk()}catch(e){}loginTick()}
+ function ltTick(){try{ltDays();ltChk('age');ltChk('days');chChk();if(Q.ch>=CH1.length&&!OTH&&Q.tut==='done'&&!document.getElementById('loginCard')&&Q.sh&&Q.sh.m)c2Intro()}catch(e){}loginTick()}
  function ev(name,n,x){n=n||1;try{if(XPT[name])xp(XPT[name]*n,name);if(name==='litterL')lt('litre',x||0);else if(LTK[name]||CHH[name])lt(name,n);
+  if(OTH&&Q.ch>=CH1.length){if(PAIR[name])lt((CID==='b'?'b_':'a_')+name,n);if(name==='photo')lt('p_photo',n)}
   if(Q.tut!=='done'){const s=TUT[Q.tut];if(s&&s.ev===name)adv()}
   if(Q.tut==='done'){for(const g of Q.g){if(g.k!==name||g.d)continue;g.h=Math.min(g.n,g.h+n);if(g.h>=g.n){g.d=true;const p=info(g);reward(p.r||6,p.i+' Goal done!');xp(8,'goal');lt('goals',1)}}
    if(!Q.full&&Q.g.length&&Q.g.every(g=>g.d)){Q.full=true;Q.streak=Q.lastFull===day-1||Q.streak===0&&!Q.lastFull?Q.streak+1:1;Q.lastFull=day;const b=30+5*Math.min(Q.streak,7);setTimeout(()=>reward(b,'🔥 All goals done! Streak '+Q.streak),900)}
@@ -3090,13 +3143,17 @@ var QM=(function(){
   let h='<div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:15px">'+(Q.tut==='done'?'🎯 Goals':'🎯 First day guide')+'</b><button id="qX" style="border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:14px">✕</button></div><div style="margin:8px 0 4px;font-weight:800">⭐ Home Level '+Q.lv+' <span style="font-weight:600;opacity:.7">· '+Q.xp+'/'+need(Q.lv)+' XP</span></div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+Math.min(100,Q.xp/need(Q.lv)*100)+'%;background:#f3bd56"></i></div>';
   if(Q.tut==='done'){const tb=on=>'border:0;border-radius:12px;padding:7px 12px;font-weight:800;font-size:12px;font-family:inherit;'+(on?'background:#2e7658;color:#fff':'background:#fff;color:#24332e');
    h+='<div style="display:flex;gap:6px;margin:10px 0 2px;flex-wrap:wrap"><button data-pt="c" style="'+tb(ptab==='c')+'">📖 Chapters</button><button data-pt="d" style="'+tb(ptab==='d')+'">📅 Daily</button></div>';
-   if(ptab==='c'){const nm=x=>nameT(x),cur=Q.ch;h+='<div style="margin:8px 0 2px;font-weight:800">📖 Part 1 · '+(cur>=CH.length?'complete 🎉':'Chapter '+(cur+1)+' of '+CH.length)+'</div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+(cur/CH.length*100)+'%;background:#a56bd0"></i></div>';
-    CH.forEach((c,i)=>{const done=i<cur,act=i===cur,pc=done?1:act?chPct(c):0;
-     h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:'+(act?'#fff':'transparent')+';'+(done?'opacity:.6':'')+(i>cur?';opacity:.75':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;font-weight:800"><span>'+(i>cur?'🔒':c.i)+' '+(i+1)+'. '+c.t+(done?' ✅':'')+'</span><span style="white-space:nowrap">'+(done?'Done':'🪙'+c.c+' + 🎁')+'</span></div>';
+   if(ptab==='c'){const nm=x=>nameT(x),cur=Q.ch,P=(cur>CH1.length||(cur===CH1.length&&OTH))?2:1,all=CH.filter(c=>c.p===P),first=CH.indexOf(all[0]),dn=Math.max(0,Math.min(all.length,cur-first));
+    h+='<div style="margin:8px 0 2px;font-weight:800">📖 Part '+P+' · '+(dn>=all.length?'complete 🎉':'Chapter '+(dn+1)+' of '+all.length)+'</div><div style="height:7px;border-radius:4px;background:#e6dcc0;overflow:hidden"><i style="display:block;height:100%;width:'+(dn/all.length*100)+'%;background:#a56bd0"></i></div>';
+    all.forEach((c,k)=>{const i=first+k,done=i<cur,act=i===cur,pc=done?1:act?chPct(c):0;
+     h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:'+(act?'#fff':'transparent')+';'+(done?'opacity:.6':'')+(i>cur?';opacity:.75':'')+'"><div style="display:flex;justify-content:space-between;gap:8px;font-weight:800"><span>'+(i>cur?'🔒':c.i)+' '+(k+1)+'. '+escH(nm(c.t))+(done?' ✅':'')+'</span><span style="white-space:nowrap">'+(done?'Done':'🪙'+c.c+' + 🎁')+'</span></div>';
      if(act||done){h+='<div style="font-size:11px;opacity:.75;margin:3px 0 6px">'+escH(nm(c.s))+'</div>';c.S.forEach(x=>{const v=chVal(x[0]),ok=done||v>=x[1],sh=Math.min(x[1],Math.floor(v));h+='<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;font-weight:700;margin:2px 0;'+(ok?'opacity:.6':'')+'"><span>'+(ok?'✅ ':'⬜ ')+escH(nm(x[2]))+'</span><span style="white-space:nowrap">'+(ok?'':sh+'/'+x[1])+'</span></div>'})}
      else h+='<div style="font-size:11px;opacity:.75;margin-top:3px">Coming up: '+escH(nm(c.s))+'</div>';
      h+='<div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:6px;overflow:hidden"><i style="display:block;height:100%;width:'+Math.round(pc*100)+'%;background:#a56bd0"></i></div></div>'});
-    if(cur>=CH.length)h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:#fff"><div style="font-weight:800">🐾 Part 2 · Two’s Company</div><div style="font-size:11px;opacity:.75;margin-top:3px">A second cat is on the way. Coming soon.</div></div>';h+='<div style="font-size:11px;opacity:.7">Each chapter pays coins and a gift when every step is done. Part 2 begins when Part 1 is finished.</div>'}
+    if(P===1&&cur>=CH1.length)h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:#fff"><div style="font-weight:800">🐾 Part 2 · Two’s Company</div><div style="font-size:11px;opacity:.75;margin-top:3px">A newcomer is about to arrive. Open the game again soon.</div></div>';
+    if(P===2&&cur>=CH.length)h+='<div style="margin:10px 0;padding:9px;border-radius:12px;background:#fff"><div style="font-weight:800">🌟 Part 3</div><div style="font-size:11px;opacity:.75;margin-top:3px">More of your story is coming soon.</div></div>';
+    if(P===2)h+='<div style="font-size:11px;opacity:.7;margin-bottom:4px">Tap a cat’s name at the top of the screen, or tap the cat, to look after them.</div>';
+    h+='<div style="font-size:11px;opacity:.7">Each chapter pays coins and a gift when every step is done.</div>'}
    else if(ptab==='d'){const dn=Q.g.filter(g=>g.d).length;h+='<div style="margin:6px 0;font-weight:700">'+(Q.streak?'🔥 '+Q.streak+'-day streak · ':'')+dn+'/'+Q.g.length+' done'+(Q.streak?'':' · finish all to start a streak')+'</div>';
     for(const g of Q.g){const p=info(g);h+='<div style="margin:9px 0;'+(g.d?'opacity:.6':'')+'"><div style="display:flex;justify-content:space-between;font-weight:800"><span>'+p.i+' '+p.t+(g.d?' ✅':'')+'</span><span>'+g.h+'/'+g.n+' · 🪙'+(p.r||6)+'</span></div><div style="height:6px;border-radius:3px;background:#e6dcc0;margin-top:4px;overflow:hidden"><i style="display:block;height:100%;width:'+g.h/g.n*100+'%;background:#2e7658"></i></div></div>'}
     h+='<div style="font-size:11px;opacity:.7;margin-top:6px">Six new goals every day. Finish them all for a streak bonus.</div>'}
@@ -3110,7 +3167,7 @@ var QM=(function(){
  function init(){if(Q.tv!==3){Q.tv=3;if(Q.tut!=='done'&&edges.size>0)Q.tut='done';else if(Q.tut!=='done')Q.tut=0;save()}if(Q.tut!==0&&Q.tut!=='done'||Q.day)return;if(Q.tut===0&&!Q.seen.init){Q.seen.init=1;if(edges.size>=8&&furn.size>=6){Q.tut='done';Q.lv=4}save()}}
  setTimeout(()=>{try{init();refresh()}catch(e){}},0);
  function tick(dt){pollT-=dt;if(pollT>0)return;pollT=1;init();poll();ltTick();refresh()}
- return {tutEnd:()=>{Q.tut=TUT.length-1;adv()},loginCard,monthCard,streakInfo,monthInfo,loginTick,ltTick,ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
+ return {near:dt=>{Q.lt.near=+((Q.lt.near||0)+dt/60).toFixed(4)},tutEnd:()=>{Q.tut=TUT.length-1;adv()},loginCard,monthCard,streakInfo,monthInfo,loginTick,ltTick,ev,tick,panel,refresh,dayEnd,need,xp,save,hold:()=>Q.tut!=='done'&&started&&!OB.on,cam:()=>{const s=curStep();if(!s||!s.cam||!started||OB.on||build.on||SH.on||SH.tr)return null;return typeof s.cam==='function'?s.cam():s.cam},get Q(){return Q},TUT,POOL}
 })();
 function qev(n,c,x){try{QM.ev(n,c,x)}catch(e){}}
 // ===== Kitty's personality and little random events =====
@@ -3215,6 +3272,7 @@ cv.addEventListener('pointerup',e=>{const t=tapDown;tapDown=null;if(!t||t.id!==e
 
  if(SH.on){if(SH.id==='hosp')hospTap(e);else if(SH.id==='cafe')cafeTap(e);else if(SH.id==='groc')grocTap(e);else if(hitShopCounter(e))tapCounter();return}
  const dsh=hitDish(e);if(dsh){dishTap(dsh);return}
+ if(c2HitOther(e)){c2Focus();return}
  if(hitCat(e)){action('pet');return}
  const fm=hitMess(e);if(fm){action('cleanmess',fm);return}
  const bn=hitBench(e);if(bn){furnTap(bn);return}
@@ -4338,6 +4396,7 @@ ckEl.addEventListener('click',e=>{const t0=e.target.closest('[data-a="ptoss"]');
 
 
 try{const sv=JSON.parse(localStorage.getItem('purrfect-cat')||'null');if(sv&&sv.breed)catRebuild(catNorm(sv),true)}catch(e){console.warn('cat restore',e)}if(!localStorage.getItem('purrfect-cat')){try{catRebuild({},true)}catch(e){console.warn('cat default',e)}}
+try{c2Load()}catch(e){console.warn('c2 load',e)}
 // ===== Main loop =====
 const OC={hid:[]},OC_TALL={wardrobe:1,fridge:1,shelf:1,shower:1,hood:1,wallcab:1};
 function ocBlocks(cx,cz,ax,az,bx,bz,r){const dx=bx-ax,dz=bz-az,L2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((cx-ax)*dx+(cz-az)*dz)/L2));if(t>.9)return false;const qx=ax+dx*t-cx,qz=az+dz*t-cz;return qx*qx+qz*qz<r*r}
@@ -4352,6 +4411,7 @@ window.__splash3d=function(canvas){
  // Everything is built and drawn in a single synchronous step and the game state is put back before returning.
  if(!canvas)return false;
  const par=cat.parent,U=cat.userData,svCat={x:cat.position.x,y:cat.position.y,z:cat.position.z,ry:cat.rotation.y,s:cat.scale.x,vis:cat.visible},svSpec=catSpec,svLS=(()=>{try{return localStorage.getItem('purrfect-cat')}catch(e){return null}})();
+ if(OTH)OTH.cat.visible=false;
  const svU={task:U.task,stage:U.stage,lift:U.lift,leap:U.leap,moving:U.moving,t:U.t,happy:U.happy,init:U.init,P:U.P?Object.assign({},U.P):null};
  const vp=new THREE.Vector4();renderer.getViewport(vp);const svSc=renderer.getScissorTest(),svAuto=renderer.autoClear;
  let ok=false;const made=[];
@@ -4420,7 +4480,7 @@ function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRec
  duvetTick(dt);
  if(!seat&&!act&&!CI.on&&!KP.on&&!GE.on){body.position.y=walking?Math.abs(Math.sin(elapsed*10))*.045:Math.sin(elapsed*2)*.012;
  collide(player.position,.3,false);player.position.y+=(groundY(player.position.x,player.position.z)+.05-player.position.y)*Math.min(1,dt*15)}
- try{medTick(dt)}catch(e){}if(started&&!SH.on&&!STU.on&&!SPL.on)updateCat(dt);if(!SH.on&&!SPL.on){poseCat(dt,elapsed);petGameTick(dt)}scoopTick(dt);shopTick(dt);try{QM.tick(dt);PERS.tick(dt)}catch(e){}try{if(started&&!AU.begun)AU.begin();AU.tick(dt,Math.floor(mins/60)%24,SH.on||floorAt(player.position.x,player.position.z))}catch(e){}try{lightTick(dt,floorAt(player.position.x,player.position.z),dayNightK())}catch(e){}try{sssTick(dt)}catch(e){}shopImgTick();if(walking&&!SH.on&&!SH.tr){const ddx=player.position.x,ddz=player.position.z;if(shopDoorZone(ddx,ddz))enterShop('shop');else if(hospDoorZone(ddx,ddz))enterShop('hosp');else if(cafeDoorZone(ddx,ddz))enterShop('cafe');else if(grocDoorZone(ddx,ddz))enterShop('groc')}simulate(dt);
+ try{medTick(dt)}catch(e){}if(started&&!SH.on&&!STU.on&&!SPL.on)updateCat(dt);if(!SH.on&&!SPL.on){poseCat(dt,elapsed);petGameTick(dt)}scoopTick(dt);shopTick(dt);try{QM.tick(dt);PERS.tick(dt)}catch(e){}try{if(started&&!AU.begun)AU.begin();AU.tick(dt,Math.floor(mins/60)%24,SH.on||floorAt(player.position.x,player.position.z))}catch(e){}try{lightTick(dt,floorAt(player.position.x,player.position.z),dayNightK())}catch(e){}try{sssTick(dt)}catch(e){}shopImgTick();try{c2Tick(dt,elapsed)}catch(e){}if(walking&&!SH.on&&!SH.tr){const ddx=player.position.x,ddz=player.position.z;if(shopDoorZone(ddx,ddz))enterShop('shop');else if(hospDoorZone(ddx,ddz))enterShop('hosp');else if(cafeDoorZone(ddx,ddz))enterShop('cafe');else if(grocDoorZone(ddx,ddz))enterShop('groc')}simulate(dt);
  uiT+=dt;if(uiT>.25){uiT=0;updateUI();updateSeatBtn();const h=Math.floor(mins/60)%24,m=Math.floor(mins%60);{const ap=document.getElementById('agePill');if(ap)ap.textContent='🐱 '+ageText();const mo=Math.floor(ageDays()/30);if(window.__lastMo===undefined)window.__lastMo=mo;else if(mo>window.__lastMo){window.__lastMo=mo;toast('🎂 Kitty is now '+(mo>=12&&mo%12===0?mo/12+' year'+(mo>=24?'s':''):mo+' months')+' old!')}}document.getElementById('clock').textContent=`${h>=6&&h<18?'☀️':'🌙'} Day ${day} · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
  saveT+=dt;if(saveT>5){saveT=0;saveBuild();saveCat();sbBackup();try{localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}}
  const px=player.position.x,pz=player.position.z,onLot=Math.abs(px)<8&&Math.abs(pz)<7;
@@ -4451,7 +4511,7 @@ function animateInner(now){if(started&&window.__saveRecovered&&!window.__saveRec
  else if((TC=QM.cam())){scene.fog.near=fogN;scene.fog.far=fogF;const d=TC[2],yw=TC[4];camTarget.set(TC[0],1.2,TC[1]);camDesired.set(TC[0]+Math.sin(yw)*d,TC[3],TC[1]+Math.cos(yw)*d);cameraYaw=yw}
  else{scene.fog.near=fogN;scene.fog.far=fogF;camTarget.set(px,player.position.y+1.7,pz);if(!SH.on)ocClear(camera.position.x,camera.position.z,px,pz);camDesired.set(px+Math.sin(cameraYaw)*(SH.on?5.2:7),player.position.y+1.9+cameraPitch*4.5,pz+Math.cos(cameraYaw)*(SH.on?5.2:7))}
  cineCam(dt);camera.position.lerp(camDesired,1-Math.pow(.001,dt));camera.lookAt(camTarget);if(!SPL.on)renderer.render(scene,camera);if(PHO.snap)photoGrab()}
-window.__cfErr=0;window.purrDebug=()=>({catchUp,hospEndVisit,hospTick,hospStartVisit,bookService,HP,HV,SH,enterShop,hospFinish,setDay:v=>{RT.doff+=v-day;syncClock()},stats,openHospMenu,SICK,INV,svcState,openCatInfo,medTick,MED,KP,startKneelPet,petChoose,stuOpen,stuClose,STU,openWardrobe,catHeadRef:()=>catHead,catRef:()=>cat,mealWin,napsOf,clocks,foodBowl,waterBowl,fxCoins,fxHearts,fxStink,addFloorMess,floorMess,CINE,cineGo,LIFE,SICK,startTask,setMins:v=>{RT.off+=v-mins;syncClock()},accGroups,applyWorn,toggleWear,addFurn,napTarget,deskWork,coffeeBrew,openFridge,openFeedMenu,openLitterMenu,openShopMenu,openHospMenu,FURN,makeFurnModel,homeScore,furn,FGROUPS,BEN,TIP,build,tptsN:()=>tpts.size,bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{RT.off+=v-mins;syncClock()},getDay:()=>day,setDay:v=>{RT.doff+=v-day;syncClock()},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
+window.__cfErr=0;window.purrDebug=()=>({c2:{ui:c2Ui,dbg:()=>JSON.stringify({started,sh:SH.on,hv:HV.on,ob:OB.on,b:build.on,stu:STU.on,busy:C2.busy,uiT:C2.uiT,err:C2.err&&String(C2.err.stack||C2.err)}),begin:c2Begin,focus:c2Focus,intro:c2Intro,oth:()=>OTH,cid:()=>CID,err:()=>C2.err&&String(C2.err.stack||C2.err),cat:()=>cat,stats:()=>stats,ch:CH,catSpec:()=>catSpec,name:()=>CNAME},catchUp,hospEndVisit,hospTick,hospStartVisit,bookService,HP,HV,SH,enterShop,hospFinish,setDay:v=>{RT.doff+=v-day;syncClock()},stats,openHospMenu,SICK,INV,svcState,openCatInfo,medTick,MED,KP,startKneelPet,petChoose,stuOpen,stuClose,STU,openWardrobe,catHeadRef:()=>catHead,catRef:()=>cat,mealWin,napsOf,clocks,foodBowl,waterBowl,fxCoins,fxHearts,fxStink,addFloorMess,floorMess,CINE,cineGo,LIFE,SICK,startTask,setMins:v=>{RT.off+=v-mins;syncClock()},accGroups,applyWorn,toggleWear,addFurn,napTarget,deskWork,coffeeBrew,openFridge,openFeedMenu,openLitterMenu,openShopMenu,openHospMenu,FURN,makeFurnModel,homeScore,furn,FGROUPS,BEN,TIP,build,tptsN:()=>tpts.size,bowlRef:()=>bowl,PERS,PM,floorMess,furnLocked,homeLv,coins,WALLET,QM,qev,addEdge,setFloorRaw,AU,DN,dnStart,dnPlan,dnTick,INV,keys,catRebuild,catSpec:()=>catSpec,CBREEDS,CPAT,CCOL,ctOpen,openWardrobe,setWd:c=>{wdCat=c},renderer,scene,camera,player,cat,mkStaff,buildHead,PLK,applyLook,CF,CI,cafeTick,cfOrder,cfBuyTreat,ciStart,cafeTap,cfEatTick,cfCatMenu,cfTalkMenu,GR,GRG,grocTick,grocTap,grSecMenu,grCheckMenu,grPay,GE,frEat,openFridge,openCook,ck,ckRender,addFurn,furn,stoveModel,foodModel,heldModel,ico,foodImg,dishSync,dishTap,hitDish,stoveKey,nearStove,startEat,ING3,FRI3,MEAL3,midModel,mergeOf,MERGE,RECIPES,RSTEPS,MEALS,GR_ITEM,GR_SECS,invTick,invAdd,invFresh,invBad,invFix,itemExp,gNow,expInfo,invTake,invToss,recLeaves,ckEl,HG,PHO,photoGrab,phoMode,galOpen,galView,SV,HN,cfSvcSpot,cfBarista,cfBar,cfEl,CAFE_FOOD,TREATS,mkFoodModel,ciRigTarget,ikSolve,ikRes,PS,elbows,legL,legR,body,armL,armR,player,cfLeave,cfEnter,ciTick,startPetGame,storeState,enterShop,SIGNS,openWardrobe,applyOutfit,OUTFITS,wdEl,openLitterMenu,fillTray,litEl,doCleanTray,sleepInfo,ageDays,ageF,ageText,applyAge,mealWin,mealState,getMins:()=>mins,setMins:v=>{RT.off+=v-mins;syncClock()},getDay:()=>day,setDay:v=>{RT.doff+=v-day;syncClock()},applyGear,HV,HP,SVC,hospTap,hospReception,hospRoomTap,hospStartVisit,hospEndVisit,hospTick,openHospMenu,bookService,hpEl,hvEl,hospPrompt,RECOVER,coneMesh,hospRoomOf,openFeedMenu,serveFood,feedEl,placedN,shopBuy,action,SH,INV,enterShop,exitShop,openShopMenu,tapCounter,furnLocked,shopStock,shopRender,coins,WALLET,FURN,FLOORP,updateCoins,setMove:(x,y)=>{moveX=x;moveY=y},keys,PANTS,removeFurn,getSeat:()=>seat,cam:camera,SG,sgTap,sgS,sgRig,sgBlade,sgMound,startScoop,litter,pgTap,PG,player,body,armL,armR,poseCat,tvApply,ctxBtn,furnTap,getAct:()=>act,CLOTHES,PIX,showCtxState:()=>ctxBtn.style.display,sit,standUp,nearestSeat,getSeat:()=>seat,stats,bowl,clocks,cat,action,startTask,navPath,isPlaced,foodBowl,waterBowl,litter,scratchPost,catBed,yarn,updateCat,simulate,startedFn:()=>started,setStarted:v=>{started=v},furn,FURN,canPlace,addFurn,removeFurn,furnSpot,rotateFurn,hitFurn,placeModel,FURN_ORDER,hideFurnGhost,floors,setFloor,paintCells,cellsRect,floorAt,groundY,placeFixture,edges,build,player,addEdge,removeEdge,pathEdges,buildToggle,undo,SOLIDS,collide});
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.35));layoutView()});window.addEventListener('orientationchange',()=>setTimeout(()=>window.dispatchEvent(new Event('resize')),250));
 requestAnimationFrame(animate);
 document.getElementById('start').addEventListener('click',()=>{started=true;document.getElementById('welcome').style.display='none';toast(furn.size||edges.size?'Welcome back, '+(PNAME||'friend')+'! '+CNAME+' is waiting 🐱':'Welcome, '+(PNAME||'friend')+'! 🏡')});
