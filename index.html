@@ -1295,7 +1295,7 @@ const NOTIF=(()=>{const plug=()=>{try{return window.Capacitor&&window.Capacitor.
  let chan=false;async function mkChan(L){if(chan)return;try{await L.createChannel({id:'purrfect',name:'Purrfect Home',description:'Mealtimes, daily gifts and garden visitors',importance:4,visibility:1,vibration:true});chan=true}catch(e){}}
  async function granted(){const L=plug();if(!L)return false;try{return (await L.checkPermissions()).display==='granted'}catch(e){return false}}
  async function enable(){const L=plug();if(!L)return false;try{let p=await L.checkPermissions();if(p.display!=='granted')p=await L.requestPermissions();if(p.display==='granted'){localStorage.setItem('purrfect-notif','1');await mkChan(L);return true}}catch(e){}return false}
- let asked=false;async function ask(){if(asked||!native()||!on())return;asked=true;try{if(await enable())schedule()}catch(e){}}
+ let asked=false;async function ask(){if(asked||!native()||!on())return;asked=true;try{localStorage.setItem('purrfect-nask','1')}catch(e){}try{if(await enable())schedule()}catch(e){}}
  async function cancel(){const L=plug();if(!L)return;try{await L.cancel({notifications:[...Array(8).keys()].map(i=>({id:101+i})).concat([...Array(12).keys()].map(i=>({id:200+i})))})}catch(e){}}
  function disable(){try{localStorage.setItem('purrfect-notif','0')}catch(e){}cancel()}
  // never ping at night: push anything outside 9:00-21:00 to the next 9:30
@@ -1310,7 +1310,7 @@ const NOTIF=(()=>{const plug=()=>{try{return window.Capacitor&&window.Capacitor.
  return {native,on,enable,disable,schedule,cancel,ask,granted}})();
 try{const A=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;if(A&&A.addListener)A.addListener('appStateChange',st=>{try{if(!st.isActive)NOTIF.schedule();else NOTIF.cancel()}catch(e){}})}catch(e){}
 window.addEventListener('pagehide',()=>{try{NOTIF.schedule()}catch(e){}});
-setInterval(()=>{try{if(NOTIF.native()&&Q_done()&&started&&!OB.on)NOTIF.ask()}catch(e){}},4000);
+setInterval(()=>{try{if(NOTIF.native()&&Q_done()&&started&&!OB.on&&localStorage.getItem('purrfect-nask')!=='1')NOTIF.ask()}catch(e){}},4000);
 document.addEventListener('visibilitychange',()=>{try{if(document.hidden){try{NOTIF.schedule()}catch(e){}awayFrom=Date.now();try{localStorage.setItem('purrfect-seen',String(awayFrom))}catch(e){}}else{try{NOTIF.cancel()}catch(e){}if(awayFrom){const s=(Date.now()-awayFrom)/1000;awayFrom=null;catchUp(s)}}}catch(e){}});
 function spawnSand(){const fx=Math.sin(cat.rotation.y),fz=Math.cos(cat.rotation.y);const top=litter.position.y+.25;for(let k=0;k<3;k++){const p=sandP.find(o=>o.life<=0);if(!p)break;p.life=.6;p.m.visible=true;p.m.position.set(cat.position.x+fx*.4,top+.1,cat.position.z+fz*.4);p.vx=-fx*(.5+Math.random()*.7)+(Math.random()-.5)*.7;p.vz=-fz*(.5+Math.random()*.7)+(Math.random()-.5)*.7;p.vy=1+Math.random()*.9}}
 function updateSandParticles(dt){const lo=litter.position.y+.19;for(const p of sandP){if(p.life<=0)continue;p.life-=dt;p.vy-=6*dt;p.m.position.x+=p.vx*dt;p.m.position.y+=p.vy*dt;p.m.position.z+=p.vz*dt;if(p.life<=0||p.m.position.y<lo){p.life=0;p.m.visible=false}}}
@@ -3001,6 +3001,7 @@ var QM=(function(){
   T('☕ Purrfect Café','A cosy café full of friendly cats to pet, feed and play with. Perfect for a lazy afternoon. Open 7 am to 9 pm.',OKB(Object.assign({guide:'at:@9,20.3'},shopCam(9)))),
   T('Photos','Some moments are too sweet to lose. Tap the camera to capture {c} and your home. Photos can also complete challenges in your Collections.',OKB({spot:'#phBtn'})),
   T('Gallery','Every memory you capture is kept safe in your gallery.',OKB({spot:'#gaBtn'})),
+  T('🔔 Stay in touch','{c} will not be able to call you, so we will do it for {c}! We will send you little reminders for mealtimes, your daily gift and hungry visitors at the garden bowl. Please accept the notification permission on the next screen so you never miss them.',OKB({ok:'Allow notifications',act:()=>{try{NOTIF.ask(true)}catch(e){}}})),
   T('Settings','Sound, vibration, saving and backups, and the cinematic camera all live in Settings, so you can make the world feel just right.',OKB({spot:'#audBtn'})),
   T('🍗 Food bowl','The practice is over, and {c} is getting hungry. Let’s make the home real. Pick the Food bowl in the 🐾 Cat items section and tap the ground to place it.',OKB({bld:true,cat:'furn',fg:'cat',fs:'foodbowl',spot:'#bCatFurn',allow:['#bCatFurn','#subBar','#grpBar','canvas','#bUndo','#bL','#bR'],poll:()=>nF('foodbowl')>0,ok:null,done:0,r:60,free:1})),
   T('💧 Water bowl','Now something to wash it down. Pick the Water bowl and place it close to the food.',OKB({bld:true,cat:'furn',fg:'cat',fs:'waterbowl',spot:'#bCatFurn',allow:['#bCatFurn','#subBar','#grpBar','canvas','#bUndo','#bL','#bR'],poll:()=>nF('waterbowl')>0,ok:null,done:0,r:60,free:1})),
@@ -3134,7 +3135,7 @@ var QM=(function(){
  const locked=()=>{const s=curStep();return !!(s&&s.allow&&s.allow!=='*'&&started&&!OB.on)};
  const okTarget=(t,s)=>{if(!t||!t.closest)return false;if(t.closest('#qBanner,#audBtn,#audPanel,#toast'))return true;for(const q of s.allow){if(q==='canvas'){if(t===cv)return true}else if(t.closest(q))return true}return false};
  for(const n of ['pointerdown','mousedown','click','touchstart','dblclick','contextmenu'])window.addEventListener(n,e=>{if(!locked())return;const s=curStep();
-  if(okTarget(e.target,s)){if(n==='click'){if(s.click&&e.target.closest(s.click)){setTimeout(()=>{if(curStep()===s)adv()},90)}else if(s.done==='ok'&&e.target.closest('#tutOk'))setTimeout(()=>{if(curStep()===s)adv()},0)}return}
+  if(okTarget(e.target,s)){if(n==='click'){if(s.click&&e.target.closest(s.click)){setTimeout(()=>{if(curStep()===s)adv()},90)}else if(s.done==='ok'&&e.target.closest('#tutOk')){if(s.act)try{s.act()}catch(_){}setTimeout(()=>{if(curStep()===s)adv()},0)}}return}
   e.stopImmediatePropagation();e.preventDefault()},{capture:true,passive:false});
  window.addEventListener('keydown',e=>{if(!locked())return;const s=curStep();if(s.allow.includes('#pad'))return;if(/^(w|a|s|d|arrowup|arrowdown|arrowleft|arrowright| |e)$/i.test(e.key)){e.stopImmediatePropagation();e.preventDefault()}},true);
  // ---- spotlight + pointing hand ----
