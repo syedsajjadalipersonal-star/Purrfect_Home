@@ -841,7 +841,7 @@ function catBuild(rig,spec,track,mats,seedBase){
   rig.legs.forEach((l,i)=>{const lf=furBlades(l.children[0].geometry,(x,y,z,nx,ny,nz)=>y>-.3*LL&&y<-.04*LL,Math.round(50*dens),{flow:()=>[0,-1,-.25],len:[.1,.2],w:[.05,.08],droop:.5,g:.5,fw:1,nw:.12,sway:.08},(x,y,z)=>coat('leg',x,y/LL,z),rnd);if(lf)add(l,lf,'fur',false,true)});
  }
  rig.head.position.set(0,.74,.52);
- return {pupils,ears,lids,jaw,tongue,tears,hd:BD.hd.map(v=>v*.86),oy,mz:oy,Z,tail:rig.tail,body:bodyM}
+ return {pupils,ears,lids,jaw,tongue,tears,hd:BD.hd.map(v=>v*.72),oy,mz:oy,Z,tail:rig.tail,body:bodyM}
 }
 
 function catRebuild(spec,silent){
