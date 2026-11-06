@@ -618,7 +618,8 @@ function rotateFurn(it){const cx=it.x0+it.fw/2,cz=it.z0+it.fd/2,nr=frot(it.rot+1
  for(const x of xs)for(const z of zs)if(canPlace(it.type,x,z,nr,it.uid)){const from=[it.x0,it.z0,it.rot];it.x0=x;it.z0=z;it.rot=nr;placeModel(it);build.undo.push({furnSet:[[it.uid,from]]});saveBuild();sound();return true}
  toast('No room to turn it here');return false}
 // cat with tail, ears, face and articulated legs
-const CAT_SCALE=.7;let cat=group(scene,1.2,0,5.2);cat.scale.setScalar(CAT_SCALE);let catBody=group(cat);
+const CAT_SCALE=.44; // adult cat: ~0.27 m at the shoulder when 1 unit is ~0.9 m, matching the humans and doors
+const CAT_K=CAT_SCALE/.7;let cat=group(scene,1.2,0,5.2);cat.scale.setScalar(CAT_SCALE);let catBody=group(cat);
 var catPupils=[],catPd=0,catHead=group(catBody,0,.74,.52),catEars=[],catLids=[],catTears=[],catJaw=null,catTongue=null;
 var legs=[0,1,2,3].map(()=>group(catBody,0,.34,0));var tail=group(catBody,0,.5,-.42);
 let catMount=group(catBody,0,0,0);catMount.add(catHead);let catNew=[],catMats=[];var AGE0=60,AGE_RATE=5,OTH=null,CID='a',BGP=false,NOSAVE=false;
@@ -1037,16 +1038,16 @@ const catBed=new THREE.Group();buildBed(catBed);
 // yarn ball
 function buildYarn(g){const y=group(g,0,.18,0);sphere(y,0,0,0,.18,.18,.18,mat('#d6495b',.95));for(let i=0;i<3;i++){const r=sphere(y,0,0,0,.185,.185,.185,mat('#e8828f',.95));r.rotation.set(i*1.05,i*.6,0);r.scale.set(.185,.02,.185)}sphere(g,.22,.03,.12,.03,.01,.12,mat('#d6495b',.95))}
 const yarn=new THREE.Group();buildYarn(yarn);const yarnBall=yarn.children[0];
-litter.scale.setScalar(.52);scratchPost.scale.setScalar(.7);yarn.scale.setScalar(.65);foodBowl.scale.setScalar(.7);waterBowl.scale.setScalar(.7);
+litter.scale.setScalar(.3);scratchPost.scale.setScalar(.44);yarn.scale.setScalar(.3);foodBowl.scale.setScalar(.26);waterBowl.scale.setScalar(.26);
 for(const o of [foodBowl,waterBowl,litter,scratchPost,catBed,yarn])o.visible=false;
 const isPlaced=o=>o.visible&&o.parent===furnGroup;
 Object.assign(FURN,{
- foodbowl:{grp:'cat',n:'Food bowl',ic:'🍗',w:1,d:1,unique:1,catPass:1,single:()=>foodBowl,make(g){g.scale.setScalar(.7);g.add(dish('#8e5545'));sphere(g,0,.045,0,.3,.09,.3,kibbleMat)}},
- waterbowl:{grp:'cat',n:'Water bowl',ic:'💧',w:1,d:1,unique:1,catPass:1,single:()=>waterBowl,make(g){g.scale.setScalar(.7);g.add(dish('#6f8d9b'));cyl(g,0,.15,0,.32,.32,.01,M.water,40)}},
- litter:{grp:'cat',n:'Litter tray',ic:'🏖️',w:1,d:1,unique:1,catPass:1,single:()=>litter,make(g){g.scale.setScalar(.52);buildTray(g);box(g,0,.19,0,1.6,.08,1.2,litterMat)}},
- scratch:{grp:'cat',n:'Scratch post',ic:'🪵',w:1,d:1,back:1,unique:1,catPass:1,single:()=>scratchPost,make(g){g.scale.setScalar(.7);buildPost(g)}},
- catbed:{grp:'cat',n:'Cat bed',ic:'🐈',w:1,d:1,unique:1,catPass:1,single:()=>catBed,make(g){buildBed(g)}},
- yarn:{grp:'cat',n:'Yarn ball',ic:'🎾',w:1,d:1,flat:1,unique:1,single:()=>yarn,make(g){g.scale.setScalar(.65);buildYarn(g)}}
+ foodbowl:{grp:'cat',n:'Food bowl',ic:'🍗',w:1,d:1,unique:1,catPass:1,single:()=>foodBowl,make(g){g.scale.setScalar(.26);g.add(dish('#8e5545'));sphere(g,0,.045,0,.3,.09,.3,kibbleMat)}},
+ waterbowl:{grp:'cat',n:'Water bowl',ic:'💧',w:1,d:1,unique:1,catPass:1,single:()=>waterBowl,make(g){g.scale.setScalar(.26);g.add(dish('#6f8d9b'));cyl(g,0,.15,0,.32,.32,.01,M.water,40)}},
+ litter:{grp:'cat',n:'Litter tray',ic:'🏖️',w:1,d:1,unique:1,catPass:1,single:()=>litter,make(g){g.scale.setScalar(.3);buildTray(g);box(g,0,.19,0,1.6,.08,1.2,litterMat)}},
+ scratch:{grp:'cat',n:'Scratch post',ic:'🪵',w:1,d:1,back:1,unique:1,catPass:1,single:()=>scratchPost,make(g){g.scale.setScalar(.44);buildPost(g)}},
+ catbed:{grp:'cat',n:'Cat bed',ic:'🐈',w:1,d:1,unique:1,catPass:1,single:()=>catBed,make(g){g.scale.setScalar(.62);buildBed(g)}},
+ yarn:{grp:'cat',n:'Yarn ball',ic:'🎾',w:1,d:1,flat:1,unique:1,single:()=>yarn,make(g){g.scale.setScalar(.3);buildYarn(g)}}
 });
 FURN_ORDER.push('foodbowl','waterbowl','litter','scratch','catbed','yarn');
 FGROUPS.push(['cat','🐾','Cat']);
@@ -1698,7 +1699,7 @@ function petGameTick(dt){if(!PG.on)return;
  cat.rotation.y=PG.sy+angDiff(yaw-Math.PI/2,PG.sy)*e;cat.rotation.x=0;cat.rotation.z=0;
  body.rotation.x=0;legL.rotation.x=legR.rotation.x=0;
  // right arm cradles the cat's belly, left hand (head side) strokes along the back, starting at the head
- const k=Math.max(.4,Math.min(1.05,cat.scale.x/.7)); // cat size relative to a full-grown cat: strokes and cradle scale with it
+ const k=Math.max(.4,Math.min(1.05,cat.scale.x/CAT_SCALE)); // cat size relative to a full-grown cat: strokes and cradle scale with it
  const sl=PG.phase==='hold'?pp:0,backH=PGH.up+(PGH.back-PGH.up)*k,hb=backH+PGH.dy-.01+.09*k*Math.pow(Math.max(0,1-sl/.3),1.5);
  const Tp=[(PGH.side-.30*k+.27*k*sl)/PS,hb/PS,PGH.fwd/PS],Ts=[(PGH.side+.1)/PS,(PGH.up+.084*k-.095)/PS,(PGH.fwd+.04)/PS];
  if(!PG.ikL)PG.ikL=[-1.4,.3,-.8];if(!PG.ikR)PG.ikR=[-1.1,-.4,-1.0];
@@ -1896,9 +1897,9 @@ const SHP_BY={};for(const i of SHP_CAT)SHP_BY[i.id]=i;
 const SH={on:false,tr:null,trT:0,lock:false,tab:'food',walls:[],ox:300,oz:300,id:'shop',dest:'shop',label:'🐾 Pets & Paws',cl:[-7.6,7.6,-5.4,6.5],exZ:5.55,exX:1};
 // ---- extra catalogue pieces that can be placed in the home ----
 Object.assign(FURN,{
- mouse:{grp:'cat',n:'Toy mouse',ic:'🐭',w:1,d:1,flat:1,shop:1,make(g){sphere(g,0,.05,0,.09,.05,.05,mat('#9aa0a6',.9));sphere(g,.07,.06,.0,.03,.03,.03,mat('#e8a3a8',.8));sphere(g,.05,.1,.03,.03,.03,.012,mat('#e8a3a8',.8));sphere(g,.05,.1,-.03,.03,.03,.012,mat('#e8a3a8',.8));for(let i=0;i<5;i++)sphere(g,-.1-i*.045,.02,Math.sin(i)*.03,.025,.012,.012,mat('#e8a3a8',.8))}},
- ball:{grp:'cat',n:'Jingle ball',ic:'🔴',w:1,d:1,flat:1,shop:1,make(g){sphere(g,0,.08,0,.08,.08,.08,mat('#d9534f',.5));sphere(g,0,.08,0,.082,.02,.082,mat('#f3bd56',.5));sphere(g,0,.15,0,.015,.015,.015,mat('#f3bd56',.3))}},
- feather:{grp:'cat',n:'Feather wand',ic:'🪶',w:1,d:1,flat:1,shop:1,make(g){const s=box(g,0,.02,0,.7,.02,.02,mat('#c9806a',.8),false);s.rotation.y=.4;for(let i=0;i<4;i++){const f=sphere(g,-.3+i*.03,.03,.14+i*.03,.1,.01,.025,mat(['#ef9da2','#a9dcf0','#f3bd56','#8bbf5a'][i],.8));f.rotation.y=.4+i*.3}}},
+ mouse:{grp:'cat',n:'Toy mouse',ic:'🐭',w:1,d:1,flat:1,shop:1,make(g){g.scale.setScalar(.55);sphere(g,0,.05,0,.09,.05,.05,mat('#9aa0a6',.9));sphere(g,.07,.06,.0,.03,.03,.03,mat('#e8a3a8',.8));sphere(g,.05,.1,.03,.03,.03,.012,mat('#e8a3a8',.8));sphere(g,.05,.1,-.03,.03,.03,.012,mat('#e8a3a8',.8));for(let i=0;i<5;i++)sphere(g,-.1-i*.045,.02,Math.sin(i)*.03,.025,.012,.012,mat('#e8a3a8',.8))}},
+ ball:{grp:'cat',n:'Jingle ball',ic:'🔴',w:1,d:1,flat:1,shop:1,make(g){g.scale.setScalar(.55);sphere(g,0,.08,0,.08,.08,.08,mat('#d9534f',.5));sphere(g,0,.08,0,.082,.02,.082,mat('#f3bd56',.5));sphere(g,0,.15,0,.015,.015,.015,mat('#f3bd56',.3))}},
+ feather:{grp:'cat',n:'Feather wand',ic:'🪶',w:1,d:1,flat:1,shop:1,make(g){g.scale.setScalar(.6);const s=box(g,0,.02,0,.7,.02,.02,mat('#c9806a',.8),false);s.rotation.y=.4;for(let i=0;i<4;i++){const f=sphere(g,-.3+i*.03,.03,.14+i*.03,.1,.01,.025,mat(['#ef9da2','#a9dcf0','#f3bd56','#8bbf5a'][i],.8));f.rotation.y=.4+i*.3}}},
  tree:{grp:'cat',n:'Cat tree',ic:'🌳',w:1,d:1,shop:1,make(g){const sis=mat('#cdb48a',.95),pl=mat('#8fb6c8',.95);
   box(g,0,.05,0,.9,.1,.9,pl);cyl(g,0,.62,0,.1,.1,1.1,sis,14);for(let i=0;i<9;i++)cyl(g,0,.12+i*.12,0,.105,.105,.012,mat('#a8916a',.9),14);
   box(g,.12,.5,.1,.8,.07,.55,pl);box(g,.12,.46,.1,.74,.03,.5,mat('#6f8d9b',.9),false);cyl(g,0,1.2,0,.38,.38,.07,pl,20);sphere(g,0,1.27,0,.25,.07,.25,mat('#f2d9a8',.95));
@@ -2502,8 +2503,8 @@ function parkTap(ev){const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.
  for(const R of PK.kids){if(!R.g.visible)continue;if(bRay.intersectObject(R.g,true).length){toast((PK.A.includes(R)?'🧑 ':'🧒 ')+(PK.A.includes(R)?PKSAY.adult:PKSAY.kid)[Math.floor(Math.random()*4)%(PK.A.includes(R)?3:4)]);return}}}
 // ---- cat carrier: the cat rides to the vet in a carrier, which is set down in the exam room ----
 const rmP=o=>{if(o&&o.parent)o.parent.remove(o)};
-const CARR={on:false,mode:'',g:null,door:null,slot:null,clone:null,home:null,bodyY:-.25};
-function makeCarrier(){const g=new THREE.Group(),blue=mat('#5b8fd0',.55),dk=mat('#3f6aa6',.6),wire=new THREE.MeshStandardMaterial({color:'#d4dadd',roughness:.3,metalness:.6}),W=.34,L=.56,H=.34,by=CARR.bodyY;
+const CARR={on:false,mode:'',g:null,door:null,slot:null,clone:null,home:null,bodyY:-.3};
+function makeCarrier(){const g=new THREE.Group(),blue=mat('#5b8fd0',.55),dk=mat('#3f6aa6',.6),wire=new THREE.MeshStandardMaterial({color:'#d4dadd',roughness:.3,metalness:.6}),W=.42,L=.64,H=.42,by=-.3;
  box(g,0,by-H/2+.02,0,W,.04,L,dk,false);box(g,0,by+H/2-.015,0,W,.03,L,blue,false);
  box(g,0,by,-L/2+.012,W,H,.024,blue,false);for(const k of [-.1,.1])box(g,k,by+.03,-L/2-.002,.1,.02,.006,dk,false);
  for(const sx of [-1,1]){box(g,sx*(W/2-.012),by+H/2-.03,0,.024,.04,L,dk,false);box(g,sx*(W/2-.012),by-H/2+.05,0,.024,.04,L,dk,false);for(let i=0;i<7;i++)cyl(g,sx*(W/2-.012),by,-L/2+.07+i*(L-.14)/6,.007,.007,H-.06,wire,6)}
@@ -2516,9 +2517,9 @@ function makeCarrier(){const g=new THREE.Group(),blue=mat('#5b8fd0',.55),dk=mat(
  g.userData={door,slot};return g}
 function carrierFillCat(){CARR.clone=null;while(CARR.slot.children.length)CARR.slot.remove(CARR.slot.children[0]);
  const ud=cat.userData;cat.userData={};let c;try{c=cat.clone(true)}finally{cat.userData=ud}c.position.set(0,0,0);c.rotation.set(0,0,0);c.visible=true;c.userData={};c.updateMatrixWorld(true);
- const bb=new THREE.Box3().setFromObject(c),sz=bb.getSize(new THREE.Vector3()),k=Math.min(1,.27/Math.max(sz.y,.01),.4/Math.max(sz.z,.01),.25/Math.max(sz.x,.01));
+ const bb=new THREE.Box3().setFromObject(c),sz=bb.getSize(new THREE.Vector3()),k=Math.min(1,.34/Math.max(sz.y,.01),.5/Math.max(sz.z,.01),.3/Math.max(sz.x,.01));
  c.scale.multiplyScalar(k);c.updateMatrixWorld(true);const b2=new THREE.Box3().setFromObject(c);c.position.y=-b2.min.y;c.position.z=-.02;CARR.slot.add(c);CARR.clone=c}
-function carrierHand(){if(!CARR.g)return;rmP(CARR.g);elbows[1].add(CARR.g);CARR.g.position.set(0,-.38,.1);CARR.g.rotation.set(0,0,0);CARR.g.scale.setScalar(1.3);CARR.door.rotation.y=0;CARR.mode='hand';CARR.g.visible=true}
+function carrierHand(){if(!CARR.g)return;rmP(CARR.g);elbows[1].add(CARR.g);CARR.g.position.set(0,-.38,.1);CARR.g.rotation.set(0,0,0);CARR.g.scale.setScalar(1.05);CARR.door.rotation.y=0;CARR.mode='hand';CARR.g.visible=true}
 function carrierFill(){if(CARR.on||!cat.visible||LIFE.hide)return;
  if(!CARR.g){CARR.g=makeCarrier();CARR.door=CARR.g.userData.door;CARR.slot=CARR.g.userData.slot}
  CARR.home={x:cat.position.x,z:cat.position.z,ry:cat.rotation.y};try{carrierFillCat()}catch(e){console.error(e)}
@@ -2589,7 +2590,7 @@ function hospTick(dt){const P=player.position,t=elapsed,lx=P.x-HP.ox,lz=P.z-HP.o
 }
 
 applyWorn();
-function applyGear(){const T=INV.tier,fs=[1,1.2,1.4][T.food>=5?2:T.food>=3?1:0],ws=[1,1.2,1.4][T.water>=5?2:T.water>=3?1:0],ls=T.tray<=15?.88:T.tray<=25?.7:.52;foodBowl.scale.setScalar(.7*fs);waterBowl.scale.setScalar(.7*ws);fountainF.visible=T.water>=5;litter.scale.setScalar(ls)}
+function applyGear(){const T=INV.tier,fs=[1,1.2,1.4][T.food>=5?2:T.food>=3?1:0],ws=[1,1.2,1.4][T.water>=5?2:T.water>=3?1:0],ls=T.tray<=15?.42:T.tray<=25?.36:.3;foodBowl.scale.setScalar(.26*fs);waterBowl.scale.setScalar(.26*ws);fountainF.visible=T.water>=5;litter.scale.setScalar(ls)}
 applyGear();
 {const op=paintMat((c,w,h)=>{c.fillStyle='#2e7658';c.fillRect(0,0,w,h);c.fillStyle='#fff8e9';c.font='bold 40px system-ui';c.textAlign='center';c.fillText('OPEN',w/2,44)},128,64);box(scene,-9,.14,19.05,1.2,.03,.55,mat('#b0553f',.95),false)}
 {const op=paintMat((c,w,h)=>{c.fillStyle='#2e7658';c.fillRect(0,0,w,h);c.fillStyle='#fff8e9';c.font='bold 40px system-ui';c.textAlign='center';c.fillText('OPEN',w/2,44)},128,64);box(scene,3.5,.14,19.05,1.2,.03,.55,mat('#2fa3b5',.95),false);box(scene,-3.5,.14,19.05,1.2,.03,.55,mat('#df9c65',.95),false)}
@@ -2664,7 +2665,7 @@ function napsOf(d,id){id=id||CID;if(NAPC.d===d&&NAPC.i===id)return NAPC.n;const 
  NAPC={d,i:id,n};return n}
 function sleepInfo(m,dd){m=((m%1440)+1440)%1440;if(m>=1380||m<300)return 'night';for(const n of napsOf(dd===undefined?day:dd))if(m>=n[0]&&m<n[1])return 'nap';return null}
 const ageDays=()=>AGE0+((day-1)+(((mins%1440)+1440)%1440)/1440)*AGE_RATE;
-const ageF=()=>.52+.48*Math.min(1,(1-Math.exp(-(ageDays()-60)/120))/(1-Math.exp(-305/120)));
+const ageF=()=>.46+.54*Math.min(1,(1-Math.exp(-(ageDays()-60)/120))/(1-Math.exp(-305/120)));
 // ===== Health record: vaccinations, deworming, spay/neuter =====
 const VAX_FIRST=75,VAX_BOOST=10,VAX_YEAR=365,DEW_EVERY=90,MED_GRACE=15,SPAY_AGE=180,MED={t:0,cool:0};
 const vaxNext=()=>{const v=INV.med.v;return !v.length?{due:VAX_FIRST,name:'First vaccine'}:v.length===1?{due:v[0]+VAX_BOOST,name:'Booster shot'}:{due:v[v.length-1]+VAX_YEAR,name:'Yearly vaccine'}};
@@ -2725,14 +2726,14 @@ const bowlD=b=>.23*(b.scale.x/.7)+.62*cat.scale.x;
 function startTask(name){momTask(name);const U=cat.userData,T=U.target;if(U.task==='climb'&&U.o0&&U.o0.bx!==undefined){cat.position.x=U.o0.bx;cat.position.z=U.o0.bz}if(U.item&&furn.has(U.item.uid)&&/^(play-|climb)/.test(U.task||''))placeModel(U.item);U.lift=0;U.leap=false;U.rest=false;U.o0=null;U.task=name;U.stage='goto';U.t=0;U.face=null;U.avoid=Math.random()<.5?1:-1;U.speed=.65;
  const at=(o,dist)=>{U.speed=.95;if(!isPlaced(o)){T.set(cat.position.x,0,cat.position.z);return}const a=accFront(o,dist);T.set(a.x,0,a.z);U.face=a.face};
  switch(name){
-  case 'eat':at(foodBowl,bowlD(foodBowl));break;case 'beg-food':at(foodBowl,bowlD(foodBowl)+.29);break;
-  case 'drink':at(waterBowl,bowlD(waterBowl));break;case 'beg-water':at(waterBowl,bowlD(waterBowl)+.29);break;
+  case 'eat':at(foodBowl,bowlD(foodBowl));break;case 'beg-food':at(foodBowl,bowlD(foodBowl)+.29*CAT_K);break;
+  case 'drink':at(waterBowl,bowlD(waterBowl));break;case 'beg-water':at(waterBowl,bowlD(waterBowl)+.29*CAT_K);break;
   case 'litter':{litter.updateMatrixWorld(true);const lp=litter.localToWorld(tmpV.set((Math.random()-.5)*.7,0,(Math.random()-.5)*.3));T.set(lp.x,0,lp.z);U.face=litter.rotation.y+Math.PI;U.speed=.95;U.doPoop=clocks.poop>=POOP_DUE;U.doPee=clocks.pee>=PEE_DUE||!U.doPoop;U.done=false;break}
   case 'refuse':at(litter,1.5);break;
   case 'accident':{const p=freeSpot(1.9,litter);T.set(p.x,0,p.z);U.speed=.95;U.doPoop=clocks.poop>=POOP_DUE;U.doPee=clocks.pee>=PEE_DUE||!U.doPoop;U.done=false;break}
-  case 'scratch':at(scratchPost,.1+.17*(cat.scale.x/CAT_SCALE));break;
-  case 'play':at(yarn,.15+.4*(cat.scale.x/CAT_SCALE));break;
-  case 'play-mouse':case 'play-ball':case 'play-feather':{const its=[...furn.values()].filter(o=>o.type===name.slice(5));U.item=its[Math.floor(Math.random()*its.length)];if(!U.item)T.set(cat.position.x,0,cat.position.z);else at(U.item.group,.1+.4*(cat.scale.x/CAT_SCALE));break}
+  case 'scratch':at(scratchPost,(.1+.17*(cat.scale.x/CAT_SCALE))*CAT_K*1.2);break;
+  case 'play':at(yarn,(.15+.4*(cat.scale.x/CAT_SCALE))*CAT_K);break;
+  case 'play-mouse':case 'play-ball':case 'play-feather':{const its=[...furn.values()].filter(o=>o.type===name.slice(5));U.item=its[Math.floor(Math.random()*its.length)];if(!U.item)T.set(cat.position.x,0,cat.position.z);else at(U.item.group,(.1+.4*(cat.scale.x/CAT_SCALE))*CAT_K);break}
   case 'climb':{const its=[...furn.values()].filter(o=>o.type==='tree'||o.type==='tower');U.item=its[Math.floor(Math.random()*its.length)];if(!U.item)T.set(cat.position.x,0,cat.position.z);else at(U.item.group,.85);break}
   case 'nap':{const nbd=napTarget();if(nbd){T.set(nbd.position.x,0,nbd.position.z);U.face=nbd.rotation.y+2.2}else T.set(cat.position.x,0,cat.position.z);break}
   case 'window':{const w=windowSpot();if(!w){T.set(cat.position.x,0,cat.position.z);U.winKey=null;break}T.set(w.x,0,w.z);U.face=w.face;U.winKey=w.key;U.base=[w.x,w.z];U.sill=[w.sx,w.sz];U.speed=.8;break}
@@ -2894,7 +2895,7 @@ function poseCat(dt,t){const U=cat.userData,P=U.P;if(!U.init)return;const L=THRE
  if(sc>.001){catBody.rotation.x+=-.8*sc+rake*.03*sc;by+=.34*sc;legs[0].rotation.x=L(legs[0].rotation.x,-1.5+rake*.35,sc);legs[1].rotation.x=L(legs[1].rotation.x,-1.5-rake*.35,sc);legs[2].rotation.x=L(legs[2].rotation.x,.8,sc);legs[3].rotation.x=L(legs[3].rotation.x,.8,sc);catHead.rotation.x+=.5*sc}
  const csz=cat.scale.x,nbo=napObj(),onBed=!!nbo&&Math.hypot(cat.position.x-nbo.position.x,cat.position.z-nbo.position.z)<.6,nl=U.napBase!==undefined?U.napBase:(onBed?(nbo===catBed?.375*catBed.scale.x:.11):0);
  {if(P.wn>.001){catHead.rotation.x-=.5*P.wn;tail.rotation.z+=Math.sin(t*3)*.12*P.wn}const nbb=Math.max(nb,P.rl||0);if(nbb>.001){by-=.14*nbb;cat.position.y+=nl*nbb;legs.forEach(l=>l.scale.y=1-.75*nbb);catHead.rotation.x+=.38*nbb;catBody.scale.y=1+Math.sin(t*2)*.02*nbb;tail.rotation.z+=nbb*.9}}
- cat.position.y+=(.17*litter.scale.x/.52)*P.lt;cat.position.y+=(U.lift||0)-(U.task==='climb'?nl*nb:0);
+ cat.position.y+=(.17*litter.scale.x/.3*CAT_K)*P.lt;cat.position.y+=(U.lift||0)-(U.task==='climb'?nl*nb:0);
  if(P.lp>.001){legs[0].rotation.x=L(legs[0].rotation.x,-1.05,P.lp);legs[1].rotation.x=L(legs[1].rotation.x,-1.05,P.lp);legs[2].rotation.x=L(legs[2].rotation.x,.95,P.lp);legs[3].rotation.x=L(legs[3].rotation.x,.95,P.lp);catBody.rotation.x+=-.3*P.lp;catHead.rotation.x+=-.1*P.lp;tail.rotation.z+=.3*P.lp}
  if(hd>.001){catHead.position.y-=.38*hd;catHead.position.z+=.12*hd;catHead.rotation.x+=.95*hd+Math.sin(t*14)*.07*P.chew+Math.sin(t*9)*.05*P.lap;by-=.03*hd;legs[0].rotation.x=L(legs[0].rotation.x,-.3,hd);legs[1].rotation.x=L(legs[1].rotation.x,-.3,hd);catBody.rotation.x+=.08*hd;tail.rotation.z+=Math.sin(t*4)*.15*hd}
  if(P.dg>.001){legs[0].rotation.x=L(legs[0].rotation.x,-.3+Math.sin(t*13)*.6,P.dg);legs[1].rotation.x=L(legs[1].rotation.x,-.3-Math.sin(t*13)*.6,P.dg);catBody.rotation.x+=.12*P.dg;catHead.rotation.x+=.35*P.dg;by-=.03*P.dg}
@@ -3539,7 +3540,9 @@ let cameraYaw=0,cameraPitch=.36,lookPointer=null,lastLookX=0,lastLookY=0;cv.styl
 cv.addEventListener('pointerdown',e=>{if(build.on)return;lookPointer=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;cv.setPointerCapture(e.pointerId)});
 cv.addEventListener('pointermove',e=>{if(e.pointerId!==lookPointer)return;cameraYaw-=(e.clientX-lastLookX)*.008;cameraPitch=THREE.MathUtils.clamp(cameraPitch+(e.clientY-lastLookY)*.004,-.05,.85);lastLookX=e.clientX;lastLookY=e.clientY});
 function hitBench(ev){const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);for(const h of bRay.intersectObjects(streetBenches.map(b=>b.group),true)){let o=h.object;while(o){const b=streetBenches.find(q=>q.group===o);if(b)return b;o=o.parent}}return null}
-function hitCat(ev){const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);const hs=bRay.intersectObject(cat,true);return hs.some(h=>h.object!==bubble)}
+function hitCat(ev){const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);const hs=bRay.intersectObject(cat,true);if(hs.some(h=>h.object!==bubble))return true;
+ // the cat is realistically small: forgive taps that land close to it on screen
+ if(!cat.visible)return false;const pv=new THREE.Vector3(cat.position.x,cat.position.y+.2*cat.scale.x/CAT_SCALE,cat.position.z).project(camera);if(pv.z>1)return false;const px=(pv.x*.5+.5)*r.width+r.left,py=(-pv.y*.5+.5)*r.height+r.top;return Math.hypot(ev.clientX-px,ev.clientY-py)<38}
 function hitMess(ev){if(!floorMess.length)return null;const r=cv.getBoundingClientRect();bNdc.set(((ev.clientX-r.left)/r.width)*2-1,-((ev.clientY-r.top)/r.height)*2+1);bRay.setFromCamera(bNdc,camera);let best=null,bd=1e9;for(const m of floorMess){const hs=bRay.intersectObject(m.g,true);if(hs.length&&hs[0].distance<bd){bd=hs[0].distance;best=m}}return best}
 let tapDown=null;cv.addEventListener('pointerdown',e=>{tapDown=build.on?null:{id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now()}});
 cv.addEventListener('pointerup',e=>{const t=tapDown;tapDown=null;if(!t||t.id!==e.pointerId||build.on||PHO.mode)return;if(Math.hypot(e.clientX-t.x,e.clientY-t.y)>12||performance.now()-t.t>500)return;
@@ -4730,7 +4733,7 @@ function withRig(b,fn){const cur=capCat(),q=QUIET,bg=BGP,ns=NOSAVE;putCat(b);BGP
 const STR={rigs:{},cur:null,v:null,mode:'none',wp:[],eatT:0,purT:0,live:false,ct:0,card:null};
 function strayRig(id){if(STR.rigs[id])return STR.rigs[id];const s=STBY[id],b=Object.assign(newRig(),{id:'s',spec:null,name:s[1],stats:Object.assign({},STATS0,{love:60}),clocks:{pee:0,poop:0},sick:0,rec:0,med:{v:[],dw:45,sx:1,warn:'',scare:'',r:AGE_RATE},age0:900,warnH:false,warnC:false});
  withRig(b,()=>{catRebuild(stSpec(s),true);applyAge();const U=cat.userData;U.init=1;U.task='';U.stage='do';U.t=0;U.P={};U.happy=0;U.moving=false;U.zoom=0;U.gait=0;U.wait=9;cat.visible=false});STR.rigs[id]=b;return b}
-const strayBowl=group(scene,BOWL.x,0,BOWL.z);strayBowl.add(dish('#8a6a50'));const strayMound=sphere(strayBowl,0,.045,0,.33,.11,.33,kibbleMat);strayMound.visible=false;strayBowl.scale.setScalar(.7);strayBowl.userData.stray=1;
+const strayBowl=group(scene,BOWL.x,0,BOWL.z);strayBowl.add(dish('#8a6a50'));const strayMound=sphere(strayBowl,0,.045,0,.33,.11,.33,kibbleMat);strayMound.visible=false;strayBowl.scale.setScalar(.26);strayBowl.userData.stray=1;
 function strayWalk(dt,b){const c=b.cat,U=c.userData;if(!STR.wp.length){U.moving=false;return true}const w=STR.wp[0],dx=w[0]-c.position.x,dz=w[1]-c.position.z,d=Math.hypot(dx,dz);if(d<.08){STR.wp.shift();return false}
  const sp=.85*dt,k=Math.min(1,sp/d);c.position.x+=dx*k;c.position.z+=dz*k;const ang=Math.atan2(dx,dz);let da=ang-c.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));c.rotation.y+=da*Math.min(1,dt*8);U.moving=true;U.gait=(U.gait||0)+dt*8;return false}
 function strayTick(dt,t){if(colSaveT-=dt,colSaveT<=0){colSaveT=3;colSave()}
