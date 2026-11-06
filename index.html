@@ -2083,7 +2083,7 @@ const MAPP=[
  {id:'hosp',n:'Petspace Animal Hospital',ic:'🏥',x:77,y:24,hrs:'24/7, breaks 1–2 am & 1–2 pm',c:'#4a9fb0'},
  {id:'groc',n:'Anytime Mart',ic:'🛒',x:23,y:54,hrs:'Open 24/7',c:'#df9c65'},
  {id:'cafe',n:'Purrfect Café',ic:'☕',x:77,y:57,hrs:'7 am – 9 pm',c:'#c47a93'},
- {id:'park',n:'Purrfect Park',ic:'🌳',x:50,y:12,hrs:'Open all day',c:'#4aa36b'},
+ {id:'park',n:'Fur & Family Park',ic:'🌳',x:50,y:12,hrs:'Open all day',c:'#4aa36b'},
  {id:'home',n:'Home',ic:'🏡',x:50,y:85,hrs:'Sweet home',c:'#2e7658'}];
 const mapHere=()=>SH.on?SH.id:'home';
 function mapBusy(){try{return !!(HV.on||CI.on||ck.on||GE.on||GR.ui||CF.ui||seat||act||PG.on||SG.on||SH.tr)}catch(e){return false}}
@@ -2120,7 +2120,7 @@ let mapT=0;function mapTick(){const t=performance.now();if(t-mapT<1000)return;ma
 const SHOP0={ox:SH.ox,oz:SH.oz,walls:SH.walls,cl:SH.cl},shLightPos=shLights.map(l=>[l.position.x,l.position.y,l.position.z]);
 function shopSwitch(){const P=player.position;
  if(SH.go==='in'){if(SH.on){if(SH.id==='hosp')try{carrierRelease(false)}catch(e){}if(SH.id==='park')try{parkLeave(false)}catch(e){}closeHospMenu();if(SH.id==='cafe')cfLeave();if(SH.id==='groc')grLeave()}SH.on=true;SH.out=false;PKG.visible=false;const hp=SH.dest==='hosp';
-  GRG.visible=false;if(SH.dest==='park'){CFG.visible=false;SHG.visible=false;HPG.visible=false;for(const l of shLights)l.intensity=0;SH.id='park';SH.ox=PK.ox;SH.oz=PK.oz;SH.walls=[];SH.cl=PK.cl;SH.label='🌳 Purrfect Park';SH.exZ=PK.exZ;SH.exX=PK.exX;SH.out=true;P.set(PK.ox,.09,PK.oz+15.3);player.rotation.y=Math.PI;cameraYaw=0;try{parkEnter()}catch(e){console.error(e)}toast('Welcome to Purrfect Park! 🌳 '+(PK.cat?(CNAME||'Kitty')+' wears a harness and walks right beside you.':'Enjoy the fresh air.'))}
+  GRG.visible=false;if(SH.dest==='park'){CFG.visible=false;SHG.visible=false;HPG.visible=false;for(const l of shLights)l.intensity=0;SH.id='park';SH.ox=PK.ox;SH.oz=PK.oz;SH.walls=[];SH.cl=PK.cl;SH.label='🌳 Fur & Family Park';SH.exZ=PK.exZ;SH.exX=PK.exX;SH.out=true;P.set(PK.ox,.09,PK.oz+15.3);player.rotation.y=Math.PI;cameraYaw=0;try{parkEnter()}catch(e){console.error(e)}toast('Welcome to Fur & Family Park! 🌳 '+(PK.cat?(CNAME||'Kitty')+' wears a harness and walks right beside you.':'Enjoy the fresh air.'))}
   else if(SH.dest==='groc'){SH.id='groc';SH.ox=GR.ox;SH.oz=GR.oz;SH.walls=GR.walls;SH.cl=GR.cl;SH.label='🛒 Anytime Mart';SH.exZ=GR.exZ;SH.exX=GR.exX;GRG.visible=true;CFG.visible=false;SHG.visible=false;HPG.visible=false;shLights.forEach((l,i)=>{l.position.set(GR.ox+GR_LIGHTS[i][0],GR_LIGHTS[i][1],GR.oz+GR_LIGHTS[i][2]);l.intensity=1.2});P.set(GR.ox,.09,GR.oz+4.8);player.rotation.y=Math.PI;cameraYaw=0;grEnter()}
   else if(hp){CFG.visible=false;SH.id='hosp';SH.ox=HP.ox;SH.oz=HP.oz;SH.walls=HP.walls;SH.cl=HP.cl;SH.label='🏥 Petspace Animal Hospital';SH.exZ=6.5;SH.exX=1.1;HPG.visible=true;SHG.visible=false;shLights.forEach((l,i)=>{l.position.set(HP.ox+hpLightPos[i][0],hpLightPos[i][1],HP.oz+hpLightPos[i][2]);l.intensity=i===2?1.3:1.0});P.set(HP.ox,.09,HP.oz+5.6);player.rotation.y=Math.PI;cameraYaw=0;try{carrierFill()}catch(e){console.error(e)}toast('Welcome to Petspace Animal Hospital 🏥 '+(CARR.on?(CNAME||'Kitty')+' is snug in the carrier. ':'')+'Check in at reception.')}
   else if(SH.dest==='cafe'){SH.id='cafe';SH.ox=CF.ox;SH.oz=CF.oz;SH.walls=CF.walls;SH.cl=CF.cl;SH.label='☕ Purrfect Café';SH.exZ=CF.exZ;SH.exX=CF.exX;CFG.visible=true;SHG.visible=false;HPG.visible=false;shLights.forEach((l,i)=>{l.position.set(CF.ox+CF_LIGHTS[i][0],CF_LIGHTS[i][1],CF.oz+CF_LIGHTS[i][2]);l.intensity=1.15});P.set(CF.ox,.09,CF.oz+4.8);player.rotation.y=Math.PI;cameraYaw=0;cfEnter()}
@@ -2340,7 +2340,7 @@ function hospEndVisit(){if(!HV.on||!HV.done)return;const U=cat.userData,S=HV.cat
  for(const k in HV.rm.tools)HV.rm.tools[k].visible=false;for(const d of HP.rooms[1].dot)d.visible=false;{const B=HP.rooms[1];B.dryP.g.visible=false;B.brushP.g.visible=false;B.brushP.sp.forEach(m=>m.visible=false);B.staff.g.position.set(-0.2,0,-5.0)}
  setBubble('');hvEl.style.display='none';HV.on=false;HV.book=null;HV.rm=null;HV.catSave=null;SH.lock=false;try{carrierTake()}catch(e){console.error(e)}toast(CARR.on?(CNAME||'Kitty')+' is back in the carrier 🧳 Take '+(isTom()?'him':'her')+' home when you are ready.':'Welcome home, kitty 🐱')}
 hvB.addEventListener('click',e=>{e.stopPropagation();hospEndVisit()});hvEl.addEventListener('pointerdown',e=>e.stopPropagation());
-// ================= Purrfect Park: fenced playground, walking track, harnessed cats =================
+// ================= Fur & Family Park: fenced playground, walking track, harnessed cats =================
 const PK={ox:1500,oz:300,cl:[-23,23,-16.2,17.4],exZ:17.0,exX:1.7,t:0,built:false,home:null,cat:false,harness:null,leash:null,love:0,kids:[],walkers:[],hits:[],anim:[],vis:{k:null,w:null},bob:0};
 const PKG=group(scene,PK.ox,0,PK.oz);PKG.visible=false;
 const PKUP=new THREE.Vector3(0,1,0);
@@ -2363,7 +2363,7 @@ function pkSolidC(x,z,r){circS(PK.ox+x,PK.oz+z,r)}
  const hed=(x0,x1,z0,z1)=>{const w=x1-x0,d=z1-z0;box(PKG,(x0+x1)/2,.5,(z0+z1)/2,w,1,d,hedge);box(PKG,(x0+x1)/2,1.02,(z0+z1)/2,w*.96,.18,d*.9,hedge2,false);pkSolid(x0,x1,z0,z1)};
  hed(-23.4,23.4,-16.4,-15.6);hed(-23.4,-1.8,15.6,16.4);hed(1.8,23.4,15.6,16.4);hed(-23.4,-22.6,-16.4,16.4);hed(22.6,23.4,-16.4,16.4);
  for(const sx of [-1,1]){box(PKG,sx*1.9,1.0,16,.3,2,.3,mat('#a57b55',.8));box(PKG,sx*1.9,2.05,16,.42,.1,.42,mat('#8a6a4a',.8))}
- {const sg=paintMat((c,w,h)=>{c.fillStyle='#3f7a4a';c.fillRect(0,0,w,h);c.fillStyle='#fff8e9';c.font='bold 54px system-ui';c.textAlign='center';c.fillText('🌳 PURRFECT PARK',w/2,74);c.font='bold 24px system-ui';c.fillText('walkies welcome · harness on',w/2,108)},512,128);box(PKG,0,3.35,16,3.4,.85,.1,sg,false);for(const sx of [-1,1])box(PKG,sx*1.9,2.6,16,.12,1.2,.12,mat('#a57b55',.8),false)}
+ {const sg=paintMat((c,w,h)=>{c.fillStyle='#3f7a4a';c.fillRect(0,0,w,h);c.fillStyle='#fff8e9';c.font='bold 42px system-ui';c.textAlign='center';c.fillText('🌳 FUR & FAMILY PARK',w/2,74);c.font='bold 24px system-ui';c.fillText('walkies welcome · harness on',w/2,108)},512,128);box(PKG,0,3.35,16,3.4,.85,.1,sg,false);for(const sx of [-1,1])box(PKG,sx*1.9,2.6,16,.12,1.2,.12,mat('#a57b55',.8),false)}
  // trees and bushes
  const tree=(x,z,s)=>{const g=group(PKG,x,0,z);g.scale.setScalar(s);cyl(g,0,1.1,0,.16,.26,2.2,M.wood,10);for(const [a,y,r] of [[0,2.9,1.15],[.6,2.4,.8],[-.6,2.5,.85],[.1,3.5,.8]])sphere(g,a,y,0,r,r*.9,r,M.leaf2);pkSolidC(x,z,.3*s);return g};
  [[-21.2,-12,1.1],[21.2,-12.5,1.2],[-21.4,12,1],[21.3,12.5,1.15],[-26,-6,1.3],[26,-4,1.2],[-27,8,1.1],[27,9,1.3],[-10,-19,1.2],[10,-20,1.1],[0,-21,1.4],[-16,19,1.1],[16,19.5,1.2],[-8,19,1],[8,19,.9]].forEach(a=>tree(a[0],a[1],a[2]));
@@ -3231,7 +3231,7 @@ var QM=(function(){
   T('🐾 Pets & Paws','The pet shop, a treasure trove of food, treats and toys that {c} will adore. Open 10 am to midnight.',PO('map','mapPin-shop',{map:1})),
   T('🛒 Anytime Mart','You need to eat too! Pick up drinks and ready meals here to stock your fridge. It never closes, day or night.',PO('map','mapPin-groc',{map:1})),
   T('🏥 Petspace Animal Hospital','The town vet, kind and gentle. {c} rides there in a cosy carrier for check-ups, and whenever {c} is feeling poorly. Open all day and night, apart from short breaks at 1 am and 1 pm.',PO('map','mapPin-hosp',{map:1})),
-  T('🌳 Purrfect Park','A fenced garden with slides, swings and a sandbox, and a walking track all the way round. {c} always wears a little harness and walks right beside you, and you will meet other cats out on their walks too. Always open.',PO('map','mapPin-park',{map:1})),
+  T('🌳 Fur & Family Park','A fenced garden with slides, swings and a sandbox, and a walking track all the way round. {c} always wears a little harness and walks right beside you, and you will meet other cats out on their walks too. Always open.',PO('map','mapPin-park',{map:1})),
   T('☕ Purrfect Café','A cosy café full of friendly cats to pet, feed and play with. Perfect for a lazy afternoon. Open 7 am to 9 pm.',PO('map','mapPin-cafe',{map:1})),
   T('🏡 Home','And this is where it all begins. Tap Home on the map, or walk out through the door of any shop, and you are back in your garden.',PO('map','mapPin-home',{map:1})),
   T('Photos','Some moments are too sweet to lose. Tap the camera to capture {c} and your home. Photos can also complete challenges in your Collections.',OKB({spot:'#phBtn'})),
