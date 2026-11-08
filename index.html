@@ -4289,32 +4289,35 @@ function grocTap(ev){if(GR.ui||SH.tr||ck.on||GE.on)return;const r=cv.getBounding
 function grEnter(){GRG.visible=true;GR.bask={};toast('Welcome to Anytime Mart! 🛒 Tap shelves and fridges to shop, then pay at the checkout.')}
 function grLeave(){grClose();if(grCount())toast('You put your basket back 🧺');GR.bask={};GRG.visible=false}
 // ---------------- your fridge, eating at home, and the kitchen merge game ----------------
-// ---- recipes: each step is  a+b=result  . Every meal is a long chain of merges ----
+// ---- recipes: each step is  a+b=result  . Every meal is just 2-3 merges (3-4 ingredients) ----
 const RECIPES=[
- ['pizza','🍕','Cheesy pizza','food','#e8a030',3,'flour+flour=dough;dough+oil=pbase;tomato+tomato=puree;puree+garlic=psauce;pbase+psauce=sbase;sbase+cheese=cbase;cbase+mushroom=topped;topped+pepper=pizza'],
- ['pasta','🍝','Spaghetti bolognese','food','#d9534f',3,'beef+onion=mince;tomato+tomato=puree;puree+garlic=psauce;mince+psauce=bolsauce;noodles+salt=spag;spag+bolsauce=spag2;spag2+cheese=pasta'],
- ['curry','🍛','Chicken curry rice','food','#d9a030',3,'onion+garlic=soff;soff+chili=spice;chicken+spice=cp;cp+potato=cp2;cp2+cream=csauce;rice+salt=brice;csauce+brice=curry'],
- ['sushi','🍣','Sushi roll platter','food','#f0907a',2,'rice+salt=brice;brice+sugar=srice;fish+soy=mfish;cucumber+avocado=sfill;srice+mfish=nigiri;nigiri+sfill=roll;roll+lemon=sushi'],
- ['omelette','🍳','Loaded omelette','food','#f6d65a',2,'egg+egg=beaten;beaten+milk=emix;mushroom+onion=fmush;emix+fmush=ob;ob+bacon=ob2;ob2+cheese=ob3;ob3+butter=omelette'],
- ['pancakes','🥞','Berry pancake stack','food','#e8b765',2,'flour+egg=bat;bat+milk=bat2;bat2+sugar=bat3;bat3+butter=pcake;pcake+banana=pst;pst+strawberry=pst2;pst2+honey=pancakes'],
- ['cake','🎂','Chocolate cake','food','#6b4026',4,'flour+sugar=dry;egg+butter=wet;wet+milk=wet2;dry+wet2=cbat;chocolate+cream=ganache;cbat+ganache=sponge;sponge+strawberry=cake'],
- ['stew','🍲','Hearty beef stew','food','#a8601f',4,'potato+carrot=vegs;onion+garlic=soff;soff+beef=browned;browned+vegs=stbase;stbase+tomato=st2;st2+beans=st3;st3+salt=stew'],
- ['salad','🥗','Garden salad bowl','food','#6aaa4a',2,'lettuce+cucumber=greens;tomato+onion=tonion;greens+tonion=sb;sb+corn=sb1;sb1+avocado=sb2;oil+lemon=dress;sb2+dress=salad'],
- ['fries','🍟','Garlic fries','food','#f3c83c',2,'potato+potato=cutp;cutp+potato=cutp2;cutp2+salt=saltp;saltp+oil=fryp;fryp+garlic=fries'],
- ['burger','🍔','Cheeseburger','food','#c58b52',2,'flour+flour=dough;dough+sugar=sdough;sdough+butter=buns;beef+onion=mince;mince+salt=patty;patty+cheese=cpatty;buns+cpatty=b0;b0+lettuce=b1;b1+tomato=burger'],
- ['smoothie','🥤','Fruit smoothie','drink','#e8e0a0',1,'apple+banana=fmix;fmix+strawberry=fmix2;fmix2+milk=blend;blend+honey=smoothie'],
- ['tacos','🌮','Loaded tacos','food','#e8a84a',2,'beef+chili=sbeef;sbeef+onion=tmeat;tmeat+beans=tfill;lettuce+tomato=ftop;cheese+avocado=guac;ftop+guac=ttop;tortilla+tfill=t0;t0+ttop=tacos'],
- ['friedrice','🍤','Prawn fried rice','food','#e8c070',3,'rice+salt=brice;egg+egg=beaten;brice+beaten=frb;carrot+corn=cvg;frb+cvg=fr2;fr2+soy=fr3;fr3+shrimp=friedrice'],
- ['ramen','🍜','Chicken ramen','food','#d9a050',3,'noodles+soy=sn;chicken+garlic=bprot;bprot+onion=broth;broth+mushroom=broth2;sn+broth2=r0;r0+egg=r1;r1+corn=ramen'],
- ['club','🥪','Bacon & egg club','food','#e8c488',2,'bread+butter=toast;bacon+egg=begg;toast+begg=s1;lettuce+tomato=ftop;s1+ftop=s2;s2+cheese=s3;s3+bread=club'],
- ['hotdog','🌭','Chili hot dog','food','#d9674a',2,'sausage+onion=gsaus;tomato+tomato=puree;puree+sugar=ketchup;bread+butter=toast;toast+gsaus=hd1;hd1+ketchup=hotdog'],
- ['stirfry','🥦','Veggie stir-fry','food','#6aaa4a',3,'broccoli+carrot=bveg;bveg+mushroom=bveg2;bveg2+pepper=bveg3;garlic+soy=gsoy;bveg3+oil=fvg;fvg+gsoy=sf;sf+nuts=stirfry'],
- ['parfait','🍨','Fruit parfait','food','#f0b6c8',2,'grapes+strawberry=fbowl;fbowl+banana=fbowl2;cream+honey=scream;fbowl2+scream=par0;par0+nuts=par1;par1+chocolate=parfait']];
+ ['pizza','🍕','Cheesy pizza','food','#e8a030',3,'flour+tomato=pbase;pbase+cheese=cbase;cbase+mushroom=pizza'],
+ ['pasta','🍝','Spaghetti bolognese','food','#d9534f',3,'noodles+tomato=ptom;ptom+beef=pbol;pbol+cheese=pasta'],
+ ['curry','🍛','Chicken curry rice','food','#d9a030',3,'chicken+chili=cp;cp+cream=csauce;csauce+rice=curry'],
+ ['sushi','🍣','Sushi roll platter','food','#f0907a',2,'rice+fish=nigiri;nigiri+cucumber=sushi'],
+ ['omelette','🍳','Loaded omelette','food','#f6d65a',2,'egg+milk=emix;emix+mushroom=ob;ob+cheese=omelette'],
+ ['pancakes','🥞','Berry pancake stack','food','#e8b765',2,'flour+egg=bat;bat+milk=bat2;bat2+strawberry=pancakes'],
+ ['cake','🎂','Chocolate cake','food','#6b4026',4,'flour+sugar=dry;dry+egg=cbat;cbat+chocolate=cake'],
+ ['stew','🍲','Hearty beef stew','food','#a8601f',4,'beef+potato=stw1;stw1+carrot=stbase;stbase+onion=stew'],
+ ['salad','🥗','Garden salad bowl','food','#6aaa4a',2,'lettuce+tomato=greens;greens+cucumber=salad'],
+ ['fries','🍟','Garlic fries','food','#f3c83c',2,'potato+salt=saltp;saltp+oil=fries'],
+ ['burger','🍔','Cheeseburger','food','#c58b52',2,'bread+beef=b0;b0+cheese=bcheese;bcheese+lettuce=burger'],
+ ['smoothie','🥤','Fruit smoothie','drink','#e8e0a0',1,'banana+strawberry=fmixb;fmixb+milk=smoothie'],
+ ['tacos','🌮','Loaded tacos','food','#e8a84a',2,'tortilla+beef=t0;t0+tomato=t1;t1+cheese=tacos'],
+ ['friedrice','🍤','Prawn fried rice','food','#e8c070',3,'rice+egg=frb;frb+shrimp=fr2;fr2+soy=friedrice'],
+ ['ramen','🍜','Chicken ramen','food','#d9a050',3,'noodles+chicken=r0;r0+egg=r1;r1+soy=ramen'],
+ ['club','🥪','Bacon & egg club','food','#e8c488',2,'bread+bacon=s1;s1+egg=s2;s2+lettuce=club'],
+ ['hotdog','🌭','Chili hot dog','food','#d9674a',2,'sausage+bread=hd1;hd1+tomato=hotdog'],
+ ['stirfry','🥦','Veggie stir-fry','food','#6aaa4a',3,'broccoli+carrot=bveg;bveg+garlic=bveg2;bveg2+soy=stirfry'],
+ ['parfait','🍨','Fruit parfait','food','#f0b6c8',2,'cream+honey=scream;scream+strawberry=par0;par0+nuts=parfait']];
 const MEALS={};for(const r of RECIPES)MEALS[r[0]]=[r[1],r[2],r[3],r[4],r[5]];
 const FR_COL={juice:'#f0a030',cola:'#5a3020',tea:'#9cc56a',water:'#bfe6f6',sandw:'#e8c488',rsalad:'#6aaa4a',bento:'#e8a080',pudding:'#e8b765',cakes:'#f6b6c8',icecream:'#fbe9c0',cookies:'#c8914f',pretzel:'#b9855a',chocbar:'#6b4026',popcorn:'#fff0b8'};
 const MID_RAW='dough|🍞|Dough;pbase|🫓|Pizza base;puree|🥫|Tomato purée;psauce|🍅|Garlic pizza sauce;sbase|🥧|Sauced base;cbase|🧀|Cheesy base;topped|🍄|Loaded base;mince|🥩|Beef & onion mince;bolsauce|🥫|Bolognese sauce;spag|🍜|Boiled spaghetti;spag2|🍝|Saucy spaghetti;soff|🧅|Onion & garlic fry;spice|🌶️|Spiced base;cp|🍗|Spiced chicken;cp2|🍲|Chicken & potato;csauce|🥘|Creamy curry sauce;brice|🍚|Boiled rice;srice|🍙|Sushi rice;mfish|🐟|Marinated fish;sfill|🥒|Cucumber & avocado;nigiri|🍣|Fish on rice;roll|🍱|Sushi roll;beaten|🥣|Beaten eggs;emix|🥛|Milky egg mix;fmush|🍄|Fried mushrooms;ob|🍳|Mushroom omelette;ob2|🥓|Bacon omelette;ob3|🧀|Cheesy omelette;bat|🥣|Batter;bat2|🥛|Thin batter;bat3|🍬|Sweet batter;pcake|🥞|Plain pancakes;pst|🍌|Banana pancakes;pst2|🍓|Berry pancakes;dry|🌾|Dry mix;wet|🥚|Egg & butter cream;wet2|🥛|Wet mix;cbat|🥣|Cake batter;ganache|🍫|Chocolate ganache;sponge|🧁|Chocolate sponge;vegs|🥔|Potato & carrot;browned|🥩|Browned beef;stbase|🥘|Stew base;st2|🍅|Tomato stew;st3|🫘|Bean stew;greens|🥬|Crisp greens;tonion|🍅|Tomato & onion;sb|🥗|Salad bowl;sb1|🌽|Corny salad;sb2|🥑|Avocado salad;dress|🍋|Lemon dressing;cutp|🥔|Cut potatoes;cutp2|🥔|Lots of potato sticks;saltp|🧂|Salted sticks;fryp|🍟|Fried sticks;sdough|🍞|Sweet dough;buns|🥯|Burger buns;patty|🍖|Beef patty;cpatty|🧀|Cheese patty;b0|🍔|Burger in a bun;b1|🥬|Burger with lettuce;fmix|🍎|Apple & banana;fmix2|🍓|Fruit mix;blend|🥛|Fruit blend;sbeef|🌶️|Spicy beef;tmeat|🥩|Taco meat;tfill|🫘|Beany taco filling;ftop|🥬|Fresh toppings;guac|🥑|Cheesy guac;ttop|🥗|Taco toppings;t0|🌮|Filled tortilla;frb|🍚|Egg rice;cvg|🌽|Carrot & corn;fr2|🍚|Veggie egg rice;fr3|🍼|Soy-fried rice;sn|🍜|Soy noodles;bprot|🍗|Garlic chicken;broth|🍲|Chicken broth;broth2|🍄|Mushroom broth;r0|🍜|Noodles in broth;r1|🥚|Egg ramen;toast|🍞|Buttered toast;begg|🥓|Bacon & egg;s1|🥪|Toast, bacon & egg;s2|🥬|Fresh sandwich;s3|🧀|Cheesy sandwich;gsaus|🌭|Grilled sausage;ketchup|🍅|Ketchup;hd1|🌭|Sausage in toast;bveg|🥦|Broccoli & carrot;bveg2|🍄|Veg & mushroom;bveg3|🫑|Colourful veg;gsoy|🍼|Garlic soy sauce;fvg|🌻|Pan-fried veg;sf|🥘|Saucy stir-fry;fbowl|🍇|Berry & grape bowl;fbowl2|🍌|Fruit bowl;scream|🍯|Honey cream;par0|🍨|Fruit & cream;par1|🥜|Nutty parfait';
 const CK_MID={};for(const m of MID_RAW.split(';')){const [id,ic,n]=m.split('|');CK_MID[id]=[ic,n,2]}
+for(const m of 'ptom|🍝|Tomato noodles;pbol|🥩|Meaty noodles;stw1|🥩|Beef & potato;bcheese|🧀|Cheesy burger;fmixb|🍓|Berry banana;t1|🌮|Fresh taco;fr2|🍤|Prawn egg rice;r0|🍜|Chicken noodles;s1|🥓|Bacon toast;s2|🥪|Bacon & egg toast;hd1|🌭|Sausage in a bun;bveg2|🧄|Garlicky veg;par0|🍓|Berry cream'.split(';')){const [id,ic,n]=m.split('|');CK_MID[id]=[ic,n,2]}
 const MERGE=[];const RSTEPS={};for(const r of RECIPES){RSTEPS[r[0]]=r[6].split(';').map(x=>{const [l,res]=x.split('='),[a,b]=l.split('+');if(!mergeOf(a,b))MERGE.push([a,b,res]);return[a,b,res]})}
+// old saves: drop half-finished mixes from the retired long recipes (they can no longer be merged)
+try{const okId=x=>!!GR_ITEM[x]||!!MEALS[x]||!!MBY0[x];const MBY0={};for(const [a,b,r] of MERGE)MBY0[r]=1;if(Array.isArray(INV.board))INV.board=INV.board.map(c=>c&&okId(c.i)?c:null)}catch(e){}
 function recLeaves(id){const st=RSTEPS[id],made=new Set(st.map(x=>x[2])),c={};for(const [a,b] of st)for(const x of [a,b])if(!made.has(x))c[x]=(c[x]||0)+1;return c}
 function ckInfo(id){if(MEALS[id])return{ic:MEALS[id][0],n:MEALS[id][1],k:'meal'};if(CK_MID[id])return{ic:CK_MID[id][0],n:CK_MID[id][1],k:'mid'};const g=GR_ITEM[id];return g?{ic:g.ic,n:g.n,k:g.k==='ing'?'ing':'fr'}:{ic:'❔',n:id,k:'mid'}}
 function mergeOf(a,b){for(const [x,y,r] of MERGE)if((x===a&&y===b)||(x===b&&y===a))return r;return null}
@@ -4645,7 +4648,7 @@ function ckPartners(i){const a=INV.board[i];if(!a||ckBad(a))return[];const out=[
 const ckKnown=x=>!!GR_ITEM[x]||!!INV.rec[x];
 function ckRender(){invFix();const B=INV.board,sel=ck.sel,part=sel>=0?ckPartners(sel):[],cur=sel>=0&&B[sel]?ckInfo(B[sel].i):null,curB=sel>=0?B[sel]:null;
  const pant=Object.keys(INV.pantry).filter(id=>invFresh(INV.pantry,id)>0),nbp=invBadAll(INV.pantry);
- let st=cur?cur.ic+' '+cur.n+(ckBad(curB)?' — gone off 🤢 Toss it':' · '+expInfo(curB.e).t)+(!ckBad(curB)?(cur.k==='meal'?' — a finished meal! Eat it now or keep it in the fridge 🍽️':part.length?' — tap a glowing item to mix':' — move it to an empty spot, or tap another item'):''):'Tap an ingredient below to put it on the board, then tap two items to mix them! Meals take lots of steps — check the 📖 recipe book.';
+ let st=cur?cur.ic+' '+cur.n+(ckBad(curB)?' — gone off 🤢 Toss it':' · '+expInfo(curB.e).t)+(!ckBad(curB)?(cur.k==='meal'?' — a finished meal! Eat it now or keep it in the fridge 🍽️':part.length?' — tap a glowing item to mix':' — move it to an empty spot, or tap another item'):''):'Tap an ingredient below to put it on the board, then tap two items to mix them! Every meal is just 2–3 mixes — check the 📖 recipe book.';
  const cells=B.map((c,i)=>{const f=c?ckInfo(c.i):null;return '<button type="button" class="cc'+(c?(ckBad(c)?' x':f.k==='meal'?' m':' f'):'')+(i===sel?' s':'')+(part.includes(i)?' h':'')+(i===ck.pop?' pp':'')+'" data-i="'+i+'">'+(f?ico(c.i):'')+'</button>'}).join('');
  let act='';if(cur){if(cur.k==='meal'&&!ckBad(curB))act+='<button type="button" data-a="eat">🍽️ Eat now</button><button type="button" data-a="serve">🧊 Put in fridge</button>';if((cur.k==='ing'||cur.k==='fr')&&!ckBad(curB))act+='<button type="button" class="g" data-a="back">↩ Put back</button>';else act+='<button type="button" class="g" data-a="toss">🗑 Toss</button>'}
  let book='';for(const r of RECIPES){const id=r[0],st=RSTEPS[id],lv=recLeaves(id),done=!!INV.rec[id];
