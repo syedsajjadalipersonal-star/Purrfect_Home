@@ -1247,12 +1247,17 @@ function updateUI(){for(const k in stats)setStat(k,stats[k]);
  const miss=missingText();document.getElementById('bowls').textContent=miss||`🍗 Food bowl ${Math.round(bowl.food)}% · 💧 Water bowl ${Math.round(bowl.water)}% · 🐱 ${catStateText()}`+(isPlaced(litter)?` · 🏖️ ${(+INV.trayL.toFixed(1))}/5 L`:'');const dirt=1-stats.litter/100;litterMat.color.setRGB(1-.45*dirt,1-.5*dirt,1-.55*dirt)}
 function simulate(dtReal){if(!started||build.on)return;const dm=dtReal*GAME_MIN_PER_SEC;const slp=sleepInfo(mins)?1:0;if(isPlaced(litter)&&INV.trayL<.5){stats.love=Math.max(0,stats.love-DEC.love*dm*2.5);smellT-=dtReal;if(smellT<=0){smellT=40;fxStink(litter.position.x,litter.position.y+.25,litter.position.z,8)}}
  stats.love=Math.max(0,stats.love-DEC.love*PM.love*homeLoveK()*dm*(slp?.15:1));
- stats.health=Math.max(0,stats.health-DEC.health*dm*((stats.hunger<=0||stats.thirst<=0)?3:1)*(SICK.t>0?4:1));stats.clean=Math.max(0,stats.clean-DEC.clean*dm);if(RECOVER.t>0){RECOVER.t-=dtReal;if(RECOVER.t<=0)toast('Kitty healed — cone off 🎉')}if(!BGP)coneMesh.visible=RECOVER.t>0;if(stats.health<25&&!warnH){warnH=true;toast('Kitty looks unwell 🩺 Visit Petspace Animal Hospital')}else if(stats.health>40)warnH=false;if(stats.clean<20&&!warnC){warnC=true;toast('Kitty is scruffy 🛁 A grooming trip would help')}else if(stats.clean>40)warnC=false;
+ stats.health=Math.max(0,stats.health-DEC.health*dm*((stats.hunger<=0||stats.thirst<=0)?3:1)*(SICK.t>0?4:1));stats.clean=Math.max(0,stats.clean-DEC.clean*dm*((stats.hunger<=0||stats.thirst<=0)?3:1));if(RECOVER.t>0){RECOVER.t-=dtReal;if(RECOVER.t<=0)toast('Kitty healed — cone off 🎉')}if(!BGP)coneMesh.visible=RECOVER.t>0;if(stats.health<25&&!warnH){warnH=true;toast('Kitty looks unwell 🩺 Visit Petspace Animal Hospital')}else if(stats.health>40)warnH=false;if(stats.clean<20&&!warnC){warnC=true;toast('Kitty is scruffy 🛁 A grooming trip would help')}else if(stats.clean>40)warnC=false;
  if(isPlaced(foodBowl))stats.hunger=Math.max(0,stats.hunger-DEC.hunger*PM.hunger*dm*(slp?.3:1));if(isPlaced(waterBowl))stats.thirst=Math.max(0,stats.thirst-DEC.thirst*dm*(slp?.3:1));
  if(isPlaced(litter)){stats.litter=Math.max(0,stats.litter-DEC.litter*dm);clocks.pee+=dm;clocks.poop+=dm}
+ {const starving=stats.hunger<=0||stats.thirst<=0;LIFE.starve=starving?(LIFE.starve||0)+dm:0;
+  if(LIFE.starve>=120&&SICK.t<=0&&!(MED.cool>0)&&!LIFE.hide&&!LIFE.bug)neglectSick();if(starving&&LIFE.starve>=120&&SICK.t>0&&SICK.t<3600)SICK.t=3600}
+ if(QUIET&&SICK.t>0){SICK.t-=dtReal;LIFE.payAcc=(LIFE.payAcc||0)+dtReal;while(LIFE.payAcc>=3600){LIFE.payAcc-=3600;BG.paid+=sickPay(2)}if(SICK.t<0)SICK.t=0}
  if(QUIET)bgNeeds()}
+// a cat left hungry or thirsty for two hours falls ill; medicine then costs 2 coins an hour until the vet cures her
+function neglectSick(){SICK.t=21600;LIFE.sneezeT=6;LIFE.payT=3600;MED.cool=240;BG.ill=1;if(!QUIET){catSound('sad');toast('🤒 Kitty fell ill from going hungry · medicine costs 2 🪙 an hour. A vet visit cures her fast')}}
 // ---- while the app is closed the cat still lives her routine: she eats and drinks at mealtimes (bowls empty), and uses the tray when due ----
-var BG={meals:0,drinks:0,trips:0,oops:0};
+var BG={meals:0,drinks:0,trips:0,oops:0,paid:0,ill:0};
 function bgNeeds(){if(sleepInfo(mins)==='night')return;
  const hf=isPlaced(foodBowl),hw=isPlaced(waterBowl),hl=isPlaced(litter),ML=mealState(),w=mealWin();
  if(hf&&bowl.food>0&&(stats.hunger<=0||(w&&!ML[w]&&stats.hunger<88))){bowl.food=Math.max(0,bowl.food-100/INV.tier.food);stats.hunger=100;if(w)ML[w]=1;BG.meals++}
@@ -1267,7 +1272,7 @@ function catchUp(awaySec){
  try{if(QM.Q.tut!=='done')return}catch(e){}
  awaySec=Math.min(awaySec,30*86400);
  const b0={...stats},d0=day,h2=OTH?OTH.stats.health:0;
- BG.meals=BG.drinks=BG.trips=BG.oops=0;QUIET=true;
+ BG.meals=BG.drinks=BG.trips=BG.oops=BG.paid=BG.ill=0;LIFE.starve=0;QUIET=true;
  try{const hp=stats.health,step=Math.max(30,awaySec/1500);let left=awaySec;
   const t0=Date.now()-awaySec*1000;while(left>0){const d=Math.min(step,left);left-=d;const c=clockAt(t0+(awaySec-left)*1000);mins=c.mins;day=c.day;simulate(d);if(OTH){xchg(false);try{simulate(d)}finally{xchg(false)}}}syncClock()
   // a cat left alone gets hungry, thirsty and scruffy, but is never left in real danger: health stops falling at 20
@@ -1275,7 +1280,7 @@ function catchUp(awaySec){
   clocks.pee=Math.min(clocks.pee,PEE_DUE*1.2);clocks.poop=Math.min(clocks.poop,POOP_DUE*1.2)}
  catch(e){console.warn('catchUp',e)}
  QUIET=false;smellT=0;warnH=false;warnC=false;
- try{updateUI();saveBuild();saveCat();localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}
+ try{updateUI();saveBuild();saveCat();localStorage.setItem('purrfect-sick',String(Math.max(0,Math.round(SICK.t))));localStorage.setItem('purrfect-seen',String(Date.now()))}catch(e){}
  if(awaySec>=600)showAway(awaySec,b0,day-d0)}
 function showAway(sec,b0,days){
  const gift=awayGift(sec);
@@ -1284,7 +1289,7 @@ function showAway(sec,b0,days){
  let el=document.getElementById('awayCard');if(el)el.remove();el=document.createElement('div');el.id='awayCard';
  el.style.cssText='position:fixed;z-index:70;left:50%;top:50%;transform:translate(-50%,-50%);width:min(320px,88vw);background:#fff8e9;border-radius:20px;padding:16px;box-shadow:0 14px 44px #0006;font-family:Nunito,ui-rounded,system-ui;color:#24332e;font-size:14px';
  el.innerHTML='<div style="font-size:17px;font-weight:800">👋 Welcome back!</div><div style="margin:6px 0 8px">'+escH(CNAME||'Kitty')+' was on '+(isTom()?'his':'her')+' own for '+t+(days>0?' · '+(days===1?'1 day':days+' days')+' passed':'')+'.</div>'
-  +(BG.meals+BG.drinks+BG.trips+BG.oops?'<div style="padding:3px 0;opacity:.85">'+(BG.meals?'🍗 ate '+BG.meals+'× ':'')+(BG.drinks?'💧 drank '+BG.drinks+'× ':'')+(BG.trips?'🏖️ used the tray '+BG.trips+'× ':'')+(BG.oops?'😿 '+BG.oops+' accident'+(BG.oops>1?'s':''):'')+'</div>':'')
+  +(BG.meals+BG.drinks+BG.trips+BG.oops+BG.ill+BG.paid?'<div style="padding:3px 0;opacity:.85">'+(BG.meals?'🍗 ate '+BG.meals+'× ':'')+(BG.drinks?'💧 drank '+BG.drinks+'× ':'')+(BG.trips?'🏖️ used the tray '+BG.trips+'× ':'')+(BG.oops?'😿 '+BG.oops+' accident'+(BG.oops>1?'s':''):'')+(BG.ill?' 🤒 fell ill':'')+(BG.paid?' 💊 medicine −'+BG.paid+' 🪙':'')+'</div>':'')
   +(rows.length?rows.map(r=>'<div style="display:flex;justify-content:space-between;padding:3px 0"><span>'+r[0]+' '+r[1]+'</span><b>'+Math.round(b0[r[2]])+'% → '+Math.round(stats[r[2]])+'%</b></div>').join(''):'<div>Everything is still fine. 😸</div>')
   +(gift?'<div style="margin-top:10px;padding:9px 10px;border-radius:12px;background:#fff0c9;font-weight:800">🎁 '+escH(CNAME||'Kitty')+' left you a present: '+gift.ic+' '+escH(gift.t)+'</div>':'')
   +'<button type="button" style="margin-top:12px;width:100%;border:0;border-radius:14px;padding:11px;background:#2e7658;color:#fff;font-weight:800;font-size:14px">Let’s take care of '+escH(CNAME||'Kitty')+'</button>';
@@ -2693,7 +2698,7 @@ function svcState(id){const S=SVC[id];
  if(id==='deworm'){const n=dewNext(),o=medOver(n);return o>=0?{ok:true,d:'Deworming is due'+(o>0?' · '+pdays(o,1)+' late':' now')}:{ok:false,why:'Not due yet · '+medText(n).replace('⏳ ','')}}
  if(id==='surg'){if(stats.health<=.5&&INV.med.scare)return {ok:true,d:{hernia:'Emergency: a hernia needs repairing',foreign:'Emergency: something was swallowed',hairball:'Emergency: a stuck hairball'}[INV.med.scare]||S.d};if(!INV.med.sx&&ageDays()>=SPAY_AGE)return {ok:true,d:(isTom()?'Neuter':'Spay')+' surgery is due'};return {ok:false,why:INV.med.sx?'Only for emergencies (health at zero)':'For spay/neuter (from 6 months) or a health emergency'}}
  return {ok:true,d:S.d}}
-function forceSick(msg){if(SICK.t>0||MED.cool>0)return;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;MED.cool=240;catSound('sad');toast(msg)}
+function forceSick(msg){if(SICK.t>0||MED.cool>0)return;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=3600;MED.cool=240;catSound('sad');toast(msg)}
 function medTick(dt){MED.cool=Math.max(0,MED.cool-dt);MED.t-=dt;if(MED.t>0)return;MED.t=2;if(!started||OB.on||tutHold()||HV.on||SH.on)return;
  if(stats.health<=.5&&!INV.med.scare){INV.med.scare=['hernia','foreign','hairball'][Math.floor(Math.random()*3)];toast('🚨 Kitty needs an emergency operation! Take her to the Animal Hospital');saveBuild()}
  const list=[['v'+(INV.med.v.length?INV.med.v[INV.med.v.length-1]:'x'),vaxNext()],['d'+INV.med.dw,dewNext()]];let flag=false;
@@ -2808,10 +2813,10 @@ function hideTick(dt){const H=LIFE.hide;if(!H)return false;H.t+=dt;const sh=Math
  if(Math.hypot(player.position.x-H.x,player.position.z-H.z)<1.7){hideEnd(true);return false}
  if(H.t>150||sleepInfo(mins)){hideEnd(false);return false}return true}
 function sickPay(n){const a=Math.max(0,Math.min(n,coins()));if(a>0){WALLET.base-=a;saveBuild()}return a}
-function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.payT=(LIFE.payT||30)-dt;if(LIFE.payT<=0){LIFE.payT=30;const a=sickPay(2);if(a)toast('💊 Medicine for Kitty −'+a+' 🪙')}LIFE.sneezeT-=dt;if(LIFE.sneezeT<=0&&!cat.userData.sleeping){LIFE.sneezeT=18+Math.random()*14;catSound('sad');toast('🤧 Kitty sneezed. She is under the weather')}
+function lifeSick(dt){if(SICK.t<=0)return;SICK.t-=dt;LIFE.payT=(LIFE.payT||3600)-dt;if(LIFE.payT<=0){LIFE.payT=3600;const a=sickPay(2);if(a)toast('💊 Medicine for Kitty −'+a+' 🪙')}LIFE.sneezeT-=dt;if(LIFE.sneezeT<=0&&!cat.userData.sleeping){LIFE.sneezeT=18+Math.random()*14;catSound('sad');toast('🤧 Kitty sneezed. She is under the weather')}
  LIFE.saveT-=dt;if(LIFE.saveT<=0||SICK.t<=0){LIFE.saveT=10;try{localStorage.setItem('purrfect-sick',String(Math.max(0,Math.round(SICK.t))))}catch(e){}}
  if(SICK.t<=0){toast('💚 Kitty is feeling better!')}}
-function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=30;const bill=sickPay(Math.max(12,Math.min(60,Math.round(coins()*.08))));catSound('sad');toast('🤒 Kitty is unwell'+(bill?' · medicine −'+bill+' 🪙':'')+'. Medicine keeps costing coins until she recovers. A vet visit cures her fast');return true}
+function sickStart(){const n=(stats.clean<35?1:0)+(stats.litter<25?1:0)+(stats.hunger<25?1:0)+(stats.thirst<25?1:0);if(SICK.t>0||LIFE.bug||LIFE.hide)return false;if(Math.random()>.2+.25*n)return false;SICK.t=900;LIFE.sneezeT=6;LIFE.payT=3600;const bill=sickPay(Math.max(12,Math.min(60,Math.round(coins()*.08))));catSound('sad');toast('🤒 Kitty is unwell'+(bill?' · medicine −'+bill+' 🪙':'')+'. Medicine costs 2 🪙 an hour until she recovers. A vet visit cures her fast');return true}
 function windowSpot(){const ws=[...edges.values()].filter(e=>e.type==='window');if(!ws.length)return null;const e=ws[Math.floor(Math.random()*ws.length)],o=[[0,.55],[0,-.55]],q=e.o==='h'?[[0,.55],[0,-.55]]:[[.55,0],[-.55,0]];
  let best=q[0],bs=-1;for(const [dx,dz] of q){const x=e.cx+dx,z=e.cz+dz,sc=(floorAt(x,z)?2:0)+(blockedPoint(x,z,.25)?-3:0)+Math.random();if(sc>bs){bs=sc;best=[dx,dz]}}
  return {e,x:e.cx+best[0],z:e.cz+best[1],sx:e.cx+best[0]*.5,sz:e.cz+best[1]*.5,face:Math.atan2(-best[0],-best[1]),key:ekey(e.x,e.z,e.o)}}
