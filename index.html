@@ -19,7 +19,7 @@ html,body{overscroll-behavior:none;-webkit-user-select:none;user-select:none;-we
 .hud>.panel.meters{padding:8px 10px}@media(max-width:560px){.hud>.panel:first-child{display:none}}
 .building .hud{justify-content:flex-start}
 .building .topright{flex-direction:row;align-items:center;gap:6px;flex-wrap:nowrap}
-#catBtn{pointer-events:auto;border:0;font-family:inherit;font-weight:inherit;color:var(--ink);cursor:pointer;position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(max(16px,env(safe-area-inset-bottom)) + 62px);z-index:7;font-size:15px;padding:15px 22px;background:#fff8e9;box-shadow:0 6px 20px #254a3438;touch-action:manipulation}.building #catBtn{position:static;font-size:12px;padding:8px 14px;background:var(--green);color:#fff;box-shadow:0 3px 12px #254a3430}body.building.cm #buildBtn,body.building:not(.cm) #catBtn{display:none!important}body.cm #bClear,body.cm #bHalf{display:none!important}.building #buildBtn{position:static;font-size:12px;padding:8px 14px;background:var(--green);color:#fff;box-shadow:0 3px 12px #254a3430}
+#subBar .i img{width:34px;height:34px;object-fit:contain;display:block}#subBar .i:has(img){background:none;box-shadow:none;width:36px;height:36px}#catBtn{pointer-events:auto;border:0;font-family:inherit;font-weight:inherit;color:var(--ink);cursor:pointer;position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(max(16px,env(safe-area-inset-bottom)) + 62px);z-index:7;font-size:15px;padding:15px 22px;background:#fff8e9;box-shadow:0 6px 20px #254a3438;touch-action:manipulation}.building #catBtn{position:static;font-size:12px;padding:8px 14px;background:var(--green);color:#fff;box-shadow:0 3px 12px #254a3430}body.building.cm #buildBtn,body.building:not(.cm) #catBtn{display:none!important}body.cm #bClear,body.cm #bHalf{display:none!important}.building #buildBtn{position:static;font-size:12px;padding:8px 14px;background:var(--green);color:#fff;box-shadow:0 3px 12px #254a3430}
 /* Build dock */
 #buildMenu{position:fixed;left:0;right:0;bottom:0;z-index:6;flex-direction:column;align-items:stretch!important;gap:6px!important;padding:8px max(10px,env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:rgba(255,248,233,.97);border-radius:20px 20px 0 0;box-shadow:0 -6px 26px #254a3430;pointer-events:auto;touch-action:manipulation}
 #buildMenu .row{display:grid;gap:6px}
@@ -1876,6 +1876,8 @@ const SHP_CAT=[
  {id:'ball',cat:'toys',ic:'🔴',n:'Jingle Ball',d:'Rolls and jingles',price:8,furn:'ball'},
  {id:'feather',cat:'toys',ic:'🪶',n:'Feather Wand',d:'Flutters on the floor',price:12,furn:'feather'},
  {id:'scratch',cat:'furn',ic:'🪵',n:'Scratching Post',d:'Saves your sofa',price:40,furn:'scratch'},
+ {id:'catbed',cat:'furn',ic:'🐈',n:'Cat Bed',d:'A cosy spot to curl up',price:20,furn:'catbed'},
+ {id:'hammock',cat:'furn',ic:'🛌',n:'Cat Hammock',d:'Sway and snooze · Home Level 2',price:35,furn:'hammock'},
  {id:'tree',cat:'furn',ic:'🌳',n:'Cat Tree',d:'Two perches and a toy',price:120,furn:'tree'},
  {id:'tower',cat:'furn',ic:'🏰',n:'Cat Tower',d:'Tall tower with cosy condos',price:220,furn:'tower'},
  {id:'sand1',cat:'litter',ic:'📦',n:'Litter Sand 1 L',d:'Small pack · pour into the tray',price:5,sand:1,col:'#c9a45a'},
@@ -1910,7 +1912,7 @@ const SHP_CAT=[
  {id:'hrGold',cat:'acc',ic:'🦺',n:'Sunny Harness',d:'Walkies-ready · worn at the park too',price:320,acc:true,slot:'body'}];
 const HR_COL={hrRed:'#e8554e',hrBlue:'#4a8fd0',hrPink:'#e87aa6',hrGreen:'#4aa36b',hrGold:'#f3bd56'};
 const FEED_BASIC={id:'basic',ic:'🥣',n:'Basic Kibble',d:'Plain kibble · free',love:0};
-const SHP_TABS=[['food','🍗','Food'],['toys','🧶','Toys'],['furn','🌳','Trees & Posts'],['gear','🥣','Bowls & Trays'],['litter','🏖️','Litter Sand'],['acc','🎀','Accessories']];
+const SHP_TABS=[['food','🍗','Food'],['toys','🧶','Toys'],['furn','🌳','Cat Furniture'],['gear','🥣','Bowls & Trays'],['litter','🏖️','Litter Sand'],['acc','🎀','Accessories']];
 const SHP_BY={};for(const i of SHP_CAT)SHP_BY[i.id]=i;
 const SH={on:false,tr:null,trT:0,lock:false,tab:'food',walls:[],ox:300,oz:300,id:'shop',dest:'shop',label:'🐾 Pets & Paws',cl:[-7.6,7.6,-5.4,6.5],exZ:5.55,exX:1};
 // ---- extra catalogue pieces that can be placed in the home ----
@@ -1929,9 +1931,10 @@ Object.assign(FURN,{
   cyl(g,.25,1.46,.2,.3,.3,.06,pl,20);sphere(g,-.2,1.6,-.15,.2,.06,.2,mat('#f2d9a8',.95));sphere(g,.25,1.52,.2,.2,.05,.2,mat('#f2d9a8',.95))}}
 });
 FURN_ORDER.push('mouse','ball','feather','tree','tower');
-for(const k of ['mouse','ball','feather','tree','tower'])FURN[k].price=0;
+for(const k of ['mouse','ball','feather','tree','tower','catbed','hammock'])FURN[k].price=0;
 for(const o of pendingFurn){try{if(FURN[o[0]]&&canPlace(o[0],o[1]|0,o[2]|0,o[3]|0))addFurn(o[0],o[1]|0,o[2]|0,o[3]|0,o[4]|0)}catch(e){}}pendingFurn.length=0;
-for(const k of ['scratch','yarn'])FURN[k].shop=1;
+for(const k of ['scratch','yarn','catbed','hammock'])FURN[k].shop=1;
+for(const t of ['catbed','hammock']){const n=placedN(t);if(n>(INV.items[t]||0))INV.items[t]=n}
 // ---- cat accessories (worn on the head) ----
 const ACC_DEFS={bowred:()=>bowMesh('#e0454f'),bowblue:()=>bowMesh('#4a86d8'),flower:()=>{const g=new THREE.Group();for(let i=0;i<5;i++){const a=i*1.2566;sphere(g,Math.cos(a)*.045,Math.sin(a)*.045,0,.035,.035,.02,mat('#f4a6c0',.7))}sphere(g,0,0,0,.025,.025,.022,mat('#f3bd56',.6));return g}};
 function bowMesh(c){const g=new THREE.Group(),m=mat(c,.55);const a=sphere(g,-.055,0,0,.06,.04,.03,m);a.rotation.z=.35;const b=sphere(g,.055,0,0,.06,.04,.03,m);b.rotation.z=-.35;sphere(g,0,0,0,.027,.027,.027,mat(c,.4));return g}
@@ -2054,7 +2057,7 @@ let SHP_IMG=null,SHP_JOB=null;
 function shopImages(){if(SHP_IMG)return SHP_IMG;SHP_IMG={};
  try{const r=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});r.setPixelRatio(1);r.setSize(200,200);r.toneMapping=THREE.ACESFilmicToneMapping;r.setClearColor(0x000000,0);
   const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.05,60);sc.add(new THREE.HemisphereLight('#ffffff','#bfae92',1.7));const dl=new THREE.DirectionalLight('#fff3df',2.4);dl.position.set(3,5,4);sc.add(dl);
-  SHP_JOB={r,sc,cam,list:[...SHP_CAT,FEED_BASIC],k:0}}catch(e){SHP_JOB=null}
+  SHP_JOB={r,sc,cam,list:[...SHP_CAT,FEED_BASIC,{id:'foodbowl',furn:'foodbowl'},{id:'waterbowl',furn:'waterbowl'},{id:'litter',furn:'litter'}],k:0}}catch(e){SHP_JOB=null}
  return SHP_IMG}
 setTimeout(()=>{try{shopImages()}catch(e){}},9000);
 function shopImgTick(){const J=SHP_JOB;if(!J)return;const i=J.list[J.k++];
@@ -3521,15 +3524,16 @@ function undo(){const a=build.undo.pop();if(!a){toast('Nothing to undo');return}
  if(a.furnSet)for(const [u,from] of a.furnSet){const it=furn.get(u);if(it){it.x0=from[0];it.z0=from[1];it.rot=from[2];placeModel(it)}}
  saveBuild()}
 const CT_ITEMS={cEss:['foodbowl','waterbowl','litter'],cToy:['yarn','mouse','ball','feather','scratch'],cLod:['catbed','hammock','tree','tower']};
+const ctImg=id=>{try{return (SHP_IMG&&SHP_IMG[id])||''}catch(e){return ''}};let ctImgN=-1;
 const ctOwned=t=>FURN[t]&&(!FURN[t].shop||(INV.items[t]||0)>0);
 const ctAcc=()=>SHP_CAT.filter(i=>i.cat==='acc'&&(INV.items[i.id]||0)>0);
 const MENUS={wall:{key:'wall',opts:[['normal','','Normal','#d8cdb9'],['brick','','Brick','#b0553f'],['wallpaper','🌸','Wallpaper','#efd9d3'],['stripe','','Stripe','#7fa7a0'],['navy','','Navy','#27385e'],['subway','','Subway','#f1f2f0'],['panel','','Wood panel','#7a5230']]},
  floor:{key:'floor',opts:[['wood','','Wood','#b88a58'],['carpet','','Carpet','#8a9bb3'],['cement','','Cement','#a2a4a1'],['tile','','Tile','#4a5663'],['parquet','','Parquet','#a8743f'],['marble','','Marble','#ecebe8']]},
  acc:{key:'acc',opts:[['door','🚪','Door'],['double','🚪🚪','Double door'],['window','🪟','Window']]},
- cEss:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cEss.filter(ctOwned).map(k=>[k,FURN[k].ic,FURN[k].n])]}},
- cToy:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cToy.filter(ctOwned).map(k=>[k,FURN[k].ic,FURN[k].n])]}},
- cLod:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cLod.filter(ctOwned).map(k=>[k,FURN[k].ic,FURN[k].n])]}},
- cAcc:{key:'wear',get opts(){return ctAcc().map(i=>[i.id,i.ic,i.n])}},
+ cEss:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cEss.filter(ctOwned).map(k=>[k,ctImg(k)?'<img src="'+ctImg(k)+'" alt="">':FURN[k].ic,FURN[k].n])]}},
+ cToy:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cToy.filter(ctOwned).map(k=>[k,ctImg(k)?'<img src="'+ctImg(k)+'" alt="">':FURN[k].ic,FURN[k].n])]}},
+ cLod:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...CT_ITEMS.cLod.filter(ctOwned).map(k=>[k,ctImg(k)?'<img src="'+ctImg(k)+'" alt="">':FURN[k].ic,FURN[k].n])]}},
+ cAcc:{key:'wear',get opts(){return ctAcc().map(i=>[i.id,ctImg(i.id)?'<img src="'+ctImg(i.id)+'" alt="">':i.ic,i.n])}},
  furn:{key:'fsel',get opts(){return [['move','✋','Move'],['rotate','🔄','Rotate'],...FURN_ORDER.filter(k=>FURN[k].grp===build.fgrp).map(k=>[k,FURN[k].ic,FURN[k].n])]}}};
 function renderMenus(){
  for(const [id,c] of [['bCatWall','wall'],['bCatFloor','floor'],['bCatAcc','acc'],['bCatFurn','furn'],['bErase','erase'],['bCtEss','cEss'],['bCtToy','cToy'],['bCtLod','cLod'],['bCtAcc','cAcc']])document.getElementById(id).classList.toggle('sel',build.cat===c);
@@ -3539,7 +3543,7 @@ function renderMenus(){
  const prOf=v=>m.key==='wear'?(isWorn(v)?'Wearing':'Wear'):m.key==='wall'?WALLP[v]:m.key==='floor'?FLOORP[v]:m.key==='acc'?ACCP[v]:m.key==='fsel'&&FURN[v]?(furnLvl(v)>homeLv()?'🔒 Lv'+furnLvl(v):FURN[v].shop?(furnLocked(v)?'🔒':shopStock(v)>0?'×'+shopStock(v):'Placed'):FURN[v].price||'Free'):null;
  if(!m.opts.length)sub.innerHTML='<div class="emp" style="padding:10px 14px;font-size:13px;opacity:.8">Nothing here yet. Buy accessories at Pets &amp; Paws 🛍️</div>';else sub.innerHTML=m.opts.map(([v,ic,l,col])=>{const pv=prOf(v),lk=m.key==='fsel'&&FURN[v]&&furnLocked(v);return `<button class="bt${(m.key==='wear'?isWorn(v):build[m.key]===v)?' sel':''}${lk?' lock':''}" data-o="${v}" type="button"><span class="i"${col?` style="background:${col}"`:''}>${ic}</span>${l}${pv!=null&&pv!==''?`<span class="pr">${typeof pv==='number'?pv+' 🪙':pv}</span>`:''}</button>`}).join('');fxSet();layoutView()}
 function fxSet(){const fx=document.getElementById('fxBar');if(!fx)return;const h=fxHtml();fx.style.display=h?'':'none';if(fx._h!==h){fx._h=h;fx.innerHTML=h}}
-setInterval(()=>{if(build.on&&(build.cat==='furn'||isCF(build.cat)))fxSet()},1000);
+setInterval(()=>{if(build.on&&(build.cat==='furn'||isCF(build.cat)))fxSet();if(build.on&&isCT(build.cat)){const n=SHP_IMG?Object.keys(SHP_IMG).length:0;if(n!==ctImgN){ctImgN=n;renderMenus()}}},1000);
 function setCat(c,fresh){if(fresh)document.getElementById('subBar').scrollLeft=0;document.getElementById('buildMenu').classList.remove('min');document.querySelector('#bDock .i').textContent='⌄';build.cat=c;if(isCF(c)){const L=MENUS[c].opts.map(o=>o[0]);if(!L.includes(build.fsel))build.fsel=L[2]||'move'}build.tool=c==='cAcc'?'wear':c==='wall'?'wall':c==='floor'?'floor':c==='acc'?build.acc:(c==='furn'||isCF(c))?(build.fsel==='move'||build.fsel==='rotate'?build.fsel:'furn'):'erase';hideFurnGhost();renderMenus()}
 document.getElementById('subBar').addEventListener('pointerdown',e=>e.stopPropagation());
 document.getElementById('grpBar').addEventListener('pointerdown',e=>e.stopPropagation());
