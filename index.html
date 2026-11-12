@@ -1274,7 +1274,7 @@ function simulate(dtReal){if(!started||build.on)return;const dm=dtReal*GAME_MIN_
  {const dirty=stats.clean<=0;LIFE.dirty=dirty?(LIFE.dirty||0)+dm:0;
   if(dirty){LIFE.hairT=(LIFE.hairT||0)+dm;if(LIFE.hairT>=240){LIFE.hairT=0;if(QUIET){BG.hair=(BG.hair||0)+1;if(floorMess.length<8){try{const p=freeSpot(1.2);addFloorMess('hair',p.x,p.z)}catch(e){}}}else if(!LIFE.hide&&!LIFE.bug){const x=cat.position.x-Math.sin(cat.rotation.y)*.4,z=cat.position.z-Math.cos(cat.rotation.y)*.4;addFloorMess('hair',x,z);catSound('sad');toast('🤢 Hairball! Kitty needs grooming')}}}
   if(LIFE.dirty>=720&&SICK.t<=0&&!(MED.cool>0)&&!LIFE.hide&&!LIFE.bug)neglectSick('dirty')}
- if(QUIET&&SICK.t>0){SICK.t-=dtReal;LIFE.payAcc=(LIFE.payAcc||0)+dtReal;while(LIFE.payAcc>=3600){LIFE.payAcc-=3600;BG.paid+=sickPay(sickRate())}if(SICK.t<0)SICK.t=0}
+ if(QUIET&&SICK.t>0){SICK.t-=dtReal;LIFE.payAcc=(LIFE.payAcc||0)+dtReal;while(LIFE.payAcc>=3600){LIFE.payAcc-=3600;if(BG.paid<(LIFE.payCap||12))BG.paid+=sickPay(Math.min(sickRate(),(LIFE.payCap||12)-BG.paid))}if(SICK.t<0)SICK.t=0}
  if(QUIET)bgNeeds()}
 // a cat left hungry or thirsty for two hours falls ill; medicine then costs 2 coins an hour until the vet cures her
 function neglectSick(why){SICK.t=21600;LIFE.sneezeT=6;LIFE.payT=3600;MED.cool=240;BG.ill=1;if(!QUIET){catSound('sad');toast(why==='dirty'?'🤒 Kitty fell ill from a matted coat · medicine costs coins every hour. Grooming and a vet visit help':'🤒 Kitty fell ill from going hungry · medicine costs coins every hour. A vet visit cures her fast')}}
@@ -1294,7 +1294,7 @@ function catchUp(awaySec){
  try{if(QM.Q.tut!=='done')return}catch(e){}
  awaySec=Math.min(awaySec,30*86400);
  const b0={...stats},d0=day,h2=OTH?OTH.stats.health:0;
- BG.meals=BG.drinks=BG.trips=BG.oops=BG.paid=BG.ill=BG.hair=0;LIFE.starve=0;QUIET=true;
+ BG.meals=BG.drinks=BG.trips=BG.oops=BG.paid=BG.ill=BG.hair=0;LIFE.starve=0;LIFE.payCap=Math.max(12,Math.round(coins()*.15));QUIET=true;
  try{const hp=stats.health,step=Math.max(30,awaySec/1500);let left=awaySec;
   const t0=Date.now()-awaySec*1000;while(left>0){const d=Math.min(step,left);left-=d;const c=clockAt(t0+(awaySec-left)*1000);mins=c.mins;day=c.day;simulate(d);if(OTH){xchg(false);try{simulate(d)}finally{xchg(false)}}}syncClock()
   // a cat left alone gets hungry, thirsty and scruffy, but is never left in real danger: health stops falling at 20
